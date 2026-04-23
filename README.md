@@ -96,7 +96,46 @@ src/
 3. Vercel will auto-detect Next.js — no configuration needed
 4. Click "Deploy"
 
-Your site will be live at `https://your-project.vercel.app` within seconds.
+Your site will be live at `https://your-repo.vercel.app` within seconds.
+
+---
+
+## 🔧 Recent Changes
+
+This section documents the latest UI updates applied to the landing page.
+
+### 1. Tektur Font Applied
+
+The Tektur font from Google Fonts is now applied throughout the application for a consistent, modern look.
+
+**Files modified:**
+- `src/app/layout.tsx` — Added Tektur font via `next/font/google`
+- `src/app/globals.css` — Applied font family globally
+
+### 2. Hero Section Spacing
+
+Added extra bottom padding to the Hero section to prevent overlap with the next section.
+
+**File modified:** `src/components/sections/Hero.tsx`
+
+### 3. Social Proof Section Updated
+
+Replaced "Trusted by serious bettors" with a stats bar displaying key metrics:
+
+- **250k matches analysed**
+- **1,033 players tracked**
+- **Updated twice daily**
+
+**File modified:** `src/components/sections/SocialProof.tsx`
+
+### 4. Data Layer Section Updated
+
+- Removed the "Fatigue 72h + Δ Rank 6m" card
+- Centered elements inside the BPPI card
+
+**File modified:** `src/components/sections/MetricsShowcase.tsx`
+
+---
 
 ## 📝 License
 

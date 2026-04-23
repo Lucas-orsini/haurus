@@ -1,25 +1,23 @@
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import Navbar from '@/components/sections/Navbar'
 import Hero from '@/components/sections/Hero'
-import MetricsShowcase from '@/components/sections/MetricsShowcase'
 import SocialProof from '@/components/sections/SocialProof'
-import WhyHaurus from '@/components/sections/WhyHaurus'
-import Pricing from '@/components/sections/Pricing'
-import CTABanner from '@/components/sections/CTABanner'
+import Features from '@/components/sections/Features'
+import MetricsShowcase from '@/components/sections/MetricsShowcase'
+import Configurator from '@/components/sections/Configurator'
+import BottomCTA from '@/components/sections/BottomCTA'
+import Footer from '@/components/sections/Footer'
 
 export default function HomePage() {
   return (
-    <>
+    <main className="relative">
       <Navbar />
-      <main>
-        <Hero />
-        <SocialProof />
-        <MetricsShowcase />
-        <WhyHaurus />
-        <Pricing />
-        <CTABanner />
-      </main>
+      <Hero />
+      <SocialProof />
+      <Features />
+      <MetricsShowcase />
+      <Configurator />
+      <BottomCTA />
       <Footer />
-    </>
+    </main>
   )
 }
