@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --bg:             #09090b;
-  --surface-1:      #111113;
-  --surface-2:      #18181b;
-  --surface-3:      #1a1a1a;
+  --bg:             #050505;
+  --surface-1:      #0a0a0a;
+  --surface-2:      #080808;
+  --surface-3:      #0c0c0c;
   --border:         rgba(255,255,255,0.06);
   --border-md:      rgba(255,255,255,0.10);
   --border-hi:      rgba(255,255,255,0.14);
@@ -123,4 +123,11 @@ a[class*="h-"] {
 ::selection {
   background: rgba(242, 203, 56, 0.25);
   color: var(--text-1);
+}
+
+
+/* @keyframes restaurés par fidelity patch */
+@keyframes shine {
+from { transform: translateX(-100%); }
+to { transform: translateX(100%); }
 }
