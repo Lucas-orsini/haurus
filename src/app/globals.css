@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:             #09090b;
+  --surface-1:      #111113;
+  --surface-2:      #18181b;
+  --surface-3:      #1a1a1a;
+  --border:         rgba(255,255,255,0.06);
+  --border-md:      rgba(255,255,255,0.10);
+  --border-hi:      rgba(255,255,255,0.14);
+  --text-1:         #ffffff;
+  --text-2:         #a1a1aa;
+  --text-3:         #52525b;
+  --accent:         #F2CB38;
+  --accent-hi:      #f5d97a;
+  --accent-muted:   rgba(242,203,56,0.60);
+  --accent-glow:    rgba(242,203,56,0.18);
+  --accent-glow-sm: rgba(242,203,56,0.10);
+  --red:            #f87171;
+  --green:          #4ade80;
+  --yellow:         #facc15;
+  --orange:         #fb923c;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-tektur), system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Glass navbar */
+.glass-nav {
+  background: rgba(9, 9, 11, 0.80);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Hero glow — amber */
+.hero-glow {
+  background: radial-gradient(circle at center, rgba(242,203,56, 0.12) 0%, rgba(242,203,56, 0.04) 40%, transparent 70%);
+}
+
+/* Card gradient overlay */
+.card-gradient {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+}
+
+/* Text glow */
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Perspective container */
+.perspective-container {
+  perspective: 1000px;
+}
+
+/* Tilted card 3D effect */
+.tilted-card {
+  transform: rotateX(12deg) scale(0.94);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tilted-card:hover {
+  transform: rotateX(0deg) scale(1);
+}
+
+/* Animated shimmer border */
+.animate-border {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1;   }
+}
+
+/* Button alignment guarantee */
+button,
+a[class*="h-"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Text selection */
+::selection {
+  background: rgba(242, 203, 56, 0.25);
+  color: var(--text-1);
+}
