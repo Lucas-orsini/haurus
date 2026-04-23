@@ -6,11 +6,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        tektur: ["var(--font-tektur)", "sans-serif"],
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };

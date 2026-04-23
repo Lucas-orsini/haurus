@@ -5,24 +5,23 @@ import './globals.css'
 
 const tektur = Tektur({
   subsets: ['latin'],
-  weight: ['400', '700'],
   variable: '--font-tektur',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'BettingStats — The metrics bookmakers use. Now yours.',
+  title: 'Haurus — The metrics bookmakers use. Now yours.',
   description:
     'Access the analytical layer that professional bettors use to price ATP matches. Glicko-2, p_serve, BPPI, and more.',
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='18' font-weight='700' fill='%23F2CB38'>B</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2309090b'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='18' font-weight='700' fill='%23F2CB38'>H</text></svg>",
   },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`scroll-smooth antialiased ${tektur.variable}`}>
-      <body className="font-sans bg-[var(--bg)] text-[var(--text-1)] min-h-screen">
+    <html lang="en" className="scroll-smooth antialiased">
+      <body className={`${tektur.variable} font-sans bg-[var(--bg)] text-[var(--text-1)] min-h-screen`}>
         {children}
 
         {/* Tailwind CDN for template compatibility */}

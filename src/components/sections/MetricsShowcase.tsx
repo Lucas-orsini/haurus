@@ -461,16 +461,16 @@ export default function MetricsShowcase() {
           </BentoCard>
 
           <BentoCard>
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(242,203,56,0.08)] flex items-center justify-center border border-[rgba(242,203,56,0.15)]">
                 <Target size={16} className="text-[var(--accent)]" strokeWidth={1.5} />
               </div>
-              <div className="text-center">
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight text-center">BPPI</h3>
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">BPPI</h3>
                 <p className="text-[11px] text-[var(--text-3)]">Break Point Pressure Index</p>
               </div>
             </div>
-            <div className="mt-auto flex flex-col items-center justify-center flex-1 text-center">
+            <div className="mt-auto flex flex-col items-center justify-center pt-3">
               <div className="text-4xl font-bold text-[var(--accent)] font-mono">
                 <AnimatedCounter target={847} duration={1400} />
               </div>

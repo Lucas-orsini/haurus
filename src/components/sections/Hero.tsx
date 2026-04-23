@@ -80,7 +80,7 @@ export default function Hero() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 pb-12 sm:pb-16"
+          className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16"
         >
           {/* Badge */}
           <motion.div
