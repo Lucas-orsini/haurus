@@ -48,7 +48,7 @@ export default function Navbar() {
             href="#"
             className="group relative px-4 py-1.5 rounded-full text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] transition-all border border-[var(--border-md)] hover:border-[var(--accent)] hover:bg-[var(--accent-glow)] overflow-hidden"
           >
-            <span className="relative z-10 flex items-center gap-2">
+            <span className="relative z-10 flex items-center justify-center gap-2">
               Get access
               <svg
                 width="16"

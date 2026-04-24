@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "metrics": "Métriques",
+    "pricing": "Tarifs",
+    "about": "À propos",
+    "getAccess": "Accéder"
+  },
+  "hero": {
+    "badge": "BÊTA DISPONIBLE",
+    "headline_part1": "Les métriques que les ",
+    "headline_accent": "bookmakers",
+    "headline_part2": " utilisent.",
+    "headline_final": "Maintenant votres.",
+    "subheadline": "Accédez aux données qui servent à évaluer les cotes. Pas de tips. Juste des métriques vérifiées.",
+    "cta_start": "Commencer",
+    "cta_view": "Voir les métriques",
+    "socialProof": "800+ parieurs · 12 métriques ATP · Mis à jour après chaque match"
+  },
+  "metrics": {
+    "tag": "Couche de données",
+    "title": "La couche analytique",
+    "desc": "Huit métriques. Chacune est une dimension de la performance qu'utilise le marché pour fixer les cotes.",
+    "glicko2_label": "Classement par surface · Intervalle de confiance",
+    "pserve_label": "Points gagnés au service et retour",
+    "tsd_label": "Tiebreak Stress Data · 20 derniers",
+    "bppi_label": "score de pression · moyenne 20 derniers matchs",
+    "momentum_label": "Différentiel de momentum · Pondéré dans le temps"
+  },
+  "pricing": {
+    "tag": "Tarifs",
+    "title": "Des tarifs simples pour une analyse sérieuse",
+    "desc": "Pas de paliers masqués derrière des paywalls. Chaque plan donne accès à de vraies données.",
+    "mostPopular": "Le plus populaire",
+    "perMonth": "/mois",
+    "cta_getStarted": "Commencer",
+    "cta_goPro": "Passer Pro"
+  },
+  "socialProof": {
+    "matches": "matchs analysés",
+    "players": "joueurs suivis",
+    "updated": "mis à jour"
+  },
+  "why": {
+    "tag": "Pas un service de tips",
+    "title": "Conçu pour l'analyse, pas les conseils",
+    "desc": "Haurus est une plateforme de données. On expose les chiffres. Ce que vous en faites est votre edge."
+  },
+  "cta": {
+    "headline": "Prêt à analyser comme un bookmaker ?",
+    "subline": "Rejoignez les parieurs qui misent sur les données, pas sur les intuitions.",
+    "button": "Commencer maintenant",
+    "footnote": "No picks. No tipsters. Just data."
+  },
+  "footer": {
+    "brand_desc": "La couche analytique que les parieurs sérieux utilisent pour évaluer les matchs ATP. Data-driven. No predictions.",
+    "tagline": "Not tips. Data.",
+    "copyright": "© 2024 Haurus. Tous droits réservés.",
+    "disclaimer": "Haurus fournit uniquement des données statistiques. Aucun pronostic ni conseil de pari. Toutes les données sont à titre informatif.",
+    "product": "Produit",
+    "legal": "Mentions légales",
+    "company": "Entreprise",
+    "links_product": ["Métriques", "Tarifs", "Docs API", "Changelog"],
+    "links_legal": ["Confidentialité", "CGU", "Avertissement"],
+    "links_company": ["À propos", "Contact", "Blog"]
+  }
+}
