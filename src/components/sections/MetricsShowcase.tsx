@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, useAnimationFrame, type Variants } from 'framer-motion'
-import { BarChart3, Activity, Target, TrendingUp, Clock, Zap } from 'lucide-react'
+import { BarChart3, Activity, Target, TrendingUp, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // ── Framer Motion Variants (type-safe, no string ease) ──────────────────────
@@ -293,55 +293,6 @@ function TrendLine() {
   )
 }
 
-// ── Double Indicator (Fatigue + Rank Delta) ────────────────────────────────────
-
-function DoubleIndicator() {
-  const [fatigue, setFatigue] = useState(0)
-  const [rankDelta, setRankDelta] = useState(0)
-
-  useEffect(() => {
-    const tf = setTimeout(() => setFatigue(67), 400)
-    const tr = setTimeout(() => setRankDelta(-12), 600)
-    return () => { clearTimeout(tf); clearTimeout(tr) }
-  }, [])
-
-  return (
-    <div className="mt-2 flex gap-4 justify-center">
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="relative w-12 h-12">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 48 48">
-            <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-            <motion.circle
-              cx="24" cy="24" r="20" fill="none"
-              stroke="#f97316"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 20}
-              initial={{ strokeDashoffset: 2 * Math.PI * 20 }}
-              animate={{ strokeDashoffset: 2 * Math.PI * 20 * (1 - fatigue / 100) }}
-              transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[10px] font-mono font-semibold">{fatigue}</span>
-          </div>
-        </div>
-        <span className="text-[10px] text-[var(--text-3)] text-center">Fatigue<br />72h</span>
-      </div>
-
-      <div className="w-px bg-[var(--border-md)] self-stretch" />
-
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="flex items-center gap-1">
-          <TrendingUp size={14} className="text-[var(--green)]" />
-          <span className="text-lg font-mono font-bold text-[var(--green)]">{rankDelta > 0 ? '+' : ''}{rankDelta}</span>
-        </div>
-        <span className="text-[10px] text-[var(--text-3)] text-center">Rank<br />6 months</span>
-      </div>
-    </div>
-  )
-}
-
 // ── Bento Card with 3D tilt ────────────────────────────────────────────────────
 
 function BentoCard({
@@ -470,7 +421,7 @@ export default function MetricsShowcase() {
                 <p className="text-[11px] text-[var(--text-3)]">Break Point Pressure Index</p>
               </div>
             </div>
-            <div className="mt-auto flex flex-col items-center justify-center pt-3">
+            <div className="mt-auto flex flex-col items-center justify-center pt-4">
               <div className="text-4xl font-bold text-[var(--accent)] font-mono">
                 <AnimatedCounter target={847} duration={1400} />
               </div>
@@ -489,20 +440,6 @@ export default function MetricsShowcase() {
               </div>
             </div>
             <TrendLine />
-          </BentoCard>
-
-          {/* Row 3: Fatigue + Rank Delta */}
-          <BentoCard className="md:col-span-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[rgba(249,115,22,0.08)] flex items-center justify-center border border-[rgba(249,115,22,0.15)]">
-                <Clock size={16} className="text-orange-400" strokeWidth={1.5} />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">Fatigue 72h + Δ Rank 6m</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Recovery index · Ranking differential · Combined context signal</p>
-              </div>
-            </div>
-            <DoubleIndicator />
           </BentoCard>
         </motion.div>
       </div>
