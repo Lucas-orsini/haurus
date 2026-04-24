@@ -298,14 +298,21 @@ function TrendLine() {
 function BentoCard({
   children,
   className,
+  glowColor,
 }: {
   children: React.ReactNode
   className?: string
+  glowColor?: string
 }) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const rotateX = useTransform(y, [-50, 50], [2, -2])
   const rotateY = useTransform(x, [-50, 50], [-2, 2])
+
+  const defaultGlow = 'rgba(242,203,56,0.04)'
+  const hoverGradient = glowColor
+    ? `linear-gradient(135deg, ${glowColor}08 0%, transparent 60%)`
+    : defaultGlow
 
   return (
     <motion.div
@@ -326,7 +333,7 @@ function BentoCard({
     >
       {/* Gradient hover overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-        style={{ background: 'linear-gradient(135deg, rgba(242,203,56,0.04) 0%, transparent 60%)' }} />
+        style={{ background: hoverGradient }} />
       <div style={{ transform: 'translateZ(20px)' }} className="flex flex-col gap-2 flex-1 relative z-10">
         {children}
       </div>
@@ -368,7 +375,7 @@ export default function MetricsShowcase() {
           className="grid grid-cols-1 md:grid-cols-3 auto-rows-fr gap-4 [grid-auto-flow:dense]"
         >
           {/* Row 1: Glicko-2 (2 cols) + p_serve/return */}
-          <BentoCard className="md:col-span-2 border-b-2 border-b-[rgba(242,203,56,0.4)]">
+          <BentoCard glowColor="#F2CB38" className="md:col-span-2 border-b-2 border-b-[rgba(242,203,56,0.4)]">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(242,203,56,0.08)] flex items-center justify-center border border-[rgba(242,203,56,0.15)]">
                 <BarChart3 size={16} className="text-[var(--accent)]" strokeWidth={1.5} />
@@ -381,7 +388,7 @@ export default function MetricsShowcase() {
             <GlickoChart />
           </BentoCard>
 
-          <BentoCard>
+          <BentoCard glowColor="#3b82f6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(59,130,246,0.08)] flex items-center justify-center border border-[rgba(59,130,246,0.15)]">
                 <Activity size={16} className="text-blue-400" strokeWidth={1.5} />
@@ -398,7 +405,7 @@ export default function MetricsShowcase() {
           </BentoCard>
 
           {/* Row 2: TSD + BPPI + Momentum */}
-          <BentoCard>
+          <BentoCard glowColor="#a855f7">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(168,85,247,0.08)] flex items-center justify-center border border-[rgba(168,85,247,0.15)]">
                 <Zap size={16} className="text-purple-400" strokeWidth={1.5} />
@@ -411,7 +418,7 @@ export default function MetricsShowcase() {
             <Sparkline />
           </BentoCard>
 
-          <BentoCard>
+          <BentoCard glowColor="#F2CB38">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(242,203,56,0.08)] flex items-center justify-center border border-[rgba(242,203,56,0.15)]">
                 <Target size={16} className="text-[var(--accent)]" strokeWidth={1.5} />
@@ -429,7 +436,7 @@ export default function MetricsShowcase() {
             </div>
           </BentoCard>
 
-          <BentoCard>
+          <BentoCard glowColor="#22c55e">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[rgba(34,197,94,0.08)] flex items-center justify-center border border-[rgba(34,197,94,0.15)]">
                 <TrendingUp size={16} className="text-green-400" strokeWidth={1.5} />

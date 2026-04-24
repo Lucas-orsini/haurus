@@ -19,6 +19,7 @@ const points = [
     iconColor: 'text-[var(--accent)]',
     iconBg: 'bg-[rgba(242,203,56,0.08)]',
     iconBorder: 'border-[rgba(242,203,56,0.15)]',
+    glowColor: '#F2CB38',
     title: 'The same layer as the books',
     desc: 'Bookmakers price odds using Glicko-2, serve/return efficiency, and pressure indices. Haurus gives you that exact analytical layer.',
   },
@@ -27,6 +28,7 @@ const points = [
     iconColor: 'text-blue-400',
     iconBg: 'bg-[rgba(59,130,246,0.08)]',
     iconBorder: 'border-[rgba(59,130,246,0.15)]',
+    glowColor: '#3b82f6',
     title: 'No predictions. No tips.',
     desc: "We don't tell you who to bet on. We give you the raw metrics so you can form your own view — the way analysts do.",
   },
@@ -35,6 +37,7 @@ const points = [
     iconColor: 'text-purple-400',
     iconBg: 'bg-[rgba(168,85,247,0.08)]',
     iconBorder: 'border-[rgba(168,85,247,0.15)]',
+    glowColor: '#a855f7',
     title: 'Context over gut feel',
     desc: 'Surface-adjusted ratings, fatigue signals, and momentum decay models. Numbers over intuition. Always.',
   },
@@ -79,7 +82,7 @@ export default function WhyHaurus() {
               >
                 {/* Subtle gradient on hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                  style={{ background: 'linear-gradient(135deg, rgba(242,203,56,0.03) 0%, transparent 60%)' }} />
+                  style={{ background: `linear-gradient(135deg, ${p.glowColor}08 0%, transparent 60%)` }} />
                 <div className="p-8 relative z-10">
                   <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center mb-6 border', p.iconBg, p.iconBorder)}>
                     <Icon size={20} className={p.iconColor} strokeWidth={1.5} />
