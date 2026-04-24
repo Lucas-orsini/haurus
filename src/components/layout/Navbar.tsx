@@ -15,7 +15,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-14 glass-nav">
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-center gap-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-6 h-6 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
@@ -27,7 +27,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map(({ label, href }) => (
             <a
               key={label}
