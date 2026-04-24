@@ -22,13 +22,13 @@ export default function CTABanner() {
           className="flex flex-col items-center gap-6"
         >
           <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-[var(--text-1)] leading-tight">
-            Ready to analyze like a bookmaker?
+            Prêt à analyser comme un bookmaker&nbsp;?
           </h2>
           <p className="text-[var(--text-2)] max-w-md text-sm leading-relaxed">
-            Join the bettors who rely on data, not intuition.
+            Rejoignez les parieurs qui misent sur les données, pas sur les intuitions.
           </p>
           <button className="h-12 px-8 rounded-full bg-[var(--accent)] text-black text-sm font-semibold transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2 shadow-[0_0_28px_rgba(242,203,56,0.3)] group">
-            Start now
+            Commencer maintenant
             <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
           </button>
           <p className="text-xs text-[var(--text-3)] italic">

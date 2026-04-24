@@ -238,7 +238,7 @@ export default function Hero() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <div className="px-3 py-1.5 rounded border border-[var(--border-md)] bg-[var(--surface-1)] text-xs text-[var(--text-2)] flex items-center justify-center gap-2">
+                    <div className="px-3 py-1.5 rounded border border-[var(--border-md)] bg-[var(--surface-1)] text-xs text-[var(--text-2)] flex items-center gap-2">
                       Last 30 Days
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polyline points="6,9 12,15 18,9" />

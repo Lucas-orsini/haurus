@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const footerLinks: Record<string, string[]> = {
+const footerLinks = {
   Product: ['Metrics', 'Pricing', 'API Docs', 'Changelog'],
   Legal: ['Privacy Policy', 'Terms of Service', 'Disclaimer'],
   Company: ['About', 'Contact', 'Blog'],
@@ -32,13 +32,13 @@ export default function Footer() {
           </div>
 
           {/* Link columns */}
-          {(Object.entries(footerLinks) as Array<[string, string[]]>).map(([title, links]) => (
+          {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
               <h4 className="text-xs font-semibold text-[var(--text-2)] uppercase tracking-wider mb-4">
                 {title}
               </h4>
               <ul className="space-y-3">
-                {links.map((link: string) => (
+                {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
