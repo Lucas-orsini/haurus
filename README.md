@@ -59,25 +59,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 This project does not require any environment variables. The internationalization system uses next-intl with local JSON translation files.
 
-## 📁 Project Structure
-
-```
-haurus/
-├── src/
-│   ├── app/                    # Next.js App Router pages and layouts
-│   ├── components/
-│   │   └── layout/            # Layout components
-│   │       ├── Navbar.tsx      # Main navigation with language switcher
-│   │       └── LanguageSwitcher.tsx  # EN/FR toggle button
-│   ├── messages/               # Translation files
-│   │   ├── en.json             # English translations
-│   │   └── fr.json             # French translations
-│   └── lib/                    # Utility functions and helpers
-├── public/                     # Static assets
-├── tailwind.config.ts          # Tailwind CSS configuration
-├── next.config.mjs             # Next.js configuration
-└── package.json                # Dependencies and scripts
-```
+---
 
 ## 🌍 Internationalization
 
@@ -85,7 +67,7 @@ The landing page is fully internationalized with **English** and **French** supp
 
 ### How It Works
 
-- **Language Switcher**: A toggle button (EN / FR) in the navbar lets users switch languages instantly without page reload
+- **Language Switcher**: A toggle button (EN / FR) in the navbar lets users switch languages instantly
 - **Persistence**: The selected language is saved to `localStorage` — it persists across sessions
 - **Auto-Detection**: On first visit, the language is automatically detected from the browser's settings
 - **Supported Locales**: `en` (English) and `fr` (French)
@@ -114,38 +96,80 @@ Example structure:
   "Navbar": {
     "features": "Features",
     "pricing": "Pricing",
-    "subscribe": "Subscribe"
+    "cta": "Get Started"
   },
   "Hero": {
-    "title": "Welcome to Haurus"
+    "badge": "BETA AVAILABLE",
+    "headline": "The metrics bookmakers use. Now yours."
   }
 }
 ```
 
 ### Adding a New Language
 
-1. Create a new JSON file in `src/messages/` (e.g., `es.json` for Spanish)
-2. Copy the structure from `en.json` and translate all values
-3. Add the locale to the configuration in `i18n.ts` or `i18n/request.ts`
-4. Update the language switcher component if needed
+1. Create a new translation file: `src/messages/[LOCALE].json`
+2. Update `src/i18n/config.ts` to include the new locale
+3. Add the locale to `middleware.ts` root file
 
-## 🚀 Deploy to Vercel
+## 📁 Project Structure
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+```
+src/
+├── app/
+│   ├── globals.css      # Global styles, Tailwind imports, font-family on body
+│   ├── layout.tsx       # Root layout with Tektur font, metadata, and LocaleProvider
+│   └── page.tsx         # Home page composing all sections
+├── components/
+│   ├── layout/
+│   │   ├── Navbar.tsx        # Top navigation bar with language switcher (EN/FR)
+│   │   └── Footer.tsx        # Site footer with translated legal disclaimer
+│   ├── providers/
+│   │   └── LocaleProvider.tsx # Client-side locale context provider
+│   ├── sections/
+│   │   ├── Hero.tsx           # Hero section with BETA AVAILABLE badge (translated)
+│   │   ├── MetricsShowcase.tsx # Available metrics display (translated)
+│   │   ├── WhyHaurus.tsx      # Data layer & tipster service differentiators (translated)
+│   │   ├── SocialProof.tsx    # Testimonials or credibility elements (translated)
+│   │   ├── Pricing.tsx        # Subscription tiers display (translated)
+│   │   └── CTABanner.tsx      # Call-to-action banner (translated)
+│   └── ui/
+│       └── Button.tsx   # Reusable button component with variants
+├── i18n/
+│   ├── config.ts        # Locale configuration (supported locales list)
+│   └── request.ts       # Server-side request configuration for next-intl
+├── messages/
+│   ├── en.json          # English translations for all components
+│   └── fr.json          # French translations for all components
+├── lib/
+│   └── utils.ts        # Utility functions (cn helper for Tailwind)
+└── middleware.ts       # Middleware for locale detection and routing
+public/
+└── (static assets)
+```
 
-### Step by Step
+### Key i18n Files
 
-1. **Push your code to GitHub** — Ensure your repository is public or connected to Vercel
+| File | Purpose |
+|------|---------|
+| `src/i18n/config.ts` | Defines supported locales (`en`, `fr`) |
+| `src/i18n/request.ts` | Server-side request config for next-intl |
+| `src/messages/en.json` | All English text (headlines, CTAs, labels, errors, etc.) |
+| `src/messages/fr.json` | All French text (headlines, CTAs, labels, errors, etc.) |
+| `middleware.ts` | Intercepts requests, detects locale, redirects if needed |
 
-2. **Import to Vercel** — Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+## 🔤 Typography
 
-3. **Import your repository** — Select your GitHub repo from the list
+Haurus uses **Tektur** as its sole typeface, loaded via `next/font/google` for optimal performance. The font is configured in `src/app/layout.tsx` and applied globally to the `<body>` element via CSS variable.
 
-4. **Configure your project** — Vercel auto-detects Next.js settings. Click "Deploy"
+**Font configuration** (`src/app/layout.tsx`):
+```typescript
+import { Tektur } from 'next/font/google'
 
-5. **That's it!** — Your site is live. Vercel will automatically rebuild when you push changes to your repository.
-
-> 💡 **Note**: This project does not require any environment variables, so no additional configuration is needed.
+const tektur = Tektur({
+  subsets: ['latin'],
+  variable: '--font-tektur',
+})
+```
 
 ## 📝 License
 
