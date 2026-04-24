@@ -182,9 +182,9 @@ function Sparkline() {
   })
 
   const lastVal = (() => {
-    const points = [22, 18, 25, 15, 28, 20, 32, 24, 18, 26, 14, 22, 30, 26, 19, 23, 17, 28, 22, 20]
-    const idx = Math.min(displayed - 1, points.length - 1)
-    return points[Math.max(0, idx)]
+    const pts = [22, 18, 25, 15, 28, 20, 32, 24, 18, 26, 14, 22, 30, 26, 19, 23, 17, 28, 22, 20]
+    const idx = Math.min(displayed - 1, pts.length - 1)
+    return pts[Math.max(0, idx)]
   })()
 
   return (

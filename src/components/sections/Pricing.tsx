@@ -79,7 +79,7 @@ export default function Pricing() {
           Simple pricing for serious analysis
         </h2>
         <p className="text-[var(--text-2)] max-w-md mx-auto text-sm leading-relaxed">
-          No tiers hidden behind paywalls. Every plan gives you real data. Upgrade when you need more depth.
+          No tiers hidden behind paywalls. Every plan gives you real data.
         </p>
       </motion.div>
 
