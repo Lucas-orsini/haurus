@@ -11,6 +11,7 @@ The metrics bookmakers use. Now yours.
 - **Ranking Trends** — 6-month rank delta (Δ Rank 6m) for form assessment
 - **Three Subscription Tiers** — Starter (€20), Analyst (€50), Pro (€79)
 - **Dark Analytics Interface** — Professional, distraction-free design optimized for data analysis
+- **Dynamic Card Hover Effects** — Cards feature luminous glow effects that match the icon color on hover for "Data Layer" and "Not a Tipster Service" sections
 
 ## 🛠️ Tech Stack
 
@@ -67,6 +68,7 @@ src/
 │   ├── sections/
 │   │   ├── Hero.tsx           # Hero section with BETA AVAILABLE badge
 │   │   ├── MetricsShowcase.tsx # Available metrics display
+│   │   ├── WhyHaurus.tsx      # Data layer & tipster service differentiators with color-matched glow effects
 │   │   ├── SocialProof.tsx    # Testimonials or credibility elements
 │   │   └── Pricing.tsx        # Subscription tiers display
 │   └── ui/
@@ -99,20 +101,21 @@ body {
 }
 ```
 
-All UI elements — headings, paragraphs, buttons, labels, inputs, and navigation — inherit Tektur automatically.
+All UI elements — headings, paragraphs, buttons, labels, inputs, and navigation — inherit Tektur
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Steps
+### Step by step:
 
-1. Push your code to a GitHub repository
-2. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-3. Import your repository from GitHub
-4. Vercel will automatically detect Next.js and deploy
+1. **Import your repository** — Click the button above or go to [vercel.com/new](https://vercel.com/new) and import your GitHub repo
+2. **Configure project** — Vercel will auto-detect Next.js settings
+3. **Add environment variables** — If you add any (API keys, etc.), go to **Settings > Environment Variables** and add each key-value pair
+4. **Deploy** — Click **Deploy** and wait for the build to complete
+5. **Your site is live** — You'll get a `.vercel.app` URL, or connect a custom domain in **Settings > Domains**
 
-No environment variables are required for this landing page — all configuration is handled inline.
+> ⚠️ **Reminder**: Always add all environment variables from your `.env.local` to Vercel before deploying, otherwise your app may crash.
 
 ## 📝 License
 
