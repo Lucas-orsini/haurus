@@ -86,11 +86,11 @@ export default function Hero() {
           <motion.div
             custom={0}
             variants={fadeInUp}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--accent-muted)] bg-[var(--accent-glow-sm)] mb-8 backdrop-blur-sm"
+            className="mt-12 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--accent-muted)] bg-[var(--accent-glow-sm)] mb-8 backdrop-blur-sm"
           >
             <span className="flex h-2 w-2 rounded-full bg-[var(--accent)] animate-pulse" />
             <span className="text-xs font-medium text-[var(--accent-hi)] tracking-wide uppercase">
-              For serious bettors
+              BETA AVAILABLE
             </span>
           </motion.div>
 

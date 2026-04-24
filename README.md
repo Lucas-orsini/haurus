@@ -42,13 +42,7 @@ cd haurus
 npm install
 ```
 
-### 3. Set up environment variables
-
-This landing page does not require any environment variables to run locally. All configuration is handled inline.
-
-If you deploy to Vercel, no additional env vars are needed for the landing page.
-
-### 4. Run the development server
+### 3. Run the development server
 
 ```bash
 npm run dev
@@ -57,6 +51,31 @@ npm run dev
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 > 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac)
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── globals.css      # Global styles, Tailwind imports, font-family on body
+│   ├── layout.tsx       # Root layout with Tektur font and metadata
+│   └── page.tsx         # Home page composing all sections
+├── components/
+│   ├── layout/
+│   │   ├── Navbar.tsx   # Top navigation bar (centered horizontally)
+│   │   └── Footer.tsx   # Site footer with legal disclaimer
+│   ├── sections/
+│   │   ├── Hero.tsx           # Hero section with BETA AVAILABLE badge
+│   │   ├── MetricsShowcase.tsx # Available metrics display
+│   │   ├── SocialProof.tsx    # Testimonials or credibility elements
+│   │   └── Pricing.tsx        # Subscription tiers display
+│   └── ui/
+│       └── Button.tsx   # Reusable button component with variants
+├── lib/
+│   └── utils.ts        # Utility functions (cn helper for Tailwind)
+└── public/
+    └── (static assets)
+```
 
 ## 🔤 Typography
 
@@ -82,43 +101,18 @@ body {
 
 All UI elements — headings, paragraphs, buttons, labels, inputs, and navigation — inherit Tektur automatically.
 
-## 📁 Project Structure
-
-```
-src/
-├── app/
-│   ├── globals.css      # Global styles, Tailwind imports, font-family on body
-│   ├── layout.tsx       # Root layout with Tektur font and metadata
-│   └── page.tsx         # Home page composing all sections
-├── components/
-│   ├── layout/
-│   │   ├── Navbar.tsx   # Top navigation bar
-│   │   └── Footer.tsx   # Site footer with legal disclaimer
-│   ├── sections/
-│   │   ├── Hero.tsx           # Hero section with tagline
-│   │   ├── MetricsShowcase.tsx # Available metrics display
-│   │   ├── SocialProof.tsx    # Testimonials or credibility elements
-│   │   ├── WhyHaurus.tsx      # Why choose Haurus section
-│   │   ├── Pricing.tsx        # Pricing tiers (Starter/Analyst/Pro)
-│   │   └── CTABanner.tsx      # Call-to-action banner
-│   └── ui/
-│       ├── Button.tsx        # Reusable button component
-│       ├── MetricCard.tsx    # Individual metric display card
-│       └── PricingCard.tsx   # Pricing plan card
-└── lib/
-    └── utils.ts       # Utility functions (cn helper)
-```
-
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step:
+### Steps
 
-1. Click the "Deploy with Vercel" button above
-2. Import your GitHub repository
-3. Vercel will auto-detect Next.js — no configuration needed
-4. Click "Deploy"
+1. Push your code to a GitHub repository
+2. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+3. Import your repository from GitHub
+4. Vercel will automatically detect Next.js and deploy
+
+No environment variables are required for this landing page — all configuration is handled inline.
 
 ## 📝 License
 
