@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { UserPlus, User, Mail, Lock } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateName, validateEmail, validatePassword, mockSignup } from '@/lib/auth'
+import { validateName, validateEmail, validatePassword, signup } from '@/lib/auth'
 
 type FormState = 'idle' | 'loading' | 'error'
 
@@ -55,11 +55,13 @@ export default function SignupPage() {
     setFormState('loading')
 
     try {
-      await mockSignup(name, email, password)
+      await signup(name, email, password)
       router.push('/')
-    } catch {
+    } catch (err) {
       setFormState('error')
-      setGlobalError('Une erreur est survenue. Veuillez réessayer.')
+      setGlobalError(
+        err instanceof Error ? err.message : 'Une erreur est survenue.'
+      )
     }
   }
 
@@ -143,7 +145,7 @@ export default function SignupPage() {
           className="w-full mt-1"
         >
           {formState === 'loading' ? (
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
               Création...
             </span>
