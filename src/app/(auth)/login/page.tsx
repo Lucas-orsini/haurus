@@ -8,7 +8,7 @@ import { LogIn } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateEmail, validatePassword, mockLogin } from '@/lib/auth'
+import { validateEmail, validatePassword, login } from '@/lib/auth'
 
 type FormState = 'idle' | 'loading' | 'error'
 
@@ -37,11 +37,11 @@ export default function LoginPage() {
     setFormState('loading')
 
     try {
-      await mockLogin(email, password)
+      await login(email, password)
       router.push('/')
-    } catch {
+    } catch (err) {
       setFormState('error')
-      setGlobalError('Identifiants incorrects. Veuillez réessayer.')
+      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     }
   }
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
           className="w-full mt-1"
         >
           {formState === 'loading' ? (
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
               Connexion...
             </span>

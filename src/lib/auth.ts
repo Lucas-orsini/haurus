@@ -1,7 +1,12 @@
 /**
- * Mock authentication utilities — NO REAL NETWORK CALLS.
- * Session stored in localStorage, consumed by LoginForm/SignupForm.
+ * Authentication utilities — Supabase-backed.
+ * Session is stored in HTTP-only cookies via @supabase/ssr (no localStorage).
+ *
+ * Client Components use createClient() from @/lib/supabase/client.
+ * Server Components use createClient() from @/lib/supabase/server.
  */
+
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
 
 // ── Shared type ────────────────────────────────────────────────────────────────
 
@@ -11,11 +16,7 @@ export interface AuthUser {
   email: string
 }
 
-// ── Session key ────────────────────────────────────────────────────────────────
-
-const SESSION_KEY = 'haurus:session'
-
-// ── Validation helpers ─────────────────────────────────────────────────────────
+// ── Validation helpers (unchanged — no Supabase dependency) ───────────────────
 
 /**
  * Validate email format.
@@ -65,88 +66,106 @@ export function validateName(name: string): string | null {
   return null
 }
 
-// ── Session helpers ────────────────────────────────────────────────────────────
+// ── Session helpers ───────────────────────────────────────────────────────────
 
-/** Inflate a plain object to an AuthUser (avoids returning raw JSON) */
-function inflateUser(raw: { id: string; name: string; email: string }): AuthUser {
+/**
+ * Read the current session from the browser Supabase client.
+ * Returns AuthUser if session exists and is valid, null otherwise.
+ * Safe to call from Client Components only.
+ */
+export async function getSession(): Promise<AuthUser | null> {
+  const supabase = createBrowserClient()
+  if (!supabase) return null
+
+  const { data } = await supabase.auth.getSession()
+  const session = data.session
+
+  if (!session?.user) return null
+
+  const user = session.user
   return {
-    id: String(raw.id ?? ''),
-    name: String(raw.name ?? '').trim(),
-    email: String(raw.email ?? '').trim().toLowerCase(),
+    id: user.id,
+    name: user.user_metadata?.name ?? '',
+    email: user.email ?? '',
   }
 }
 
+// ── Auth actions (Supabase-backed) ────────────────────────────────────────────
+
 /**
- * Read the current session from localStorage.
- * @returns AuthUser if session exists and is valid, null otherwise.
+ * Sign in with email + password via Supabase Auth.
+ * Session is persisted in HTTP-only cookies by the SSR client.
+ * @throws Error with user-friendly message on failure.
  */
-export function getSession(): AuthUser | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object') return null
-    return inflateUser(parsed)
-  } catch {
-    return null
+export async function login(email: string, password: string): Promise<AuthUser> {
+  const supabase = createBrowserClient()
+  if (!supabase) {
+    throw new Error('Service temporarily unavailable. Please refresh and try again.')
   }
-}
 
-/**
- * Persist a user session to localStorage.
- */
-function setSession(user: AuthUser): void {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(SESSION_KEY, JSON.stringify(user))
-}
-
-/**
- * Remove the session from localStorage.
- */
-export function clearSession(): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem(SESSION_KEY)
-}
-
-// ── Mock auth actions ──────────────────────────────────────────────────────────
-
-/** Mock login — validates inputs, stores session, returns user or throws. */
-export function mockLogin(email: string, password: string): AuthUser {
-  const emailError = validateEmail(email)
-  if (emailError) throw new Error(emailError)
-
-  const passwordError = validatePassword(password)
-  if (passwordError) throw new Error(passwordError)
-
-  // Simulate a mock user — replace with real auth call when backend is connected.
-  const user: AuthUser = {
-    id: crypto.randomUUID(),
-    name: email.trim().split('@')[0],
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim().toLowerCase(),
+    password,
+  })
+
+  if (error) {
+    throw new Error(error.message)
   }
 
-  setSession(user)
-  return user
+  const user = data.user
+  return {
+    id: user.id,
+    name: user.user_metadata?.name ?? '',
+    email: user.email ?? '',
+  }
 }
 
-/** Mock signup — validates inputs, stores session, returns user or throws. */
-export function mockSignup(name: string, email: string, password: string): AuthUser {
-  const nameError = validateName(name)
-  if (nameError) throw new Error(nameError)
-
-  const emailError = validateEmail(email)
-  if (emailError) throw new Error(emailError)
-
-  const passwordError = validatePassword(password)
-  if (passwordError) throw new Error(passwordError)
-
-  const user: AuthUser = {
-    id: crypto.randomUUID(),
-    name: name.trim(),
-    email: email.trim().toLowerCase(),
+/**
+ * Sign up with email + password + name via Supabase Auth.
+ * @throws Error on validation failure, email already taken, or network error.
+ */
+export async function signup(
+  name: string,
+  email: string,
+  password: string
+): Promise<AuthUser> {
+  const supabase = createBrowserClient()
+  if (!supabase) {
+    throw new Error('Service temporarily unavailable. Please refresh and try again.')
   }
 
-  setSession(user)
-  return user
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: {
+      data: {
+        name: name.trim(),
+      },
+    },
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  if (!data.user) {
+    throw new Error('Signup failed. Please try again.')
+  }
+
+  const user = data.user
+  return {
+    id: user.id,
+    name: user.user_metadata?.name ?? '',
+    email: user.email ?? '',
+  }
+}
+
+/**
+ * Sign out the current user — clears the session cookie.
+ */
+export async function signOut(): Promise<void> {
+  const supabase = createBrowserClient()
+  if (!supabase) return
+
+  await supabase.auth.signOut()
 }
