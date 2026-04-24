@@ -12,6 +12,7 @@ The metrics bookmakers use. Now yours.
 - **Three Subscription Tiers** — Starter (€20), Analyst (€50), Pro (€79)
 - **Dark Analytics Interface** — Professional, distraction-free design optimized for data analysis
 - **Dynamic Card Hover Effects** — Cards feature luminous glow effects that match the icon color on hover for "Data Layer" and "Not a Tipster Service" sections
+- **Secure Authentication** — User account creation and login with email/password
 
 ## 🛠️ Tech Stack
 
@@ -53,28 +54,53 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 > 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac)
 
+## 🔐 Authentication
+
+Haurus includes user authentication pages for account management.
+
+### Login
+
+Access the login page at `/login` or click the sign-in button in the navbar.
+
+- Enter your email and password
+- Click "Sign In" to access your account
+- Use the "Forgot password?" link if needed (coming soon)
+
+### Sign Up
+
+Create a new account at `/signup` or click the "Get Started" button in the navbar.
+
+- Enter your full name
+- Enter your email address
+- Choose a secure password (minimum 8 characters)
+- Click "Create Account" to register
+
 ## 📁 Project Structure
 
 ```
 src/
 ├── app/
-│   ├── globals.css      # Global styles, Tailwind imports, font-family on body
-│   ├── layout.tsx       # Root layout with Tektur font and metadata
-│   └── page.tsx         # Home page composing all sections
+│   ├── globals.css          # Global styles, Tailwind imports, font-family on body
+│   ├── layout.tsx           # Root layout with Tektur font and metadata
+│   ├── page.tsx             # Home page composing all sections
+│   ├── login/
+│   │   └── page.tsx         # Login page for existing users
+│   └── signup/
+│       └── page.tsx         # Sign up page for new users
 ├── components/
 │   ├── layout/
-│   │   ├── Navbar.tsx   # Top navigation bar with three-zone flexbox layout (logo left, nav links centered, CTA right)
-│   │   └── Footer.tsx   # Site footer with legal disclaimer
+│   │   ├── Navbar.tsx       # Top navigation bar with auth buttons (Login/Sign Up)
+│   │   └── Footer.tsx       # Site footer with legal disclaimer
 │   ├── sections/
-│   │   ├── Hero.tsx           # Hero section with BETA AVAILABLE badge
-│   │   ├── MetricsShowcase.tsx # Available metrics display
-│   │   ├── WhyHaurus.tsx      # Data layer & tipster service differentiators with color-matched glow effects
-│   │   ├── SocialProof.tsx    # Testimonials or credibility elements
-│   │   └── Pricing.tsx        # Subscription tiers display
+│   │   ├── Hero.tsx              # Hero section with BETA AVAILABLE badge
+│   │   ├── MetricsShowcase.tsx   # Available metrics display
+│   │   ├── WhyHaurus.tsx         # Data layer & tipster service differentiators
+│   │   ├── SocialProof.tsx       # Testimonials or credibility elements
+│   │   └── Pricing.tsx           # Subscription tiers display
 │   └── ui/
-│       └── Button.tsx   # Reusable button component with variants
+│       └── Button.tsx      # Reusable button component with variants
 ├── lib/
-│   └── utils.ts        # Utility functions (cn helper for Tailwind)
+│   └── utils.ts            # Utility functions (cn helper for Tailwind)
 └── public/
     └── (static assets)
 ```
@@ -82,44 +108,6 @@ src/
 ## 🔤 Typography
 
 Haurus uses **Tektur** as its sole typeface, loaded via `next/font/google` for optimal performance. The font is configured in `src/app/layout.tsx` and applied globally to the `<body>` element via CSS variable.
-
-**Font configuration** (`src/app/layout.tsx`):
-```typescript
-import { Tektur } from 'next/font/google'
-
-const tektur = Tektur({
-  subsets: ['latin'],
-  variable: '--font-tektur',
-  display: 'swap',
-})
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={tektur.variable}>
-      <body className="antialiased" style={{ fontFamily: 'var(--font-tektur)' }}>
-        {children}
-      </body>
-    </html>
-  )
-}
-```
-
-## 🚀 Deploy to Vercel
-
-The easiest way to deploy your Haurus app is to use [Vercel](https://vercel.com/new), the platform built and maintained by the creators of Next.js.
-
-### One-Click Deploy
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-### Manual Deployment
-
-1. Push your code to a GitHub repository
-2. Go to [Vercel](https://vercel.com/new) and import your repository
-3. Select your project and click **Deploy**
-4. Your app will be live at `https://your-project.vercel.app`
-
-No environment variables are required for the basic deployment since this project doesn't use Supabase or other external services.
 
 ## 📝 License
 
