@@ -15,19 +15,21 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-14 glass-nav">
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-center gap-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-6 h-6 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
-            <span className="text-black text-xs font-bold leading-none">H</span>
-          </div>
-          <span className="text-base font-medium tracking-tight text-[var(--text-1)]">
-            Haur<span className="text-[var(--accent)]">u</span>s
-          </span>
-        </Link>
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center">
+        {/* Zone gauche : Logo */}
+        <div className="flex-1 flex items-center">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-6 h-6 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
+              <span className="text-black text-xs font-bold leading-none">H</span>
+            </div>
+            <span className="text-base font-medium tracking-tight text-[var(--text-1)]">
+              Haur<span className="text-[var(--accent)]">u</span>s
+            </span>
+          </Link>
+        </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Zone centrale : Navigation desktop */}
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-6">
           {navLinks.map(({ label, href }) => (
             <a
               key={label}
@@ -40,8 +42,8 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Zone droite : CTA desktop */}
+        <div className="hidden md:flex flex-1 items-center justify-end">
           <Link
             href="#"
             className="group relative px-4 py-1.5 rounded-full text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] transition-all border border-[var(--border-md)] hover:border-[var(--accent)] hover:bg-[var(--accent-glow)] overflow-hidden"

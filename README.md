@@ -63,7 +63,7 @@ src/
 │   └── page.tsx         # Home page composing all sections
 ├── components/
 │   ├── layout/
-│   │   ├── Navbar.tsx   # Top navigation bar (centered horizontally)
+│   │   ├── Navbar.tsx   # Top navigation bar with three-zone flexbox layout (logo left, nav links centered, CTA right)
 │   │   └── Footer.tsx   # Site footer with legal disclaimer
 │   ├── sections/
 │   │   ├── Hero.tsx           # Hero section with BETA AVAILABLE badge
@@ -92,30 +92,34 @@ const tektur = Tektur({
   variable: '--font-tektur',
   display: 'swap',
 })
-```
 
-**Global CSS** (`src/app/globals.css`):
-```css
-body {
-  font-family: var(--font-tektur);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={tektur.variable}>
+      <body className="antialiased" style={{ fontFamily: 'var(--font-tektur)' }}>
+        {children}
+      </body>
+    </html>
+  )
 }
 ```
 
-All UI elements — headings, paragraphs, buttons, labels, inputs, and navigation — inherit Tektur
-
 ## 🚀 Deploy to Vercel
+
+The easiest way to deploy your Haurus app is to use [Vercel](https://vercel.com/new), the platform built and maintained by the creators of Next.js.
+
+### One-Click Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step:
+### Manual Deployment
 
-1. **Import your repository** — Click the button above or go to [vercel.com/new](https://vercel.com/new) and import your GitHub repo
-2. **Configure project** — Vercel will auto-detect Next.js settings
-3. **Add environment variables** — If you add any (API keys, etc.), go to **Settings > Environment Variables** and add each key-value pair
-4. **Deploy** — Click **Deploy** and wait for the build to complete
-5. **Your site is live** — You'll get a `.vercel.app` URL, or connect a custom domain in **Settings > Domains**
+1. Push your code to a GitHub repository
+2. Go to [Vercel](https://vercel.com/new) and import your repository
+3. Select your project and click **Deploy**
+4. Your app will be live at `https://your-project.vercel.app`
 
-> ⚠️ **Reminder**: Always add all environment variables from your `.env.local` to Vercel before deploying, otherwise your app may crash.
+No environment variables are required for the basic deployment since this project doesn't use Supabase or other external services.
 
 ## 📝 License
 
