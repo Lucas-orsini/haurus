@@ -78,103 +78,63 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
 2. Click **New Project** and follow the steps to create a new Supabase project
 3. Wait for your project to be created (this takes about 2 minutes)
-4. In the left sidebar, click **Settings** (the gear icon)
-5. Click **API**
-6. Find **Project URL** — copy it and paste as `NEXT_PUBLIC_SUPABASE_URL`
-7. Find **API Keys** → **anon public** — click **Copy** and paste as `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. In the left sidebar, click **Settings** (the gear icon ⚙️)
+5. Click **API** in the settings menu
+6. Copy the **Project URL** and paste it as `NEXT_PUBLIC_SUPABASE_URL`
+7. In the same page, find the table "Project API keys" and copy the **anon public** key
+8. Paste it as `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-Your `.env.local` file should look like this:
+Your `.env.local` should look like this:
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...your-anon-key
 ```
-
-## 🔐 Authentication
-
-Haurus includes secure user authentication powered by Supabase Auth.
-
-### Sign Up
-
-Create a new account at `/signup` or click the **"Get Started"** button in the navbar.
-
-- Enter your full name
-- Enter your email address
-- Choose a secure password (minimum 8 characters)
-- Click **"Create Account"** to register
-
-When you sign up:
-- Your account is created in Supabase Auth (email + password)
-- A user record is automatically created in the `users` table in your database
-
-### Login
-
-Access the login page at `/login` or click the **"Login"** button in the navbar.
-
-- Enter your email and password
-- Click **"Sign In"** to access your account
-- Supabase verifies your credentials and creates a secure session
-
-### Protected Pages
-
-Once logged in, protected pages (coming soon) will:
-- Verify your session on the server side
-- Redirect to `/login` if you are not authenticated
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/
-│   ├── globals.css              # Global styles, Tailwind imports, custom fonts
-│   ├── layout.tsx               # Root layout with Tektur font and metadata
-│   ├── page.tsx                 # Home page composing all sections
-│   ├── login/
-│   │   └── page.tsx             # Login page for existing users
-│   └── signup/
-│       └── page.tsx             # Sign up page for new users
-├── components/
-│   ├── layout/
-│   │   ├── Navbar.tsx            # Top navigation bar with auth buttons
-│   │   └── Footer.tsx            # Site footer with legal disclaimer
-│   └── sections/
-│       ├── Hero.tsx             # Hero section with BETA AVAILABLE badge
-│       └── MetricsShowcase.tsx   # Available metrics cards with hover effects
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts             # Supabase client for browser (CSR)
-│   │   └── server.ts             # Supabase client for server components (SSR)
-│   └── utils.ts                  # Utility functions (cn helper, etc.)
-└── types/
-    └── index.ts                  # TypeScript type definitions
+├── app/                    # Next.js App Router — pages and layouts
+│   ├── layout.tsx          # Root layout (fonts, providers, metadata)
+│   ├── page.tsx            # Landing page
+│   └── globals.css         # Global styles + Tailwind imports
+├── components/             # Reusable UI components
+│   ├── Navbar.tsx          # Navigation bar with logo and CTA button
+│   ├── Hero.tsx            # Hero section
+│   ├── Pricing.tsx         # Pricing tiers (Starter, Analyst, Pro)
+│   ├── Features.tsx        # Features showcase
+│   └── Footer.tsx          # Footer
+├── lib/                    # Utility functions and helpers
+│   └── utils.ts            # cn() helper (clsx + tailwind-merge)
+└── providers/              # React context providers
+    └── SupabaseProvider.tsx  # Supabase client provider
 ```
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+The easiest way to deploy your Haurus app is with Vercel.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ### Step-by-step deployment
 
-1. **Push your code to GitHub** (if you haven't already)
+1. **Import your GitHub repository**
+   - Click "Import Git Repository" on Vercel
+   - Select your `haraus` repository from the list
+   - Vercel will auto-detect Next.js settings
 
-2. **Go to Vercel** — Click the button above or visit [vercel.com/new](https://vercel.com/new)
+2. **Add your environment variables**
+   - In Vercel dashboard, go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
+   - Make sure both are set for **Production**, **Preview**, and **Development** environments
 
-3. **Import your repository** — Select your GitHub repo from the list
+3. **Deploy**
+   - Click **Deploy** — Vercel will build and deploy your app
+   - Your live URL will be shown (e.g., `https://haraus.vercel.app`)
 
-4. **Configure project** — Keep the default settings (Framework: Next.js)
-
-5. **Add environment variables** — Click **Environment Variables** and add each variable:
-
-   | Name | Value |
-   |------|-------|
-   | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase URL (from Settings → API) |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key (from Settings → API) |
-
-6. **Deploy** — Click **Deploy**
-
-Your app will be live at `https://your-project.vercel.app` within seconds.
-
-> ⚠️ **Important**: Make sure to add all environment variables in Vercel, otherwise authentication will not work on your deployed site.
+> ⚠️ **Important**: Don't forget to add your Supabase environment variables in Vercel. Without them, authentication won't work in production.
 
 ## 📝 License
 

@@ -33,7 +33,7 @@ const plans = [
     price: '50',
     period: 'month',
     desc: 'Advanced metrics, full history, and alerts for systematic bettors.',
-    highlight: false,
+    highlight: true,
     cta: 'Get started',
     features: [
       'All Starter metrics',
@@ -48,7 +48,7 @@ const plans = [
     price: '79',
     period: 'month',
     desc: 'Complete access, exports, and API for power users and professionals.',
-    highlight: true,
+    highlight: false,
     cta: 'Go Pro',
     features: [
       'All Analyst metrics',

@@ -113,10 +113,10 @@ export default function Navbar() {
                 Connexion
               </Link>
               <Link
-                href="/signup"
+                href="#pricing"
                 className="h-8 px-4 flex items-center justify-center rounded-full text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] hover:scale-[1.02] transition-all duration-200 shadow-[0_0_16px_rgba(242,203,56,0.25)] hover:shadow-[0_0_24px_rgba(242,203,56,0.40)]"
               >
-                Créer un compte
+                Get started
               </Link>
             </div>
           )}
@@ -169,11 +169,11 @@ export default function Navbar() {
                 Connexion
               </Link>
               <Link
-                href="/signup"
+                href="#pricing"
                 onClick={() => setMobileOpen(false)}
                 className="h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] transition-colors"
               >
-                Créer un compte
+                Get started
               </Link>
             </>
           )}
