@@ -2,23 +2,14 @@
  * Edge middleware — refreshes Supabase session cookies on every request,
  * and protects authenticated routes by redirecting to /login when no session.
  *
- * Protects all routes under (app)/ only.
- * Auth pages (login, signup) are NOT in (app)/ so they pass through freely.
+ * Also redirects authenticated users away from auth pages (/login, /signup)
+ * back to /dashboard to prevent authenticated users from seeing the login form.
  */
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-
-  // Routes to protect — only (app) group routes require authentication
-  const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/api']
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
-
-  // Allow all non-protected routes through without session check
-  if (!isProtected) {
-    return NextResponse.next({ request })
-  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -63,10 +54,25 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  // Route logic after session refresh:
+  // 1. Protected routes (/dashboard, /settings, /api): redirect unauthenticated → /login
+  // 2. Auth pages (/login, /signup): redirect authenticated → /dashboard
+  // 3. Everything else: pass through
+
+  const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/api']
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
+  const isAuthPage = pathname === '/login' || pathname === '/signup'
+
+  if (isProtected && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirectTo', pathname)
+    return NextResponse.redirect(url, 302)
+  }
+
+  if (isAuthPage && user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url, 302)
   }
 
