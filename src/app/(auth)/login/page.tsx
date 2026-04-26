@@ -38,7 +38,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      router.push('/dashboard')
+      router.push('/')
     } catch (err) {
       setFormState('error')
       setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
