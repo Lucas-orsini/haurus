@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth antialiased">
+    <html lang="en" data-scroll-behavior="smooth" className="scroll-smooth antialiased">
       <body className={`${tektur.variable} bg-[var(--bg)] text-[var(--text-1)] min-h-screen`}>
         {children}
 

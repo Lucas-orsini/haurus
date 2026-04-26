@@ -1,30 +1,12 @@
 /**
  * fetchMatchStats — récupère tous les matchs ordonnés par date décroissante.
- * Utilise le client Supabase SSR (coté serveur uniquement).
- * Retourne un tableau vide en cas d'erreur, avec log de l'erreur.
+ * Mode sans base de données : retourne les fixtures locales en mémoire.
+ * TODO: replace with the real Supabase client once the schema is confirmed.
  */
-import { createClient } from '@/lib/supabase/server'
+import { MATCH_STATS_FIXTURES } from '@/lib/data'
 import type { MatchStats } from '@/types/match-stats'
 
 export async function fetchMatchStats(): Promise<MatchStats[]> {
-  try {
-    const supabase = await createClient()
-
-    const { data, error } = await supabase
-      .from('match_stats')
-      .select(
-        'id, date, tournament, surface, player1_name, player2_name, metric_names, player1_values, player2_values'
-      )
-      .order('date', { ascending: false })
-
-    if (error) {
-      console.error('[fetchMatchStats] Supabase error:', error)
-      return []
-    }
-
-    return (data as MatchStats[]) ?? []
-  } catch (err) {
-    console.error('[fetchMatchStats] Unexpected error:', err)
-    return []
-  }
+  // TODO: replace with the real Supabase client once the schema is confirmed.
+  return Promise.resolve([...MATCH_STATS_FIXTURES])
 }
