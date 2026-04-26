@@ -13,7 +13,6 @@ The metrics bookmakers use. Now yours.
 - **Dark Analytics Interface** — Professional, distraction-free design optimized for data analysis
 - **Dynamic Card Hover Effects** — Cards feature luminous glow effects that match the icon color on hover for "Data Layer" and "Not a Tipster Service" sections
 - **Secure Authentication** — User account creation and login with email/password powered by Supabase Auth
-- **Dashboard Overview** — Interactive match table with real-time search, date and tournament filters, and expandable metrics panels for each match
 
 ## 🛠️ Tech Stack
 
@@ -55,17 +54,7 @@ Create a `.env.local` file in the project root:
 touch .env.local
 ```
 
-Open `.env.local` in your code editor and add your Supabase credentials:
-
-```bash
-# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-
-# Supabase anonymous (public) key — exposed client-side, safe with RLS
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-See the [Environment Variables](#-environment-variables) section below for where to find each value.
+Open `.env.local` in your code editor and add your Supabase credentials. See the [Environment Variables](#-environment-variables) section below for where to find each value.
 
 ### 4. Run the development server
 
@@ -89,80 +78,63 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
 2. Click **New Project** and follow the steps to create a new Supabase project
 3. Wait for your project to be created (this takes about 2 minutes)
-4. In the left sidebar, click **Settings** (the gear icon)
+4. In the left sidebar, click **Settings** (the gear icon ⚙️)
 5. Click **API** in the settings menu
-6. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL`
-7. Copy the **anon public** key from the API keys table and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Copy the **Project URL** and paste it as `NEXT_PUBLIC_SUPABASE_URL`
+7. In the same page, find the table "Project API keys" and copy the **anon public** key
+8. Paste it as `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-### Database setup
+Your `.env.local` should look like this:
 
-Create a `match_stats` table in your Supabase project with the following columns:
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| date | date | Match date |
-| tournament | text | Tournament name |
-| player1 | text | First player name |
-| player2 | text | Second player name |
-| surface | text | Playing surface (hard, clay, grass) |
-| metrics | jsonb | Match metrics data |
-
-Enable Row Level Security (RLS) and create a policy that allows authenticated users to read from this table.
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...your-anon-key
+```
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages and layouts
-│   ├── dashboard/          # Dashboard section (protected)
-│   │   └── overview/      # Overview page (/dashboard/overview)
-│   ├── page.tsx           # Home page
-│   └── layout.tsx         # Root layout
-├── components/            # Reusable UI components
-│   ├── ui/                # Base UI components
-│   └── dashboard/         # Dashboard-specific components
-├── lib/                   # Utilities and Supabase client
-│   └── supabase/          # Supabase client setup
-└── styles/               # Global styles
+├── app/                    # Next.js App Router — pages and layouts
+│   ├── layout.tsx          # Root layout (fonts, providers, metadata)
+│   ├── page.tsx            # Landing page
+│   └── globals.css         # Global styles + Tailwind imports
+├── components/             # Reusable UI components
+│   ├── Navbar.tsx          # Navigation bar with logo and CTA button
+│   ├── Hero.tsx            # Hero section
+│   ├── Pricing.tsx         # Pricing tiers (Starter, Analyst, Pro)
+│   ├── Features.tsx        # Features showcase
+│   └── Footer.tsx          # Footer
+├── lib/                    # Utility functions and helpers
+│   └── utils.ts            # cn() helper (clsx + tailwind-merge)
+└── providers/              # React context providers
+    └── SupabaseProvider.tsx  # Supabase client provider
 ```
-
-Key folders:
-
-- `src/app/dashboard/overview/page.tsx` — Dashboard Overview page with match table, search, and filters
-- `src/components/` — Reusable components including the match table and accordion panels
-- `src/lib/supabase/` — Supabase client configuration for server and client components
-- `src/app/layout.tsx` — Root layout with authentication provider
 
 ## 🚀 Deploy to Vercel
 
+The easiest way to deploy your Haurus app is with Vercel.
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step deployment
+### Step-by-step deployment
 
-1. **Push your code to GitHub** — if you haven't already, create a GitHub repo and push your code:
+1. **Import your GitHub repository**
+   - Click "Import Git Repository" on Vercel
+   - Select your `haraus` repository from the list
+   - Vercel will auto-detect Next.js settings
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/haraus.git
-git push -u origin main
-```
+2. **Add your environment variables**
+   - In Vercel dashboard, go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
+   - Make sure both are set for **Production**, **Preview**, and **Development** environments
 
-2. **Import to Vercel** — Go to [vercel.com/new](https://vercel.com/new) and import your GitHub repository
+3. **Deploy**
+   - Click **Deploy** — Vercel will build and deploy your app
+   - Your live URL will be shown (e.g., `https://haraus.vercel.app`)
 
-3. **Configure environment variables** — In the Vercel dashboard, go to your project → Settings → Environment Variables and add:
-
-- `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
-
-4. **Deploy** — Click **Deploy** and wait for the build to complete
-
-5. **Test your deployment** — Open the provided URL and verify the app loads correctly
-
-> ⚠️ **Important**: Make sure all environment variables from your `.env.local` are also added to Vercel, otherwise the app will not work properly.
+> ⚠️ **Important**: Don't forget to add your Supabase environment variables in Vercel. Without them, authentication won't work in production.
 
 ## 📝 License
 
