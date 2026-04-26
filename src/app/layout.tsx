@@ -24,8 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${tektur.variable} bg-[var(--bg)] text-[var(--text-1)] min-h-screen`}>
         {children}
 
-        {/* Tailwind CDN for template compatibility */}
-        <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
         {/* Iconify with Solar icon set */}
         <Script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js" strategy="afterInteractive" />
       </body>

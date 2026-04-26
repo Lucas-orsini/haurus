@@ -4,12 +4,21 @@
  *
  * Protects all routes under (app)/ only.
  * Auth pages (login, signup) are NOT in (app)/ so they pass through freely.
+ *
+ * Development bypass: set DEV_BYPASS_AUTH=true in .env.local to skip auth
+ * checks during local development (useful when auth is not yet implemented).
  */
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Development auth bypass — never active in production
+  const devBypass = process.env.DEV_BYPASS_AUTH === 'true'
+  if (devBypass) {
+    return NextResponse.next({ request })
+  }
 
   // Routes to protect — only (app) group routes require authentication
   const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/api']
