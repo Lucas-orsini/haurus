@@ -66,6 +66,8 @@ export function validateName(name: string): string | null {
   return null
 }
 
+import { createClient as createServerClient } from '@/lib/supabase/server'
+
 // ── Session helpers ───────────────────────────────────────────────────────────
 
 /**
