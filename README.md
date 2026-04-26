@@ -82,87 +82,79 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Project API keys (table row "anon public") | Anonymous (public) key — safe for client-side use with Row Level Security |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Anonymous Key | Public-facing API key (safe for client-side use) |
 
-### How to get your Supabase credentials
+## 🔐 Authentication Flow
 
-1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
-2. Click **New Project** and follow the steps to create a new Supabase project
-3. Wait for your project to be created (this takes about 2 minutes)
-4. In the left sidebar, click **Settings** (the gear icon)
-5. Click **API** in the settings menu
-6. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL`
-7. Copy the **anon public** key from the API keys table and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+The app uses Supabase Auth with a protected dashboard route. Here's how it works:
 
-### Database setup
+### Login → Dashboard Redirect
 
-Create a `match_stats` table in your Supabase project with the following columns:
+When a user successfully logs in, they are automatically redirected to `/dashboard`.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| date | date | Match date |
-| tournament | text | Tournament name |
-| player1 | text | First player name |
-| player2 | text | Second player name |
-| surface | text | Playing surface (hard, clay, grass) |
-| metrics | jsonb | Match metrics data |
+### Dashboard Protection
 
-Enable Row Level Security (RLS) and create a policy that allows authenticated users to read from this table.
+- **Authenticated users**: Access `/dashboard` directly via URL — they stay on the dashboard
+- **Unauthenticated users**: Attempting to access `/dashboard` are redirected to `/login`
+- **After login**: Users are redirected back to `/dashboard`
+
+### OAuth & Magic Link Callbacks
+
+When using OAuth providers or magic links:
+
+1. Supabase processes the auth and calls your callback URL
+2. The callback handler exchanges the auth code for a session
+3. The user is redirected to `/dashboard`
+
+### Route Protection Implementation
+
+The app uses Next.js middleware to check the Supabase session on protected routes:
+
+- Middleware runs on every request to `/dashboard/*`
+- It validates the Supabase session cookie
+- If valid → allow access to the page
+- If invalid/missing → redirect to `/login`
 
 ## 📁 Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router pages and layouts
-│   ├── dashboard/          # Dashboard section (protected)
-│   │   └── overview/      # Overview page (/dashboard/overview)
-│   ├── page.tsx           # Home page
-│   └── layout.tsx         # Root layout
-├── components/            # Reusable UI components
-│   ├── ui/                # Base UI components
-│   └── dashboard/         # Dashboard-specific components
-├── lib/                   # Utilities and Supabase client
-│   └── supabase/          # Supabase client setup
-└── styles/               # Global styles
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── (auth)/            # Auth pages (login, signup, callback)
+│   │   ├── dashboard/          # Protected dashboard page
+│   │   ├── layout.tsx         # Root layout with providers
+│   │   └── page.tsx           # Landing page
+│   ├── components/            # Reusable UI components
+│   ├── lib/                   # Utilities and Supabase client helpers
+│   └── middleware.ts          # Auth route protection
+├── public/                    # Static assets
+├── .env.local                 # Environment variables (create from .env.example)
+└── package.json               # Dependencies and scripts
 ```
 
-Key folders:
+### Key Files
 
-- `src/app/dashboard/overview/page.tsx` — Dashboard Overview page with match table, search, and filters
-- `src/components/` — Reusable components including the match table and accordion panels
-- `src/lib/supabase/` — Supabase client configuration for server and client components
-- `src/app/layout.tsx` — Root layout with authentication provider
+- `src/middleware.ts` — Protects `/dashboard` routes by checking Supabase session
+- `src/lib/supabase/` — Client utilities for server and browser contexts
+- `src/app/(auth)/login/page.tsx` — Login page with Supabase auth
 
 ## 🚀 Deploy to Vercel
 
+### One-Click Deploy
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step deployment
+### Manual Deploy Steps
 
-1. **Push your code to GitHub** — if you haven't already, create a GitHub repo and push your code:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/haraus.git
-git push -u origin main
-```
-
-2. **Import to Vercel** — Go to [vercel.com/new](https://vercel.com/new) and import your GitHub repository
-
-3. **Configure environment variables** — In the Vercel dashboard, go to your project → Settings → Environment Variables and add:
-
-- `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
-
-4. **Deploy** — Click **Deploy** and wait for the build to complete
-
-5. **Test your deployment** — Open the provided URL and verify the app loads correctly
-
-> ⚠️ **Important**: Make sure all environment variables from your `.env.local` are also added to Vercel, otherwise the app will not work properly.
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and sign in
+3. Click "Import Project" and select your repository
+4. Vercel will auto-detect Next.js — click "Deploy"
+5. After deployment, go to Settings → Environment Variables
+6. Add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+7. Redeploy to apply the environment variables
 
 ## 📝 License
 
