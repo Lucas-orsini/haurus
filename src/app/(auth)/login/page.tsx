@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -8,9 +8,9 @@ import { LogIn } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateEmail, validatePassword, login, getSession } from '@/lib/auth'
+import { validateEmail, validatePassword, login } from '@/lib/auth'
 
-type FormState = 'idle' | 'loading' | 'error' | 'redirecting'
+type FormState = 'idle' | 'loading' | 'error'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,29 +20,6 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('idle')
-
-  // Redirect silently to /dashboard if session is already active
-  useEffect(() => {
-    let cancelled = false
-
-    async function checkSession() {
-      try {
-        const session = await getSession()
-        if (!cancelled && session) {
-          setFormState('redirecting')
-          router.replace('/dashboard')
-        }
-      } catch {
-        // Non-critical — allow user to see the login form even if session check fails
-      }
-    }
-
-    checkSession()
-
-    return () => {
-      cancelled = true
-    }
-  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -61,20 +38,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      setFormState('redirecting')
-      router.push('/dashboard')
+      router.push('/')
     } catch (err) {
       setFormState('error')
       setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     }
-  }
-
-  if (formState === 'redirecting') {
-    return (
-      <div className="w-full max-w-sm px-4 flex flex-col items-center justify-center py-12">
-        <span className="w-5 h-5 rounded-full border-2 border-[var(--border-md)] border-t-[var(--accent)] animate-spin" />
-      </div>
-    )
   }
 
   return (
