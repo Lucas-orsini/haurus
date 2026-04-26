@@ -17,6 +17,7 @@ The metrics bookmakers use. Now yours.
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth with middleware protection
 
 ## 🚀 Quick Start
 
@@ -41,13 +42,9 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env.local` file in the project root:
+Create a `.env.local` file in the project root. Open your code editor, create a new file, and save it as `.env.local` in the project folder.
 
-```bash
-touch .env.local
-```
-
-Open `.env.local` in your code editor and paste the following template:
+Paste this template into `.env.local`:
 
 ```env
 # Supabase project URL — https://app.supabase.com/project/<project>/settings/api
@@ -56,8 +53,6 @@ NEXT_PUBLIC_SUPABASE_URL=
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
-
-For each variable below: copy the value from Supabase and paste it after the `=` sign in your `.env.local` file.
 
 ### 4. Run the development server
 
@@ -73,38 +68,53 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → **Settings** → **API** → copy "Project URL" | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → **Settings** → **API** → find "anon public" row in "Project API keys" table → copy key | Anonymous key — safe for client-side use with Row Level Security |
 
 ### How to get your Supabase credentials
 
 1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
-2. Click **New Project** and follow the steps to create a new Supabase project
-3. Wait for your project to be created (this takes about 2 minutes)
-4. In the left sidebar, click **Settings** (the gear icon)
+2. Click **New Project** and follow the steps to create a new project
+3. Wait for your project to be created (takes about 2 minutes)
+4. In the left sidebar, click the **gear icon** (Settings)
 5. Click **API** in the settings menu
-6. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL` in your `.env.local`
-7. In the same page, copy the **anon public** key from the "Project API keys" table and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY` in your `.env.local`
+6. Copy the **Project URL** and paste into `NEXT_PUBLIC_SUPABASE_URL`
+7. Copy the **anon public** key from the "Project API keys" table and paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+## 🧪 Running Tests
+
+Tests check that individual pieces of code (like functions or components) work correctly without needing the whole app running.
+
+```bash
+# Run all tests
+npx jest
+
+# Run a specific test file
+npx jest path/to/file.test.ts
+
+# Watch mode — automatically re-runs tests when files change
+npx jest --watch
+```
+
+Currently no test files exist yet. Once you add `.test.ts` or `.test.tsx` files, they will automatically be picked up by Jest.
 
 ## 📁 Project Structure
 
-- `src/app/dashboard` — Dashboard pages and layouts (Next.js App Router)
-- `src/components/dashboard` — Dashboard UI components (Sidebar, MatchTable, TableFilters)
-- `src/lib/supabase` — Supabase client utilities and database queries
-- `src/types` — TypeScript type definitions for match statistics
+- `src/app` — Next.js App Router pages and layouts (auth routes, login page)
+- `src/middleware.ts` — Authentication middleware for protected routes
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`haraus`)
-3. In the **Environment Variables** section, add each variable from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your Supabase anon key
+2. Import your GitHub repository
+3. In **Environment Variables**, add each variable from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
 4. Click **Deploy**
 
-Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`) once the deployment finishes.
+Your app will be live on a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
