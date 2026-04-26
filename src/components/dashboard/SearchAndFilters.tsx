@@ -74,8 +74,8 @@ export default function SearchAndFilters({
           "
         >
           <option value="">Tous les tournois</option>
-          {tournaments.map((t) => (
-            <option key={t} value={t}>
+          {tournaments.map((t, index) => (
+            <option key={`${t}-${index}`} value={t}>
               {t}
             </option>
           ))}
