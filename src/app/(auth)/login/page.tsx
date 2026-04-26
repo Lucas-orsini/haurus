@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -8,9 +8,9 @@ import { LogIn } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateEmail, validatePassword, login } from '@/lib/auth'
+import { validateEmail, validatePassword, login, getSession } from '@/lib/auth'
 
-type FormState = 'idle' | 'loading' | 'error'
+type FormState = 'idle' | 'loading' | 'redirecting'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,6 +20,22 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('idle')
+
+  // Check for existing session on mount — redirect if already authenticated
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const session = await getSession()
+        if (session) {
+          setFormState('redirecting')
+          router.push('/')
+        }
+      } catch {
+        // Session check failed — stay on login page
+      }
+    }
+    checkSession()
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,9 +54,10 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
+      setFormState('redirecting')
       router.push('/')
     } catch (err) {
-      setFormState('error')
+      setFormState('idle')
       setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     }
   }
@@ -74,7 +91,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={errors.email}
-          disabled={formState === 'loading'}
+          disabled={formState !== 'idle'}
           autoComplete="email"
         />
 
@@ -85,7 +102,7 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={errors.password}
-          disabled={formState === 'loading'}
+          disabled={formState !== 'idle'}
           autoComplete="current-password"
         />
 
@@ -99,13 +116,18 @@ export default function LoginPage() {
           type="submit"
           variant="primary"
           size="lg"
-          disabled={formState === 'loading'}
+          disabled={formState !== 'idle'}
           className="w-full mt-1"
         >
           {formState === 'loading' ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
               Connexion...
+            </span>
+          ) : formState === 'redirecting' ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
+              Redirection...
             </span>
           ) : (
             'Se connecter'
