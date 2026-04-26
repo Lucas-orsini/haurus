@@ -77,7 +77,7 @@ export default function MatchRow({ match, isOpen, onToggle }: MatchRowProps) {
             <div className="px-4 pb-4 pt-2 bg-[var(--surface-1)] border-t border-[var(--border-md)]">
               {/* Metrics grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-2">
-                {Object.entries(match.metrics ?? {}).map(([key, value]) => (
+                {Object.entries(match.metrics).map(([key, value]) => (
                   <div key={key} className="flex flex-col gap-0.5">
                     <span className="text-xs text-[var(--text-3)] capitalize">
                       {key.replace(/_/g, ' ')}
