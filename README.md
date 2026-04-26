@@ -84,78 +84,85 @@ After login, you will be redirected directly to the dashboard overview page at `
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → anon public key | Anonymous key for client-side Supabase access |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → anon.public | Your Supabase anonymous (public) key |
+
+### Steps to find your Supabase credentials:
+
+1. Go to [Supabase Dashboard](https://app.supabase.com)
+2. Select your project
+3. Click **Settings** (the gear icon)
+4. Click **API** in the sidebar
+5. Copy the **Project URL** and paste it as `NEXT_PUBLIC_SUPABASE_URL`
+6. Under "API Keys", copy the **anon public** key and paste it as `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly without needing the full app running.
+Unit tests automatically verify that the application logic works correctly. When you run them, Jest will tell you if everything passes (✓) or if something broke (✗).
 
 ### Run all tests
 
 ```bash
-npx jest
+npm test
 ```
 
 ### Run a specific test file
 
 ```bash
-npx jest __tests__/matchFormatters.test.ts
+npm test -- matchFormatters.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+### Watch mode (re-runs tests automatically when files change)
 
 ```bash
-npx jest --watch
+npm test -- --watch
 ```
 
-### Understanding test output
+### What the tests cover
 
-- **PASS** — All tests in that file passed successfully
-- **FAIL** — Something broke; look at the error message below to see which test failed and why
-- **FAIL** example output shows the test name, expected value, and actual value received
+- **`__tests__/matchFormatters.test.ts`** — Tests for match data formatting utilities (win rate calculations, score formatting, ranking comparisons)
 
-**Tests covered in this project:**
-- `__tests__/matchFormatters.test.ts` — Tests for match data formatting utilities
+### Reading Jest output
+
+- **PASS** — All assertions in the test passed. Your code is working correctly.
+- **FAIL** — Something broke. Jest shows which test failed and why (expected vs. received value).
 
 ## 📁 Project Structure
 
 ```
-├── __tests__/              # Unit tests
-├── public/                 # Static assets (favicon, images)
-├── src/
-│   ├── app/                # Next.js App Router pages
-│   │   ├── (auth)/         # Authentication pages (login, signup)
-│   │   ├── dashboard/      # Protected dashboard pages
-│   │   ├── layout.tsx      # Root layout
-│   │   └── page.tsx        # Landing page
-│   ├── components/         # Reusable React components
-│   │   ├── ui/             # Base UI components (buttons, inputs, cards)
-│   │   └── ...             # Feature-specific components
-│   ├── lib/                # Utilities and Supabase client setup
-│   │   └── supabase/       # Supabase client configuration
-│   └── types/              # TypeScript type definitions
-├── .env.local              # Environment variables (create from .env.example)
-├── .env.example            # Template for required environment variables
-├── tailwind.config.ts      # Tailwind CSS configuration
-├── tsconfig.json           # TypeScript configuration
-└── package.json            # Dependencies and scripts
+src/
+├── app/                    # Next.js App Router pages and layouts
+│   ├── (auth)/            # Authentication pages (login, signup)
+│   ├── dashboard/         # Protected dashboard pages
+│   └── page.tsx           # Landing page
+├── components/
+│   ├── auth/              # Authentication form components
+│   ├── dashboard/         # Dashboard-specific components
+│   └── ui/                # Reusable UI components (buttons, inputs, cards)
+├── lib/
+│   ├── supabase/          # Supabase client setup (browser & server)
+│   └── utils.ts           # Utility functions (cn for class merging)
+└── types/                 # TypeScript type definitions
 ```
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
+### Step by step:
 
-1. **Import your repository** — Click the button above or go to [vercel.com/new](https://vercel.com/new), select "Import Git Repository", and choose your GitHub repo
-2. **Add environment variables** — In the Vercel dashboard, go to Settings → Environment Variables and add each variable from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. **Deploy** — Click "Deploy". Vercel will automatically detect Next.js and configure the build settings
-4. **Custom domain (optional)** — Configure your custom domain in Settings → Domains
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository (`haraus`)
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` → your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → your Supabase anon key
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are added to Vercel before deploying. The app will not work without `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+Vercel will automatically build and deploy your app. After deployment, remember to update your Supabase dashboard with the new production URL if needed (for authentication redirect URLs, etc.).
 
 ## 📝 License
 
 MIT
+
+---
+
+**Fix applied**: Resolved the React "unique key prop" warning in `SearchAndFilters.tsx` by using `${tournament}-${index}` as the key to ensure uniqueness for tournament dropdown options.

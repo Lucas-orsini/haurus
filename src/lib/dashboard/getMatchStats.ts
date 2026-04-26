@@ -30,7 +30,6 @@ export async function getMatchStats(): Promise<MatchStats[]> {
   const { data, error } = await supabase
     .from('match_stats')
     .select('*')
-    .order('date', { ascending: false })
 
   if (error) {
     throw new Error(
