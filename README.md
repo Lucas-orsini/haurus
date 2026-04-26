@@ -4,7 +4,8 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Match Statistics** — Access and display sports betting metrics via Supabase integration
+- **Authentication Flow** — Login page with Supabase integration
+- **Next.js App Router** — Modern routing with route groups for organized code structure
 
 ## 🛠️ Tech Stack
 
@@ -85,8 +86,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router layouts and pages
-- `src/lib` — Shared utilities, Supabase client setup, and data fetching logic
+- `src/app/(auth)/login` — Login page
 
 ## 🚀 Deploy to Vercel
 
@@ -95,12 +95,15 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Step by step:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from `.env.local`:
+2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+3. Vercel will auto-detect Next.js settings — click **Deploy**
+4. Once deployed, go to your project in Vercel dashboard → **Settings** → **Environment Variables**
+5. Add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy** — your app will be live at a URL like `your-app.vercel.app`
+6. Click **Save** and trigger a **redeploy** so the new env vars take effect
+
+> ⚠️ **Important**: Environment variables must be added in Vercel BEFORE the app will work. Without them, Supabase connections will fail.
 
 ## 📝 License
 
