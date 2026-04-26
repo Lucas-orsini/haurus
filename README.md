@@ -84,85 +84,90 @@ After login, you will be redirected directly to the dashboard overview page at `
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → anon.public | Your Supabase anonymous (public) key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → Project API keys (table row "anon public") | Anonymous (public) key — safe for client-side use with Row Level Security |
 
-### Steps to find your Supabase credentials:
+### How to get your Supabase credentials
 
-1. Go to [Supabase Dashboard](https://app.supabase.com)
-2. Select your project
-3. Click **Settings** (the gear icon)
-4. Click **API** in the sidebar
-5. Copy the **Project URL** and paste it as `NEXT_PUBLIC_SUPABASE_URL`
-6. Under "API Keys", copy the **anon public** key and paste it as `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
+2. Click **New Project** and follow the steps to create a new Supabase project
+3. Wait for your project to be created (this takes about 2 minutes)
+4. In the left sidebar, click **Settings** (the gear icon)
+5. Click **API** in the settings menu
+6. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL`
+7. Copy the **anon public** key from the API keys table and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Your `.env.local` file should look like this:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xyzabc123.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that the application logic works correctly. When you run them, Jest will tell you if everything passes (✓) or if something broke (✗).
-
-### Run all tests
+Unit tests verify that individual pieces of code (like utility functions or components) work correctly. When a test fails, it means something broke and needs fixing.
 
 ```bash
-npm test
+# Run all tests
+npx jest
+
+# Run a specific test file
+npx jest path/to/file.test.ts
+
+# Watch mode — re-runs tests on file changes
+npx jest --watch
 ```
 
-### Run a specific test file
+### Understanding test output
 
-```bash
-npm test -- matchFormatters.test.ts
-```
+- **PASS** — All tests in that file passed, nothing is broken
+- **FAIL** — Something broke, the error message shows which test failed and why
+- A failing test displays the expected vs actual values so you can debug
 
-### Watch mode (re-runs tests automatically when files change)
-
-```bash
-npm test -- --watch
-```
-
-### What the tests cover
-
-- **`__tests__/matchFormatters.test.ts`** — Tests for match data formatting utilities (win rate calculations, score formatting, ranking comparisons)
-
-### Reading Jest output
-
-- **PASS** — All assertions in the test passed. Your code is working correctly.
-- **FAIL** — Something broke. Jest shows which test failed and why (expected vs. received value).
+Currently no test files exist. Tests would be added in `src/__tests__/` or colocated with components as `*.test.ts` or `*.test.tsx`.
 
 ## 📁 Project Structure
 
 ```
 src/
 ├── app/                    # Next.js App Router pages and layouts
-│   ├── (auth)/            # Authentication pages (login, signup)
-│   ├── dashboard/         # Protected dashboard pages
+│   ├── dashboard/
+│   │   └── overview/       # Protected dashboard overview page (/dashboard/overview)
+│   ├── login/              # Authentication page
 │   └── page.tsx           # Landing page
-├── components/
-│   ├── auth/              # Authentication form components
-│   ├── dashboard/         # Dashboard-specific components
-│   └── ui/                # Reusable UI components (buttons, inputs, cards)
-├── lib/
-│   ├── supabase/          # Supabase client setup (browser & server)
-│   └── utils.ts           # Utility functions (cn for class merging)
-└── types/                 # TypeScript type definitions
+├── components/             # Reusable UI components
+├── lib/                    # Utilities, Supabase client, shared functions
+├── hooks/                  # Custom React hooks
+middleware.ts              # Route protection (redirect unauthenticated users)
 ```
+
+## 📊 Dashboard Features
+
+The dashboard overview page (`/dashboard/overview`) provides:
+
+- **Match Table** — Displays all matches from Supabase `match_stats` table with columns: date, tournament, players, surface
+- **Accordion Details** — Click any row to expand and view all match metrics in an animated panel
+- **Real-time Search** — Filter matches instantly by player name (searches both players)
+- **Combined Filters** — "Today" toggle and tournament dropdown filter results simultaneously
+- **Route Protection** — Unauthenticated users are redirected to login
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step:
+### Step by step
 
-1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
-2. Import your GitHub repository (`haraus`)
-3. In the **Environment Variables** section, add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` → your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → your Supabase anon key
-4. Click **Deploy**
+1. Push your code to GitHub (if not already done)
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Click **Add New Project**
+4. Import your `haurus` repository
+5. In the **Environment Variables** section, add both:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
+6. Click **Deploy**
 
-Vercel will automatically build and deploy your app. After deployment, remember to update your Supabase dashboard with the new production URL if needed (for authentication redirect URLs, etc.).
+Vercel will automatically build and deploy your app. Any future pushes to `main` will trigger a new deployment.
 
 ## 📝 License
 
 MIT
-
----
-
-**Fix applied**: Resolved the React "unique key prop" warning in `SearchAndFilters.tsx` by using `${tournament}-${index}` as the key to ensure uniqueness for tournament dropdown options.
