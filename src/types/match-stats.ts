@@ -9,7 +9,7 @@ export interface MatchStats {
   surface: string
   player1_name: string
   player2_name: string
-  metric_names: string[] | null
-  player1_values: (number | null)[] | null
-  player2_values: (number | null)[] | null
+  metric_names: string[]
+  player1_values: (number | null)[]
+  player2_values: (number | null)[]
 }

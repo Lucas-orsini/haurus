@@ -10,13 +10,16 @@ interface MatchTableProps {
 }
 
 export function MatchTable({ matches }: MatchTableProps) {
+  // Ensemble des IDs d'accordions ouverts
   const [openAccordions, setOpenAccordions] = useState<Set<string>>(new Set())
 
+  // Tournois distincts pour les filtres
   const tournaments = useMemo(() => {
     const unique = new Set(matches.map((m) => m.tournament))
     return Array.from(unique).sort()
   }, [matches])
 
+  // Toggle un accordion par ID
   const toggleAccordion = (id: string) => {
     setOpenAccordions((prev) => {
       const next = new Set(prev)
@@ -29,6 +32,7 @@ export function MatchTable({ matches }: MatchTableProps) {
     })
   }
 
+  // Formatage de date
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('fr-FR', {
@@ -40,6 +44,7 @@ export function MatchTable({ matches }: MatchTableProps) {
 
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg overflow-hidden">
+      {/* Filtres */}
       <div className="px-4 py-3 border-b border-[var(--border)]">
         <TableFilters
           tournaments={tournaments}
@@ -48,6 +53,7 @@ export function MatchTable({ matches }: MatchTableProps) {
         />
       </div>
 
+      {/* Tableau */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -104,6 +110,7 @@ export function MatchTable({ matches }: MatchTableProps) {
 
                 return (
                   <>
+                    {/* Ligne principale */}
                     <tr
                       key={match.id}
                       onClick={() => toggleAccordion(match.id)}
@@ -141,6 +148,7 @@ export function MatchTable({ matches }: MatchTableProps) {
                       </td>
                     </tr>
 
+                    {/* Panneau accordion */}
                     {isOpen && (
                       <tr key={`${match.id}-accordion`} className="border-b border-[var(--border)] last:border-0">
                         <td colSpan={4} className="px-4 py-0">
@@ -151,52 +159,46 @@ export function MatchTable({ matches }: MatchTableProps) {
                             )}
                           >
                             <div className="py-4 bg-[var(--surface-2)]/30">
-                              {match.metric_names === null || match.metric_names.length === 0 ? (
-                                <p className="text-xs text-[var(--text-3)] text-center py-4">
-                                  Aucune métrique disponible
-                                </p>
-                              ) : (
-                                <table className="w-full text-xs">
-                                  <thead>
-                                    <tr className="border-b border-[var(--border)]">
-                                      <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-                                        Métrique
-                                      </th>
-                                      <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-                                        {match.player1_name}
-                                      </th>
-                                      <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-                                        {match.player2_name}
-                                      </th>
+                              <table className="w-full text-xs">
+                                <thead>
+                                  <tr className="border-b border-[var(--border)]">
+                                    <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                                      Métrique
+                                    </th>
+                                    <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                                      {match.player1_name}
+                                    </th>
+                                    <th className="px-3 py-2 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                                      {match.player2_name}
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {match.metric_names.map((metricName, metricIndex) => (
+                                    <tr
+                                      key={metricName}
+                                      className={cn(
+                                        'border-b border-[var(--border)] last:border-0',
+                                        metricIndex % 2 === 0 ? 'bg-[var(--surface-1)]/50' : 'bg-transparent'
+                                      )}
+                                    >
+                                      <td className="px-3 py-2 text-[var(--text-2)]">
+                                        {metricName}
+                                      </td>
+                                      <td className="px-3 py-2 text-[var(--text-1)] font-mono tabular-nums">
+                                        {match.player1_values[metricIndex] !== null
+                                          ? match.player1_values[metricIndex]
+                                          : '—'}
+                                      </td>
+                                      <td className="px-3 py-2 text-[var(--text-1)] font-mono tabular-nums">
+                                        {match.player2_values[metricIndex] !== null
+                                          ? match.player2_values[metricIndex]
+                                          : '—'}
+                                      </td>
                                     </tr>
-                                  </thead>
-                                  <tbody>
-                                    {match.metric_names.map((metricName, metricIndex) => (
-                                      <tr
-                                        key={metricName}
-                                        className={cn(
-                                          'border-b border-[var(--border)] last:border-0',
-                                          metricIndex % 2 === 0 ? 'bg-[var(--surface-1)]/50' : 'bg-transparent'
-                                        )}
-                                      >
-                                        <td className="px-3 py-2 text-[var(--text-2)]">
-                                          {metricName}
-                                        </td>
-                                        <td className="px-3 py-2 text-[var(--text-1)] font-mono tabular-nums">
-                                          {match.player1_values?.[metricIndex] !== null
-                                            ? match.player1_values?.[metricIndex]
-                                            : '—'}
-                                        </td>
-                                        <td className="px-3 py-2 text-[var(--text-1)] font-mono tabular-nums">
-                                          {match.player2_values?.[metricIndex] !== null
-                                            ? match.player2_values?.[metricIndex]
-                                            : '—'}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              )}
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </div>
                         </td>

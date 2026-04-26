@@ -4,9 +4,8 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Match Statistics Dashboard** — View and analyze match performance data with a sortable, interactive table component
-- **Supabase Integration** — Server-side data fetching with authenticated Supabase client utilities
-- **TypeScript Core** — Fully typed data structures for match statistics across the application
+- **Authentication Flow** — Login page with Supabase integration
+- **Next.js App Router** — Modern routing with route groups for organized code structure
 
 ## 🛠️ Tech Stack
 
@@ -29,7 +28,7 @@ The metrics bookmakers use. Now yours.
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/haraus.git
-cd haus
+cd haurus
 ```
 
 ### 2. Install dependencies
@@ -87,9 +86,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the match statistics table
-- `src/lib/supabase` — Supabase client utilities for data fetching
-- `src/types` — TypeScript type definitions for match statistics
+- `src/app/(auth)/login` — Login page
 
 ## 🚀 Deploy to Vercel
 
@@ -98,15 +95,15 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Step by step:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository from your GitHub account
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+3. Vercel will auto-detect Next.js settings — click **Deploy**
+4. Once deployed, go to your project in Vercel dashboard → **Settings** → **Environment Variables**
+5. Add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy** and wait for the build to complete
-6. Your app will be live at a `vercel.app` URL
+6. Click **Save** and trigger a **redeploy** so the new env vars take effect
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. If you deploy without them, the app may fail to load properly.
+> ⚠️ **Important**: Environment variables must be added in Vercel BEFORE the app will work. Without them, Supabase connections will fail.
 
 ## 📝 License
 
