@@ -4,19 +4,17 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Tennis Match Stats Dashboard** — View and filter tennis match statistics in a professional interface
-- **Advanced Filtering** — Filter match data by various criteria with real-time table updates
-- **Sidebar Navigation** — Clean sidebar layout for dashboard navigation
-- **Dark Analytics Interface** — Professional, distraction-free design optimized for data analysis
+- **Authentication Flow** — Login page with Supabase integration
+- **Next.js App Router** — Modern routing with route groups for organized code structure
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
-- **Database**: Supabase (PostgreSQL)
+- **Auth & Database**: Supabase
 
 ## 🚀 Quick Start
 
@@ -88,23 +86,24 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
-- `src/app/dashboard` — Dashboard pages and layouts (Next.js App Router)
-- `src/components/dashboard` — Dashboard UI components (Sidebar, MatchTable, TableFilters)
-- `src/lib/supabase` — Supabase client utilities and database queries
-- `src/types` — TypeScript type definitions for match statistics
+- `src/app/(auth)/login` — Login page
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`haraus`)
-3. In the **Environment Variables** section, add each variable from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your Supabase anon key
-4. Click **Deploy**
+### Step by step:
 
-Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`) once the deployment finishes.
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+3. Vercel will auto-detect Next.js settings — click **Deploy**
+4. Once deployed, go to your project in Vercel dashboard → **Settings** → **Environment Variables**
+5. Add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Click **Save** and trigger a **redeploy** so the new env vars take effect
+
+> ⚠️ **Important**: Environment variables must be added in Vercel BEFORE the app will work. Without them, Supabase connections will fail.
 
 ## 📝 License
 
