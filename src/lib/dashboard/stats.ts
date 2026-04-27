@@ -3,58 +3,34 @@
  *
  * These functions are idempotent and side-effect free — suitable for
  * unit testing and independent of any Supabase or React context.
+ *
+ * All stats (win rate surface, momentum) are now read directly from
+ * match_stats columns _p1 / _p2. The player_stats table query is removed.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { TodaysStats } from '@/lib/types/dashboard'
 
-/** Row shape returned by the player_stats join query. */
-export interface PlayerStatsRow {
-  player_name: string
-  win_rate_clay_td: number | null
-  win_rate_hard_td: number | null
-  win_rate_grass_td: number | null
-  momentum_td: number | null
-}
-
-/** Raw match row for today's matches. */
+/** Raw match row — includes the per-player _p1 / _p2 stats needed for card2/card3. */
 export interface MatchRow {
   player1: string
   player2: string
   surface: string | null
   tournoi: string | null
+  win_rate_surf_td_p1: number | null
+  win_rate_surf_td_p2: number | null
+  momentum_td_p1: number | null
+  momentum_td_p2: number | null
 }
 
 /**
- * Returns the surface win rate for a given surface string,
- * or null if the value is unavailable.
+ * Builds the TodaysStats object from raw match_stats rows.
  *
- * Uses explicit conditionals instead of a key lookup so TypeScript
- * can narrow the return type to `number | null` (avoids widening
- * through `player_name: string` in PlayerStatsRow).
- */
-export function getSurfaceWinRate(
-  stats: PlayerStatsRow,
-  surface: string | null
-): number | null {
-  if (!surface) return null
-  const s = surface.toLowerCase()
-  if (s === 'clay')  return stats.win_rate_clay_td
-  if (s === 'hard')  return stats.win_rate_hard_td
-  if (s === 'grass') return stats.win_rate_grass_td
-  return null
-}
-
-/**
- * Builds the TodaysStats object from raw query results.
- *
- * @param todaysMatches   — match_stats rows where date_match = today
- * @param playerStatsMap — Map<playerName, PlayerStatsRow> from the player_stats join
- * @param tournaments    — unique { name, surface } entries from todaysMatches
+ * @param todaysMatches — match_stats rows where date_match = today
+ * @param tournaments   — unique { name, surface } entries from todaysMatches
  */
 export function buildTodaysStats(
   todaysMatches: MatchRow[],
-  playerStatsMap: Map<string, PlayerStatsRow>,
   tournaments: Array<{ name: string; surface: string }>
 ): TodaysStats {
   // Card 1 — simple count + tournament list
@@ -63,40 +39,40 @@ export function buildTodaysStats(
     tournaments,
   }
 
-  // Card 2 — highest surface win rate
-  const card2 = findSurfaceSpecialist(todaysMatches, playerStatsMap)
+  // Card 2 — highest surface win rate across both players in all matches
+  const card2 = findSurfaceSpecialist(todaysMatches)
 
-  // Card 3 — highest |momentum|
-  const card3 = findExtremeMomentum(todaysMatches, playerStatsMap)
+  // Card 3 — highest |momentum| across both players in all matches
+  const card3 = findExtremeMomentum(todaysMatches)
 
   return { card1, card2, card3 }
 }
 
 /**
- * Card 2: selects the player with the highest win rate matching their match surface.
- * Returns null if no player has a non-null value for their surface.
+ * Card 2: selects the match where one player has the highest win_rate_surf_td.
+ * Returns null if no player has a non-null value in any match.
  */
 function findSurfaceSpecialist(
-  matches: MatchRow[],
-  statsMap: Map<string, PlayerStatsRow>
+  matches: MatchRow[]
 ): TodaysStats['card2'] {
-  let best: { playerName: string; winRate: number; surface: string; opponent: string } | null = null
+  let best: { player1: string; player2: string; winRate: number; surface: string } | null = null
 
   for (const match of matches) {
-    for (const playerName of [match.player1, match.player2]) {
-      const opponent = playerName === match.player1 ? match.player2 : match.player1
-      const stats = statsMap.get(playerName)
-      if (!stats) continue
+    const { win_rate_surf_td_p1, win_rate_surf_td_p2, surface } = match
 
-      const winRate = getSurfaceWinRate(stats, match.surface)
+    for (const [player1, winRate] of [
+      [match.player1, win_rate_surf_td_p1] as [string, number | null],
+      [match.player2, win_rate_surf_td_p2] as [string, number | null],
+    ]) {
       if (winRate === null) continue
+      const player2 = player1 === match.player1 ? match.player2 : match.player1
 
       if (best === null || winRate > best.winRate) {
         best = {
-          playerName,
+          player1,
+          player2,
           winRate,
-          surface: match.surface ?? 'Unknown',
-          opponent,
+          surface: surface ?? 'Unknown',
         }
       }
     }
@@ -106,27 +82,30 @@ function findSurfaceSpecialist(
 }
 
 /**
- * Card 3: selects the player with the highest absolute momentum.
+ * Card 3: selects the player with the highest absolute momentum across all matches.
  * Returns null if no player has a non-null momentum value.
  */
 function findExtremeMomentum(
-  matches: MatchRow[],
-  statsMap: Map<string, PlayerStatsRow>
+  matches: MatchRow[]
 ): TodaysStats['card3'] {
-  let best: { playerName: string; momentum: number; opponent: string } | null = null
+  let best: { player1: string; player2: string; momentum: number } | null = null
 
   for (const match of matches) {
-    for (const playerName of [match.player1, match.player2]) {
-      const opponent = playerName === match.player1 ? match.player2 : match.player1
-      const stats = statsMap.get(playerName)
-      if (!stats || stats.momentum_td === null) continue
+    const { momentum_td_p1, momentum_td_p2 } = match
 
-      const absMomentum = Math.abs(stats.momentum_td)
+    for (const [player1, momentum] of [
+      [match.player1, momentum_td_p1] as [string, number | null],
+      [match.player2, momentum_td_p2] as [string, number | null],
+    ]) {
+      if (momentum === null) continue
+      const player2 = player1 === match.player1 ? match.player2 : match.player1
+      const absMomentum = Math.abs(momentum)
+
       if (best === null || absMomentum > Math.abs(best.momentum)) {
         best = {
-          playerName,
-          momentum: stats.momentum_td,
-          opponent,
+          player1,
+          player2,
+          momentum,
         }
       }
     }
@@ -170,42 +149,20 @@ export async function computeTodaysStats(
 ): Promise<TodaysStats | undefined> {
   const today = new Date().toISOString().slice(0, 10)
 
-  // Fetch today's matches
+  // Fetch today's matches — now includes all _p1 / _p2 columns needed
+  // for card2 (win_rate_surf_td) and card3 (momentum_td)
   const { data: todaysMatches, error: matchesError } = await supabase
     .from('match_stats')
-    .select('player1, player2, surface, tournoi')
+    .select(
+      'player1, player2, surface, tournoi, win_rate_surf_td_p1, win_rate_surf_td_p2, momentum_td_p1, momentum_td_p2'
+    )
     .eq('date_match', today)
 
   if (matchesError || !todaysMatches || todaysMatches.length === 0) {
     return undefined
   }
 
-  // Collect unique player names
-  const playerNames = Array.from(
-    new Set(
-      todaysMatches.flatMap((m) => [m.player1, m.player2])
-    )
-  )
-
-  if (playerNames.length === 0) {
-    return undefined
-  }
-
-  // Batch-fetch player stats
-  const { data: playerStatsRows, error: statsError } = await supabase
-    .from('player_stats')
-    .select('player_name, win_rate_clay_td, win_rate_hard_td, win_rate_grass_td, momentum_td')
-    .in('player_name', playerNames)
-
-  if (statsError || !playerStatsRows) {
-    return undefined
-  }
-
-  const playerStatsMap = new Map<string, PlayerStatsRow>(
-    playerStatsRows.map((r) => [r.player_name, r])
-  )
-
   const tournaments = extractTournaments(todaysMatches)
 
-  return buildTodaysStats(todaysMatches, playerStatsMap, tournaments)
+  return buildTodaysStats(todaysMatches, tournaments)
 }
