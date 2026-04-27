@@ -99,11 +99,9 @@ npx jest
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
-npx jest __tests__/dashboard/formatMetric.test.ts
-npx jest __tests__/utils.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+### Run tests in watch mode (re-runs on file change)
 
 ```bash
 npx jest --watch
@@ -112,34 +110,32 @@ npx jest --watch
 ### Understanding test output
 
 - **PASS** — All assertions in the test passed ✅
-- **FAIL** — Something broke. The output shows which test failed and on which line
+- **FAIL** — Something broke, with details on which assertion failed and why
 
-**What the tests cover:**
-- Authentication validators (email format, password strength)
-- Dashboard metric formatting utilities
-- General utility functions
+The test suite covers:
+- **auth-validators** — Authentication validation logic
+- **dashboard/formatMetric** — Dashboard metric formatting utilities
+- **utils** — General utility functions
 
 ## 📁 Project Structure
 
-- src/components/dashboard — MatchRow component and related dashboard UI components
+- `src/components/dashboard` — Dashboard components including the MatchRow reusable component
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
+### Step by step:
 
-1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-Your app will be live at a URL like `your-app.vercel.app`.
-
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are also added in Vercel, otherwise your app will break.
+Vercel will automatically build and deploy your app. Every push to your `main` branch triggers a new deployment.
 
 ## 📝 License
 
