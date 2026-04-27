@@ -102,42 +102,42 @@ npx jest
 npx jest __tests__/auth-validators.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+### Run tests in watch mode (re-runs automatically when files change)
 
 ```bash
 npx jest --watch
 ```
 
-### Understanding test results
+### Understanding test output
 
-- **PASS** — all tests passed, your code is working correctly
-- **FAIL** — something broke, check the error message for which test failed and why
+- **PASS** — Everything is working correctly
+- **FAIL** — Something broke; the error message shows which test failed and why
 
 ### What the tests cover
 
-- **auth-validators.test.ts** — authentication validation logic
-- **dashboard/formatMetric.test.ts** — metric formatting utilities for the dashboard
-- **utils.test.ts** — general utility functions
+- **auth-validators.test.ts** — Authentication validation logic
+- **dashboard/formatMetric.test.ts** — Metric formatting in the dashboard
+- **utils.test.ts** — Shared utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard components (MatchRow, DashboardSidebar)
+- `src/components/dashboard` — Dashboard UI components including MatchRow and DashboardSidebar
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
+### Step by step:
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
+3. Add your environment variables in Vercel dashboard:
    - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
 4. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables from your `.env.local` file must be added to Vercel before deploying, otherwise the app will not work correctly.
+> ⚠️ **Important**: Make sure all environment variables from `.env.local` are added to Vercel before deploying, otherwise your app may crash.
 
 ## 📝 License
 

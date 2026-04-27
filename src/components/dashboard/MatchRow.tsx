@@ -165,8 +165,8 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                           </span>
                         </div>
 
-                        {/* Valeur P2 — centered */}
-                        <div className="flex items-center justify-center">
+                        {/* Valeur P2 — left-aligned */}
+                        <div className="flex items-center justify-start">
                           <span
                             className={cn(
                               'text-xs font-mono tabular-nums',
