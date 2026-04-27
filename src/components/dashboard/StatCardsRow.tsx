@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
-import { CalendarDays, TrendingUp, TrendingDown } from 'lucide-react'
+import { CalendarDays, TrendingUp } from 'lucide-react'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
@@ -87,11 +87,11 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
         </p>
       </div>
       <p className="text-2xl font-medium text-[var(--text-1)] font-mono tabular-nums tracking-tight">
-        {Math.round(card2.winRate * 100)}%
+        {Math.round((card2.winRate ?? 0) * 100)}%
       </p>
       <p className="text-xs text-[var(--text-3)] mt-0.5">{card2.surface}</p>
       <p className="text-[11px] text-[var(--text-3)] mt-2">
-        {card2.playerName} vs {card2.opponent}
+        {card2.player1} vs {card2.player2}
       </p>
     </div>
   )
@@ -130,7 +130,7 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
         {formattedValue}
       </p>
       <p className="text-[11px] text-[var(--text-3)] mt-2">
-        {card3.playerName} vs {card3.opponent}
+        {card3.player1} vs {card3.player2}
       </p>
     </div>
   )

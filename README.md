@@ -108,34 +108,34 @@ npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed, everything works correctly
-- `FAIL` — Something broke, check the error message below for which test failed and why
+- `PASS` means all tests passed — everything is working correctly
+- `FAIL` means something broke — the output will show which test failed and why
 
-**Tests cover:**
-- Authentication validators — form validation logic for auth inputs
-- Authentication — auth flow components and behavior
-- Dashboard formatting — metric display formatting utilities
-- Utility functions — helper functions used across the app
+**What the tests cover:**
+- Auth validators and auth functionality
+- Dashboard metric formatting utilities
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts
-- `src/components/dashboard` — Dashboard UI components
-- `src/lib` — Shared utilities, types, and dashboard logic
+- `src/components/dashboard` — Dashboard components for displaying statistics
+- `src/lib/dashboard` — Dashboard stats logic and utilities
+- `src/lib/types` — TypeScript type definitions
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+**Step by step:**
+
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+3. Add your environment variables in Vercel dashboard → Settings → Environment Variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Click **Deploy**
 
-> ⚠️ **Important**: Don't forget to add both Supabase environment variables in Vercel — the app won't connect to your database without them.
+> ⚠️ **Important**: Make sure all variables from your `.env.local` file are added to Vercel's Environment Variables before deploying.
 
 ## 📝 License
 
