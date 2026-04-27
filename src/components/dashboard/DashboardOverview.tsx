@@ -4,12 +4,15 @@ import { useState, useMemo } from 'react'
 import { Search, X, ChevronDown, AlertCircle, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MatchRow from './MatchRow'
+import StatCardsRow from './StatCardsRow'
 import type { MatchStats } from '@/lib/types/match'
+import type { TodaysStats } from '@/lib/types/dashboard'
 
 interface DashboardOverviewProps {
   matches: MatchStats[]
   fetchError?: string
   favoriteMatchIds?: string[]
+  todaysStats?: TodaysStats
 }
 
 const TODAY_FILTER_KEY = '__today__'
@@ -18,6 +21,7 @@ export default function DashboardOverview({
   matches,
   fetchError,
   favoriteMatchIds = [],
+  todaysStats,
 }: DashboardOverviewProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set())
@@ -106,6 +110,9 @@ export default function DashboardOverview({
 
   return (
     <div className="space-y-4">
+
+      {/* Stat cards row */}
+      <StatCardsRow todaysStats={todaysStats} />
 
       {/* Error banner */}
       {fetchError && (

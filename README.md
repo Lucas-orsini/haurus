@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Sidebar** — Navigation sidebar component for the dashboard interface
+- **Dashboard Metrics** — Display key performance statistics and formatted metrics data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -76,7 +76,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -107,35 +107,35 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- **PASS** — All tests in that file passed successfully
-- **FAIL** — Something broke; Jest will show which test failed and why
+**How to read the output:**
+- `PASS` — All tests in that file passed, everything works correctly
+- `FAIL` — Something broke, check the error message below for which test failed and why
 
-The test suite covers:
-- Auth validators (email/password validation logic)
-- Dashboard formatting utilities (metric display formatting)
-- General utility functions
+**Tests cover:**
+- Authentication validators — form validation logic for auth inputs
+- Authentication — auth flow components and behavior
+- Dashboard formatting — metric display formatting utilities
+- Utility functions — helper functions used across the app
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the sidebar navigation
-- `__tests__` — Jest test files for auth validators, dashboard formatting, and utilities
+- `src/app` — Next.js App Router pages and layouts
+- `src/components/dashboard` — Dashboard UI components
+- `src/lib` — Shared utilities, types, and dashboard logic
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
+3. Add your environment variables:
    - Go to **Settings** → **Environment Variables**
    - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
    - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all `.env.local` variables are added to Vercel before deploying, otherwise your app will crash.
+> ⚠️ **Important**: Don't forget to add both Supabase environment variables in Vercel — the app won't connect to your database without them.
 
 ## 📝 License
 
