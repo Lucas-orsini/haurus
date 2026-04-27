@@ -115,7 +115,6 @@ const PERCENT_ROUNDED_KEYS = new Set([
   'map_p1', 'map_p2',
   'win_rate_td_p1', 'win_rate_td_p2',
   'win_rate_surf_td_p1', 'win_rate_surf_td_p2',
-  'win_rate_5m_p1', 'win_rate_5m_p2',
 ])
 
 /**

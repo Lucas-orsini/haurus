@@ -23,13 +23,11 @@ const METRIC_DEFS: MetricDef[] = [
   { label: 'P-Serve',               p1Key: 'p_serve_p1',            p2Key: 'p_serve_p2',            mode: 'higher'  },
   { label: 'P-Return',              p1Key: 'p_return_p1',           p2Key: 'p_return_p2',           mode: 'higher'  },
   { label: 'Glicko Rating',          p1Key: 'glicko_rating_p1',      p2Key: 'glicko_rating_p2',      mode: 'higher'  },
-  { label: 'Glicko RD',             p1Key: 'glicko_rd_p1',          p2Key: 'glicko_rd_p2',          mode: 'neutral' },
   { label: 'TSD',                   p1Key: 'tsd_p1',                p2Key: 'tsd_p2',                mode: 'higher'  },
   { label: 'BPPI',                  p1Key: 'bppi_p1',               p2Key: 'bppi_p2',               mode: 'higher'  },
   { label: 'MAP',                   p1Key: 'map_p1',                p2Key: 'map_p2',                mode: 'higher'  },
   { label: 'Win Rate TD',           p1Key: 'win_rate_td_p1',        p2Key: 'win_rate_td_p2',        mode: 'higher'  },
   { label: 'Win Rate Surface TD',   p1Key: 'win_rate_surf_td_p1',   p2Key: 'win_rate_surf_td_p2',   mode: 'higher'  },
-  { label: 'Win Rate 5M',          p1Key: 'win_rate_5m_p1',        p2Key: 'win_rate_5m_p2',        mode: 'neutral' },
   { label: 'Momentum TD',           p1Key: 'momentum_td_p1',        p2Key: 'momentum_td_p2',        mode: 'higher'  },
   { label: 'Breaks Won TD',        p1Key: 'breaks_won_td_p1',      p2Key: 'breaks_won_td_p2',      mode: 'higher'  },
   { label: 'Breaks Lost TD',       p1Key: 'breaks_lost_td_p1',     p2Key: 'breaks_lost_td_p2',     mode: 'lower'   },
@@ -123,15 +121,14 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                 </div>
               </div>
 
-              {/* Metrics grid — scrollable, comparative, 3-column per row */}
-              <div className="overflow-y-auto max-h-[420px] pr-1 -mr-1">
+              {/* Metrics grid — comparative, 3-column per row */}
+              <div>
                 <div className="space-y-0">
                   {METRIC_DEFS.map(({ label, p1Key, p2Key, mode }, idx) => {
                     const val1 = match[p1Key] as number | null
                     const val2 = match[p2Key] as number | null
                     const [classA, classB] = getMetricColor(val1, val2, mode)
 
-                    // ─── Cas spécial Glicko Rating : rating + RD inline ───────────
                     const isGlickoP1 = p1Key === 'glicko_rating_p1'
                     const isGlickoP2 = p2Key === 'glicko_rating_p2'
 
@@ -140,7 +137,6 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                         key={label}
                         className={cn(
                           'grid grid-cols-[1fr_2fr_1fr] gap-3 py-2.5',
-                          // Séparation visuelle : border-bottom sur toutes les lignes sauf la dernière
                           idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                         )}
                       >
@@ -152,16 +148,14 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                               val1 === null || val1 === undefined
                                 ? 'text-[var(--text-3)]'
                                 : isGlickoP1
-                                  ? '' // couleur gérée par le flex-col ci-dessous
+                                  ? ''
                                   : classA
                             )}
                           >
                             {isGlickoP1 ? (
-                              <GlickoRatingCell
-                                rating={val1}
-                                rd={match.glicko_rd_p1}
-                                baseColorClass={val1 !== null && val1 !== undefined ? classA : undefined}
-                              />
+                              <span className={cn(classA)}>
+                                {val1 !== null ? Math.round(val1) : '—'}
+                              </span>
                             ) : p1Key === 'form_p1' ? (
                               <FormeCell value={match.form_p1} />
                             ) : p1Key === 'delta_rank_6m_p1' ? (
@@ -174,7 +168,7 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                           </span>
                         </div>
 
-                        {/* Label — centered, non coloré */}
+                        {/* Label — centered */}
                         <div className="flex items-center justify-center">
                           <span className="text-[11px] text-[var(--text-3)] leading-none text-center">
                             {label}
@@ -189,16 +183,14 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                               val2 === null || val2 === undefined
                                 ? 'text-[var(--text-3)]'
                                 : isGlickoP2
-                                  ? '' // couleur gérée par le flex-col ci-dessous
+                                  ? ''
                                   : classB
                             )}
                           >
                             {isGlickoP2 ? (
-                              <GlickoRatingCell
-                                rating={val2}
-                                rd={match.glicko_rd_p2}
-                                baseColorClass={val2 !== null && val2 !== undefined ? classB : undefined}
-                              />
+                              <span className={cn(classB)}>
+                                {val2 !== null ? Math.round(val2) : '—'}
+                              </span>
                             ) : p2Key === 'form_p2' ? (
                               <FormeCell value={match.form_p2} />
                             ) : p2Key === 'delta_rank_6m_p2' ? (
@@ -224,37 +216,6 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
 }
 
 // ─── Sous-composants pour les cas spéciaux ───────────────────────────────────
-
-/**
- * Affiche le Glicko Rating avec le RD en dessous (petit, couleur secondaire).
- * Stack vertical : rating en grand, RD en dessous.
- */
-function GlickoRatingCell({
-  rating,
-  rd,
-  baseColorClass,
-}: {
-  rating: number | null
-  rd: number | null
-  baseColorClass?: string
-}) {
-  if (rating === null || rating === undefined) {
-    return <span className="text-[var(--text-3)]">—</span>
-  }
-
-  return (
-    <div className="flex flex-col items-end">
-      <span className={cn(baseColorClass)}>
-        {Math.round(rating)}
-      </span>
-      {rd !== null && rd !== undefined && (
-        <span className="text-[11px] text-[var(--text-3)] leading-none">
-          RD&nbsp;: {Math.round(rd)}
-        </span>
-      )}
-    </div>
-  )
-}
 
 /**
  * Affiche la forme (V/D/N) avec couleurs : V=vert, D=rouge, N=neutre.
