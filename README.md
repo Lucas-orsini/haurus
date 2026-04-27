@@ -89,53 +89,48 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they reach your browser.
+Unit tests automatically verify that small parts of the code (like validation logic) work correctly.
 
 Run all tests:
-
 ```bash
 npx jest
 ```
 
 Run a specific test file:
-
 ```bash
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Run in watch mode (re-runs on file change):
-
+Run tests in watch mode (re-runs automatically when files change):
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — all tests passed, your code is working correctly
-- `FAIL` — something broke, check the error message below for which test failed and why
+**Reading the output:**
+- **PASS** (green) = all tests passed, nothing is broken
+- **FAIL** (red) = something is broken, check the error message below for details
 
-**Tests included:**
-- Auth validation tests (`__tests__/auth-validators.test.ts`)
+**What the tests cover:**
+- Authentication validation logic (email format, password strength, input sanitization)
 
 ## 📁 Project Structure
 
-- `src/lib` — Utility functions and Supabase client setup
-- `src/components/dashboard` — Dashboard UI components including MatchRow
+- `src/components/dashboard` — Dashboard UI components (MatchRow)
+- `src/lib` — Shared utility functions
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+4. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy** — Vercel will automatically build and deploy your app
+5. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may fail to connect to Supabase.
+> ⚠️ Make sure to add all environment variables before deploying, or your app will crash.
 
 ## 📝 License
 
