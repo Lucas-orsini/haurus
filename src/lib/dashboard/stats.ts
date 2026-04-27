@@ -85,7 +85,7 @@ function findSurfaceSpecialist(
   for (const match of matches) {
     for (const playerName of [match.player1, match.player2]) {
       const opponent = playerName === match.player1 ? match.player2 : match.player1
-      const stats = statsMap.get(playerName)
+      const stats = statsMap.get(playerName.toLowerCase())
       if (!stats) continue
 
       const winRate = getSurfaceWinRate(stats, match.surface)
@@ -118,7 +118,7 @@ function findExtremeMomentum(
   for (const match of matches) {
     for (const playerName of [match.player1, match.player2]) {
       const opponent = playerName === match.player1 ? match.player2 : match.player1
-      const stats = statsMap.get(playerName)
+      const stats = statsMap.get(playerName.toLowerCase())
       if (!stats || stats.momentum_td === null) continue
 
       const absMomentum = Math.abs(stats.momentum_td)
@@ -201,8 +201,10 @@ export async function computeTodaysStats(
     return undefined
   }
 
+  // Normalise en minuscules pour éviter les défaillances de jointure
+  // dues à des différences de casse entre match_stats et player_stats
   const playerStatsMap = new Map<string, PlayerStatsRow>(
-    playerStatsRows.map((r) => [r.player_name, r])
+    playerStatsRows.map((r) => [r.player_name.toLowerCase(), r])
   )
 
   const tournaments = extractTournaments(todaysMatches)
