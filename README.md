@@ -4,10 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Match Stats System** — Type-safe match statistics using TypeScript interfaces
-- **Dashboard** — Dashboard layout at `/dashboard` with sidebar navigation
+- **Dashboard Layout** — Main dashboard interface with sidebar navigation
 - **Supabase Integration** — Client-side Supabase setup with SSR support
-- **Authentication Flow** — Login and signup pages with Supabase integration
+- **Authentication Middleware** — Route protection and user session management
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
 
@@ -83,12 +82,12 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → **Settings** → **API** → **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → **Settings** → **API** → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
 
 ## 🧪 Running Tests
 
-Jest is configured for this project. Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they reach your users.
+Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they affect your app.
 
 Run all tests:
 
@@ -102,40 +101,37 @@ Run a specific test file:
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Watch mode (re-runs tests automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- **PASS** — All tests in that file passed ✓
-- **FAIL** — Something broke. Look for the red error message showing which test failed and why
+**How to read the output:**
+- `PASS` — All tests passed, everything is working correctly
+- `FAIL` — Something broke. Look for the error message below to see which test failed and why
 
-**What the tests cover:**
-- Authentication validators (`__tests__/auth-validators.test.ts`)
+The tests in this project cover authentication validation logic.
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts (dashboard)
-- `src/lib/supabase` — Supabase client configuration and utilities (match-stats)
-- `src/types` — TypeScript type definitions and interfaces (match-stats)
+- `src/app` — Next.js App Router pages and layouts (dashboard routes)
+- `src/components` — Reusable React components (DashboardSidebar)
+- `src/middleware.ts` — Supabase authentication middleware for route protection
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
 4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your anon public key
-
-5. Click **Deploy** — Vercel will automatically build and deploy your app
-
-> ⚠️ **Important**: All environment variables must be added in Vercel before deployment. Without them, your app will crash on load.
+Your app will be live on a `.vercel.app` domain within seconds.
 
 ## 📝 License
 
