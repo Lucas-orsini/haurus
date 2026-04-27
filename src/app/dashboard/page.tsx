@@ -8,7 +8,7 @@ import DashboardOverview from '@/components/dashboard/DashboardOverview'
 /**
  * Dashboard overview page.
  *
- * Server Component — fetches all match_stats on first load.
+ * Server Component — fetches upcoming match_stats (date_match >= today) on first load.
  * If the user has no active Supabase session, redirects to /login.
  * The middleware already protects this route, but we double-check here
  * as a fail-safe (defense in depth).
@@ -24,10 +24,13 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD in server timezone
+
   const { data: matches, error } = await supabase
     .from('match_stats')
     .select('*')
-    .order('date_match', { ascending: false })
+    .gte('date_match', today)
+    .order('date_match', { ascending: true })
 
   if (error) {
     // Propagate a clean error state to the client component
