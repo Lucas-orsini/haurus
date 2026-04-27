@@ -4,9 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **MatchRow Component** — Reusable component for rendering individual match statistics in a dashboard row
-- **Dashboard Overview** — Main dashboard displaying match data with favorites functionality
-- **Favorite Button** — Interactive button to toggle match favorites
+- **Match Favorites API** — Backend endpoint for managing match favorites data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -89,55 +87,53 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly without needing to run the whole app.
+Unit tests automatically check that specific parts of your code work correctly without needing the whole app running.
 
-### Run all tests
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-### Run a specific test file
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
-npx jest __tests__/dashboard/formatMetric.test.ts
-npx jest __tests__/utils.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
-### Understanding test output
+**Understanding test output:**
+- `PASS` — All tests in that file passed ✓
+- `FAIL` — Something broke, see the error message below for what went wrong
 
-- **PASS** — All tests passed, your code is working correctly
-- **FAIL** — Something broke. The output will show which test failed and why
-- Tests cover: auth validators, dashboard metric formatting, and utility functions
+**Tests included:**
+- `__tests__/auth-validators.test.ts` — Auth validation logic
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting
+- `__tests__/utils.test.ts` — Utility functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and API routes (dashboard page, match-favorites API)
-- `src/components/dashboard` — Dashboard components (MatchRow, FavoriteButton, DashboardOverview)
-- `src/lib/types` — TypeScript type definitions (favorite types)
+- `src/app` — Next.js App Router pages, layouts, and API routes
+- `src/app/api/match-favorites` — API endpoint for match favorites management
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+3. Add your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+4. Click **Deploy**
 
-Your app will be live at a `.vercel.app` URL within seconds.
+Your app will be live at a `vercel.app` URL within seconds.
 
 ## 📝 License
 

@@ -85,21 +85,44 @@ export async function POST(request: NextRequest) {
 
   const matchId = (body as { matchId: string }).matchId.trim()
 
-  // Attempt upsert — insert a row that will conflict on (user_id, match_id),
-  // then delete it. The net effect: first call adds a favorite, second removes it.
-  const { data, error } = await supabase.rpc('toggle_match_favorite', {
-    p_user_id: user.id,
-    p_match_id: matchId,
-  })
+  // Step 1: check if favorite already exists for this user/match pair
+  const { data: existing } = await supabase
+    .from('match_favorites')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('match_id', matchId)
+    .maybeSingle()
 
-  if (error) {
-    return NextResponse.json(
-      { error: 'Failed to toggle favorite' },
-      { status: 500 }
-    )
+  let favorited: boolean
+
+  if (existing) {
+    // Step 2a: already favorited → delete to toggle off
+    const { error: deleteError } = await supabase
+      .from('match_favorites')
+      .delete()
+      .eq('id', existing.id)
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: 'Failed to remove favorite' },
+        { status: 500 }
+      )
+    }
+    favorited = false
+  } else {
+    // Step 2b: not favorited → insert to toggle on
+    const { error: insertError } = await supabase
+      .from('match_favorites')
+      .insert({ user_id: user.id, match_id: matchId })
+
+    if (insertError) {
+      return NextResponse.json(
+        { error: 'Failed to add favorite' },
+        { status: 500 }
+      )
+    }
+    favorited = true
   }
-
-  const favorited = (data as boolean) ?? false
 
   return NextResponse.json({ favorited, matchId })
 }
