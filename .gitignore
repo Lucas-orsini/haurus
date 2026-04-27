@@ -10,3 +10,4 @@ tsconfig.tsbuildinfo
 .kurtel-repo-cache.json.gz
 node_modules/
 package-lock.json
+.env
