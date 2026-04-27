@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { cn, getMetricColor } from '@/lib/utils'
+import { cn, formatMetricValue, formatForme, getDeltaColor, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 
 interface MatchRowProps {
@@ -37,22 +37,6 @@ const METRIC_DEFS: MetricDef[] = [
   { label: 'Jours de repos',       p1Key: 'jours_repos_p1',        p2Key: 'jours_repos_p2',        mode: 'neutral' },
   { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral' },
 ]
-
-// Set of keys that should be displayed as integers (no decimal)
-const INTEGER_KEYS = new Set<keyof MatchStats>([
-  'rank_p1', 'rank_p2', 'jours_repos_p1', 'jours_repos_p2',
-])
-
-function formatValue(value: unknown, key?: keyof MatchStats): string {
-  if (value === null || value === undefined) return '—'
-  if (typeof value === 'number') {
-    // Entiers pour Rank ATP et Jours de repos
-    if (key && INTEGER_KEYS.has(key)) return Math.round(value).toString()
-    // Sinon 3 décimales pour les autres valeurs numériques
-    return value.toFixed(3)
-  }
-  return String(value)
-}
 
 export default function MatchRow({ match, isEven }: MatchRowProps) {
   const [open, setOpen] = useState(false)
@@ -147,6 +131,10 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                     const val2 = match[p2Key] as number | null
                     const [classA, classB] = getMetricColor(val1, val2, mode)
 
+                    // ─── Cas spécial Glicko Rating : rating + RD inline ───────────
+                    const isGlickoP1 = p1Key === 'glicko_rating_p1'
+                    const isGlickoP2 = p2Key === 'glicko_rating_p2'
+
                     return (
                       <div
                         key={label}
@@ -163,10 +151,26 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                               'text-xs font-mono tabular-nums',
                               val1 === null || val1 === undefined
                                 ? 'text-[var(--text-3)]'
-                                : classA
+                                : isGlickoP1
+                                  ? '' // couleur gérée par le flex-col ci-dessous
+                                  : classA
                             )}
                           >
-                            {formatValue(val1, p1Key)}
+                            {isGlickoP1 ? (
+                              <GlickoRatingCell
+                                rating={val1}
+                                rd={match.glicko_rd_p1}
+                                baseColorClass={val1 !== null && val1 !== undefined ? classA : undefined}
+                              />
+                            ) : p1Key === 'form_p1' ? (
+                              <FormeCell value={match.form_p1} />
+                            ) : p1Key === 'delta_rank_6m_p1' ? (
+                              <span className={cn(getDeltaColor(val1))}>
+                                {formatMetricValue(val1, p1Key)}
+                              </span>
+                            ) : (
+                              <span>{formatMetricValue(val1, p1Key)}</span>
+                            )}
                           </span>
                         </div>
 
@@ -184,10 +188,26 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                               'text-xs font-mono tabular-nums',
                               val2 === null || val2 === undefined
                                 ? 'text-[var(--text-3)]'
-                                : classB
+                                : isGlickoP2
+                                  ? '' // couleur gérée par le flex-col ci-dessous
+                                  : classB
                             )}
                           >
-                            {formatValue(val2, p2Key)}
+                            {isGlickoP2 ? (
+                              <GlickoRatingCell
+                                rating={val2}
+                                rd={match.glicko_rd_p2}
+                                baseColorClass={val2 !== null && val2 !== undefined ? classB : undefined}
+                              />
+                            ) : p2Key === 'form_p2' ? (
+                              <FormeCell value={match.form_p2} />
+                            ) : p2Key === 'delta_rank_6m_p2' ? (
+                              <span className={cn(getDeltaColor(val2))}>
+                                {formatMetricValue(val2, p2Key)}
+                              </span>
+                            ) : (
+                              <span>{formatMetricValue(val2, p2Key)}</span>
+                            )}
                           </span>
                         </div>
                       </div>
@@ -200,5 +220,67 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
         </td>
       </tr>
     </>
+  )
+}
+
+// ─── Sous-composants pour les cas spéciaux ───────────────────────────────────
+
+/**
+ * Affiche le Glicko Rating avec le RD en dessous (petit, couleur secondaire).
+ * Stack vertical : rating en grand, RD en dessous.
+ */
+function GlickoRatingCell({
+  rating,
+  rd,
+  baseColorClass,
+}: {
+  rating: number | null
+  rd: number | null
+  baseColorClass?: string
+}) {
+  if (rating === null || rating === undefined) {
+    return <span className="text-[var(--text-3)]">—</span>
+  }
+
+  return (
+    <div className="flex flex-col items-end">
+      <span className={cn(baseColorClass)}>
+        {Math.round(rating)}
+      </span>
+      {rd !== null && rd !== undefined && (
+        <span className="text-[11px] text-[var(--text-3)] leading-none">
+          RD&nbsp;: {Math.round(rd)}
+        </span>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Affiche la forme (V/D/N) avec couleurs : V=vert, D=rouge, N=neutre.
+ * Séparé par des espaces.
+ */
+function FormeCell({ value }: { value: string | null }) {
+  const segments = formatForme(value)
+
+  if (!segments) {
+    return <span className="text-[var(--text-3)]">—</span>
+  }
+
+  return (
+    <span className="flex items-center gap-px">
+      {segments.map((seg, i) => (
+        <span
+          key={i}
+          className={cn(
+            seg.color === 'green'  && 'text-[var(--green)]',
+            seg.color === 'red'    && 'text-[var(--red)]',
+            seg.color === 'neutral' && 'text-[var(--text-3)]'
+          )}
+        >
+          {seg.char}
+        </span>
+      ))}
+    </span>
   )
 }

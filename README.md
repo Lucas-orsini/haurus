@@ -89,38 +89,44 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that small parts of the code (like validation logic) work correctly.
+Unit tests automatically check that individual pieces of code work correctly — think of them as a robot that clicks through your app to make sure nothing is broken.
 
-Run all tests:
+**Run all tests:**
+
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
+
 ```bash
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+**Watch mode (re-runs tests automatically when you save changes):**
+
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- **PASS** (green) = all tests passed, nothing is broken
-- **FAIL** (red) = something is broken, check the error message below for details
+**How to read the output:**
+- `PASS` — everything is working correctly
+- `FAIL` — something broke, and you'll see which test failed and why
 
-**What the tests cover:**
-- Authentication validation logic (email format, password strength, input sanitization)
+**What these tests cover:**
+- `__tests__/auth-validators.test.ts` — authentication validation logic
+- `__tests__/dashboard/formatMetric.test.ts` — dashboard metric formatting
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (MatchRow)
-- `src/lib` — Shared utility functions
+- `src/lib` — Utility functions and shared helpers
+- `src/components/dashboard` — Dashboard UI components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+**Step by step:**
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
@@ -130,7 +136,7 @@ npx jest --watch
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. Click **Deploy**
 
-> ⚠️ Make sure to add all environment variables before deploying, or your app will crash.
+Vercel will automatically install dependencies and deploy your app.
 
 ## 📝 License
 
