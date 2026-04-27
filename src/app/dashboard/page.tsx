@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { MatchStats } from '@/lib/types/match'
+import { computeTodaysStats } from '@/lib/dashboard/stats'
 import DashboardOverview from '@/components/dashboard/DashboardOverview'
 
 /**
@@ -49,6 +50,15 @@ export default async function DashboardPage() {
     favoriteMatchIds = []
   }
 
+  // Compute today's stats (card1/card2/card3)
+  let todaysStats = undefined
+  try {
+    todaysStats = await computeTodaysStats(supabase)
+  } catch {
+    // Non-critical: if stats computation fails, cards show fallbacks
+    todaysStats = undefined
+  }
+
   if (error) {
     // Propagate a clean error state to the client component
     // so it can render the error UI instead of crashing
@@ -57,6 +67,7 @@ export default async function DashboardPage() {
         matches={[]}
         fetchError="Failed to load match data. Please try again."
         favoriteMatchIds={favoriteMatchIds}
+        todaysStats={todaysStats}
       />
     )
   }
@@ -65,6 +76,7 @@ export default async function DashboardPage() {
     <DashboardOverview
       matches={(matches as MatchStats[]) ?? []}
       favoriteMatchIds={favoriteMatchIds}
+      todaysStats={todaysStats}
     />
   )
 }
