@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Sidebar** — Navigation sidebar component for the dashboard interface
+- **MatchRow Component** — Reusable, type-safe component for rendering individual match statistics in a dashboard row
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -82,8 +82,8 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
 
 ## 🧪 Running Tests
 
@@ -111,29 +111,28 @@ npx jest --watch
 
 ### Reading test output
 
-- **PASS** — All assertions in the test passed ✅
-- **FAIL** — Something broke. The error message shows which test failed and why
+- **PASS** — All assertions passed, the code works as expected
+- **FAIL** — Something broke. Look for the error message and which line in the test file caused the failure
 
-The tests cover authentication validators, dashboard metric formatting utilities, and general utility functions.
+The tests cover: authentication validators, dashboard metric formatting, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard components including the sidebar navigation
-- `__tests__` — Jest test files for components and utilities
+- `src/components/dashboard` — Dashboard components including MatchRow for rendering match statistics
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables in Vercel dashboard:
+3. In the Vercel dashboard, add your environment variables:
    - Go to **Settings** → **Environment Variables**
    - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
    - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all `.env.local` variables to Vercel before deploying, otherwise your app won't connect to Supabase.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
