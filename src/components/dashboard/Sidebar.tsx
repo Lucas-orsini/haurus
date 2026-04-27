@@ -1,12 +1,16 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard,
   Settings,
   LogOut,
 } from 'lucide-react'
+
+type SignOutState = 'idle' | 'signing-out'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
@@ -15,6 +19,16 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [signOutState, setSignOutState] = useState<SignOutState>('idle')
+
+  async function handleSignOut() {
+    if (signOutState !== 'idle') return
+    setSignOutState('signing-out')
+    const supabase = createClient()
+    await supabase?.auth.signOut()
+    router.push('/login')
+  }
 
   return (
     <aside className="w-[220px] shrink-0 h-screen flex flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
@@ -58,8 +72,15 @@ export function Sidebar() {
 
       {/* Footer utilisateur */}
       <div className="shrink-0">
-        <button className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer transition-colors w-full">
-          <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center text-[10px] text-[var(--text-2)] font-medium shrink-0">
+        <button
+          onClick={handleSignOut}
+          disabled={signOutState !== 'idle'}
+          className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer transition-colors w-full disabled:cursor-not-allowed"
+        >
+          <div className={cn(
+            'w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center text-[10px] text-[var(--text-2)] font-medium shrink-0 transition-opacity duration-200',
+            signOutState === 'signing-out' && 'opacity-40'
+          )}>
             U
           </div>
           <div className="flex flex-col min-w-0 flex-1 text-left">
@@ -70,7 +91,10 @@ export function Sidebar() {
               Connecté
             </span>
           </div>
-          <LogOut size={14} className="text-[var(--text-3)] shrink-0" />
+          <LogOut size={14} className={cn(
+            'text-[var(--text-3)] shrink-0 transition-opacity duration-200',
+            signOutState === 'signing-out' && 'opacity-40'
+          )} />
         </button>
       </div>
     </aside>

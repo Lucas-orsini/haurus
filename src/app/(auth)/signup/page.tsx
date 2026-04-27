@@ -28,6 +28,12 @@ export default function SignupPage() {
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('idle')
 
+  function getRedirectTo(): string {
+    if (typeof window === 'undefined') return '/dashboard'
+    const params = new URLSearchParams(window.location.search)
+    return params.get('redirectTo') ?? '/dashboard'
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setGlobalError(null)
@@ -56,9 +62,9 @@ export default function SignupPage() {
 
     try {
       await signup(name, email, password)
-      router.push('/')
+      router.push(getRedirectTo())
     } catch (err) {
-      setFormState('error')
+      setFormState('idle')
       setGlobalError(
         err instanceof Error ? err.message : 'Une erreur est survenue.'
       )

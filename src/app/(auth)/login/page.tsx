@@ -21,6 +21,12 @@ export default function LoginPage() {
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('idle')
 
+  function getRedirectTo(): string {
+    if (typeof window === 'undefined') return '/dashboard'
+    const params = new URLSearchParams(window.location.search)
+    return params.get('redirectTo') ?? '/dashboard'
+  }
+
   // Check for existing session on mount — redirect if already authenticated
   useEffect(() => {
     async function checkSession() {
@@ -28,7 +34,7 @@ export default function LoginPage() {
         const session = await getSession()
         if (session) {
           setFormState('redirecting')
-          router.push('/')
+          router.push(getRedirectTo())
         }
       } catch {
         // Session check failed — stay on login page
@@ -55,7 +61,7 @@ export default function LoginPage() {
     try {
       await login(email, password)
       setFormState('redirecting')
-      router.push('/')
+      router.push(getRedirectTo())
     } catch (err) {
       setFormState('idle')
       setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
