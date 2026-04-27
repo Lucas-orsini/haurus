@@ -4,13 +4,7 @@ import { useState, useMemo } from 'react'
 import { Search, X, ChevronDown, AlertCircle, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MatchRow from './MatchRow'
-import MatchStatsCards from './MatchStatsCards'
 import type { MatchStats } from '@/lib/types/match'
-import type {
-  MatchsJourData,
-  SpecialisteSurfaceData,
-  MomentumExtremeData,
-} from '@/lib/dashboard/statsCards'
 
 interface DashboardOverviewProps {
   matches: MatchStats[]

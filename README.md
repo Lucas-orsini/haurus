@@ -4,9 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Overview** — Main dashboard view with comprehensive metrics display
-- **Stats Cards** — Metric display cards for dashboard data visualization
-- **Match Statistics** — Match-specific stats cards component
+- **Dashboard Sidebar** — Navigation sidebar component for the dashboard interface
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -109,38 +107,35 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke. Read the error message below to see which test failed and why.
+**How to read Jest output:**
+- **PASS** — All tests in that file passed successfully
+- **FAIL** — Something broke; Jest will show which test failed and why
 
-**What the tests cover:**
-- `__tests__/auth-validators.test.ts` — Validation logic for authentication inputs
-- `__tests__/auth.test.ts` — Authentication flow and session handling
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities for dashboard display
-- `__tests__/utils.test.ts` — General utility functions used across the app
+The test suite covers:
+- Auth validators (email/password validation logic)
+- Dashboard formatting utilities (metric display formatting)
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/lib/dashboard` — Dashboard utility functions including stats card helpers
-- `src/components/dashboard` — Dashboard UI components (overview, stats cards, match statistics)
+- `src/components/dashboard` — Dashboard UI components including the sidebar navigation
+- `__tests__` — Jest test files for auth validators, dashboard formatting, and utilities
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`haraus`)
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
+1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In the Vercel dashboard, add your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+4. Click **Deploy**
 
-   - `NEXT_PUBLIC_SUPABASE_URL` → your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → your Supabase anon key
-
-5. Click **Deploy** — Vercel will automatically build and deploy your app
-
-> ⚠️ **Important**: Make sure all environment variables are added before deploying. If you add them after, you'll need to redeploy.
+> ⚠️ **Important**: Make sure all `.env.local` variables are added to Vercel before deploying, otherwise your app will crash.
 
 ## 📝 License
 
