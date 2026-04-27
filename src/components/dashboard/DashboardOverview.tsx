@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, X, ChevronDown, AlertCircle } from 'lucide-react'
+import { Search, X, ChevronDown, AlertCircle, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MatchRow from './MatchRow'
 import type { MatchStats } from '@/lib/types/match'
@@ -9,13 +9,20 @@ import type { MatchStats } from '@/lib/types/match'
 interface DashboardOverviewProps {
   matches: MatchStats[]
   fetchError?: string
+  favoriteMatchIds?: string[]
 }
 
 const TODAY_FILTER_KEY = '__today__'
 
-export default function DashboardOverview({ matches, fetchError }: DashboardOverviewProps) {
+export default function DashboardOverview({
+  matches,
+  fetchError,
+  favoriteMatchIds = [],
+}: DashboardOverviewProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set())
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const [localFavoriteIds, setLocalFavoriteIds] = useState<string[]>(favoriteMatchIds)
 
   // Collect unique tournaments from data
   const tournaments = useMemo(() => {
@@ -38,6 +45,11 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
     const query = searchQuery.trim().toLowerCase()
 
     return matches.filter((m) => {
+      // Favorites filter
+      if (favoritesOnly && !localFavoriteIds.includes(m.id)) {
+        return false
+      }
+
       // Text search: player1 OR player2
       if (query) {
         const p1 = m.player1.toLowerCase()
@@ -63,7 +75,7 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
 
       return true
     })
-  }, [matches, searchQuery, activeFilters, tournaments])
+  }, [matches, searchQuery, activeFilters, tournaments, favoritesOnly, localFavoriteIds])
 
   function toggleFilter(key: string) {
     setActiveFilters((prev) => {
@@ -77,9 +89,20 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
   function clearFilters() {
     setActiveFilters(new Set())
     setSearchQuery('')
+    setFavoritesOnly(false)
   }
 
-  const hasActiveFilters = activeFilters.size > 0 || searchQuery.trim().length > 0
+  function handleToggleFavorite(matchId: string, favorited: boolean) {
+    setLocalFavoriteIds((prev) =>
+      favorited
+        ? [...prev, matchId]
+        : prev.filter((id) => id !== matchId)
+    )
+  }
+
+  const hasActiveFilters =
+    activeFilters.size > 0 || searchQuery.trim().length > 0 || favoritesOnly
+  const showFavoritesEmpty = favoritesOnly && localFavoriteIds.length === 0
 
   return (
     <div className="space-y-4">
@@ -143,6 +166,20 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
             Aujourd&apos;hui
           </button>
 
+          {/* Filter: Favoris */}
+          <button
+            onClick={() => setFavoritesOnly((v) => !v)}
+            className={cn(
+              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
+              favoritesOnly
+                ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
+                : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-3)] hover:bg-white/[0.06] hover:text-[var(--text-2)]'
+            )}
+          >
+            <Star size={11} strokeWidth={1.5} />
+            Favoris
+          </button>
+
           {/* Tournament filter toggles */}
           {tournaments.slice(0, 5).map((t) => (
             <button
@@ -198,25 +235,43 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
                   Surface
                 </th>
+                <th className="px-4 py-2.5 w-10" />
               </tr>
             </thead>
             <tbody>
               {filteredMatches.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-16 text-center">
+                  <td colSpan={5} className="px-4 py-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center">
-                        <Search size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
+                        {showFavoritesEmpty ? (
+                          <Star size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
+                        ) : (
+                          <Search size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
+                        )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-[var(--text-2)]">
-                          Aucun match trouvé
-                        </p>
-                        <p className="text-xs text-[var(--text-3)] mt-0.5">
-                          Modifiez vos critères de recherche ou filtres.
-                        </p>
+                        {showFavoritesEmpty ? (
+                          <>
+                            <p className="text-sm font-medium text-[var(--text-2)]">
+                              Aucun favori
+                            </p>
+                            <p className="text-xs text-[var(--text-3)] mt-0.5">
+                              Ajoutez des matchs en étoile.
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-[var(--text-2)]">
+                              Aucun match trouvé
+                            </p>
+                            <p className="text-xs text-[var(--text-3)] mt-0.5">
+                              Modifiez vos critères de recherche ou filtres.
+                            </p>
+                          </>
+                        )}
                       </div>
-                      {hasActiveFilters && (
+                      {hasActiveFilters && !showFavoritesEmpty && (
                         <button
                           onClick={clearFilters}
                           className="h-7 px-3 flex items-center justify-center gap-1.5 rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors mt-1"
@@ -234,6 +289,8 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
                     key={match.id}
                     match={match}
                     isEven={i % 2 === 1}
+                    isFavorite={localFavoriteIds.includes(match.id)}
+                    onToggleFavorite={handleToggleFavorite}
                   />
                 ))
               )}

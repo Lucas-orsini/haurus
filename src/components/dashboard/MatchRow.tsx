@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import { cn, formatMetricValue, formatForme, getDeltaColor, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
+import FavoriteButton from './FavoriteButton'
 
 interface MatchRowProps {
   match: MatchStats
   isEven: boolean
+  isFavorite: boolean
+  onToggleFavorite: (matchId: string, favorited: boolean) => void
 }
 
 // Metric definition for the accordion panel
@@ -36,7 +39,7 @@ const METRIC_DEFS: MetricDef[] = [
   { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral' },
 ]
 
-export default function MatchRow({ match, isEven }: MatchRowProps) {
+export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }: MatchRowProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -79,11 +82,20 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
             {match.surface ?? '—'}
           </span>
         </td>
+
+        {/* Favoris */}
+        <td className="px-4 py-3.5">
+          <FavoriteButton
+            matchId={match.id}
+            isFavorite={isFavorite}
+            onToggle={onToggleFavorite}
+          />
+        </td>
       </tr>
 
       {/* Accordion panel — separate table row */}
       <tr className="border-b border-[var(--border)] last:border-0">
-        <td colSpan={4} className="p-0">
+        <td colSpan={5} className="p-0">
           <div
             className={cn(
               'overflow-hidden transition-all duration-200',

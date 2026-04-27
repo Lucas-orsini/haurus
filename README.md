@@ -4,7 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **MatchRow Component** — Reusable, type-safe component for rendering individual match statistics in a dashboard row
+- **MatchRow Component** — Reusable component for rendering individual match statistics in a dashboard row
+- **Dashboard Overview** — Main dashboard displaying match data with favorites functionality
+- **Favorite Button** — Interactive button to toggle match favorites
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -82,8 +84,8 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
 
 ## 🧪 Running Tests
 
@@ -109,28 +111,31 @@ npx jest __tests__/utils.test.ts
 npx jest --watch
 ```
 
-### Reading test output
+### Understanding test output
 
-- **PASS** — All assertions passed, the code works as expected
-- **FAIL** — Something broke. Look for the error message and which line in the test file caused the failure
-
-The tests cover: authentication validators, dashboard metric formatting, and utility functions.
+- **PASS** — All tests passed, your code is working correctly
+- **FAIL** — Something broke. The output will show which test failed and why
+- Tests cover: auth validators, dashboard metric formatting, and utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard components including MatchRow for rendering match statistics
+- `src/app` — Next.js App Router pages and API routes (dashboard page, match-favorites API)
+- `src/components/dashboard` — Dashboard components (MatchRow, FavoriteButton, DashboardOverview)
+- `src/lib/types` — TypeScript type definitions (favorite types)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
+### Step by step
+
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
 Your app will be live at a `.vercel.app` URL within seconds.
 
