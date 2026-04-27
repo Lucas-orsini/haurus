@@ -73,35 +73,83 @@ export function getMetricColor(
     : [redClass, greenClass]
 }
 
-/** Ensemble des clés de métriques à afficher en pourcentages (×100 + '%') */
-const PERCENT_KEYS = new Set([
+/**
+ * Segment de forme coloré pour le rendu.
+ */
+export interface FormeSegment {
+  char: string
+  color: 'green' | 'red' | 'neutral'
+}
+
+/**
+ * Formate une chaîne de forme (V/D/N) en segments colorés.
+ * Chaque caractère non-espace est mapper à une couleur :
+ *   V → green, D → red, N → neutral
+ *
+ * @param value - Chaîne de forme (ex: "VDVDV")
+ * @returns Tableau de segments colorés, ou null si value est null/undefined/vide
+ */
+export function formatForme(value: string | null | undefined): FormeSegment[] | null {
+  if (value === null || value === undefined || value === '') return null
+  return Array.from(value)
+    .filter((char) => char !== ' ')
+    .map((char) => {
+      if (char === 'V') return { char, color: 'green' as const }
+      if (char === 'D') return { char, color: 'red' as const }
+      return { char, color: 'neutral' as const }
+    })
+}
+
+/**
+ * Ensemble des clés de métriques à afficher en pourcentages (×100 + 1 décimale + '%')
+ */
+const PERCENT_1_DECIMAL_KEYS = new Set([
   'p_serve_p1', 'p_serve_p2',
   'p_return_p1', 'p_return_p2',
+])
+
+/**
+ * Ensemble des clés de métriques ×100 + Math.round + '%'
+ */
+const PERCENT_ROUNDED_KEYS = new Set([
+  'map_p1', 'map_p2',
   'win_rate_td_p1', 'win_rate_td_p2',
   'win_rate_surf_td_p1', 'win_rate_surf_td_p2',
   'win_rate_5m_p1', 'win_rate_5m_p2',
-  'momentum_td_p1', 'momentum_td_p2',
+])
+
+/**
+ * Ensemble des clés de métriques 1 décimale, sans signe
+ */
+const DECIMAL_1_NO_SIGN_KEYS = new Set([
   'breaks_won_td_p1', 'breaks_won_td_p2',
   'breaks_lost_td_p1', 'breaks_lost_td_p2',
 ])
 
-/** Ensemble des clés de métriques affichées en entier (pas de décimales) */
-const INTEGER_KEYS = new Set([
-  'rank_p1', 'rank_p2',
-  'delta_rank_6m_p1', 'delta_rank_6m_p2',
-  'glicko_rating_p1', 'glicko_rating_p2',
-  'glicko_rd_p1', 'glicko_rd_p2',
-  'jours_repos_p1', 'jours_repos_p2',
-  'fatigue_72h_p1', 'fatigue_72h_p2',
+/**
+ * Ensemble des clés de métriques 2 décimales, préfixe + si >= 0
+ */
+const DECIMAL_2_SIGNED_KEYS = new Set([
+  'tsd_p1', 'tsd_p2',
+  'bppi_p1', 'bppi_p2',
 ])
 
 /**
  * Formate une valeur de métrique selon son type.
- * - Pourcentages : valeur × 100 avec '%'
- * - Entiers : valeur arrondie sans décimales
- * - Delta rank : entier signé (+N / -N)
- * - Glicko rating : entier sans préfixe
- * - Autres : 3 décimales avec préfixe ↑/↓ selon le signe
+ *
+ * Règles par clé :
+ * - rank_p1 / rank_p2 : entier (Math.round)
+ * - delta_rank_6m_p1 / delta_rank_6m_p2 : entier signé (+ si >= 0)
+ * - p_serve_p1 / p_serve_p2, p_return_p1 / p_return_p2 : ×100, 1 décimale, %
+ * - glicko_rating_p1 / glicko_rating_p2 : entier
+ * - tsd_p1 / tsd_p2, bppi_p1 / bppi_p2 : 2 décimales, préfixe + si >= 0
+ * - map_p1 / map_p2, win_rate_td_p1 / win_rate_td_p2, win_rate_surf_td_p1 / win_rate_surf_td_p2 : ×100, Math.round, %
+ * - momentum_td_p1 / momentum_td_p2 : 2 décimales, ↑/↓ + signe
+ * - breaks_won_td_p1 / breaks_won_td_p2, breaks_lost_td_p1 / breaks_lost_td_p2 : 1 décimale
+ * - fatigue_72h_p1 / fatigue_72h_p2 : entier, suffixe ' min'
+ * - jours_repos_p1 / jours_repos_p2 : entier, suffixe ' jour' / ' jours'
+ * - form_p1 / form_p2 : valeur brute (le formatage coloré est géré par formatForme)
+ * - null / undefined : '—'
  *
  * @param value     - Valeur à formater (peut être null)
  * @param metricKey - Clé de la métrique (ex: 'p_serve_p1', 'delta_rank_6m_p1')
@@ -114,23 +162,71 @@ export function formatMetricValue(
   if (value === null || value === undefined) return '—'
   if (typeof value !== 'number') return String(value)
 
-  // Δ Rank 6M : entier signé sans préfixe flèche
+  // Rank ATP : entier
+  if (metricKey === 'rank_p1' || metricKey === 'rank_p2') {
+    return Math.round(value).toString()
+  }
+
+  // Δ Rank 6M : entier signé (+ si >= 0)
   if (metricKey === 'delta_rank_6m_p1' || metricKey === 'delta_rank_6m_p2') {
     const sign = value >= 0 ? '+' : ''
     return `${sign}${Math.round(value)}`
   }
 
-  // Pourcentages : ×100 avec '%'
-  if (PERCENT_KEYS.has(metricKey)) {
+  // P-Serve et P-Return : ×100, 1 décimale, %
+  if (PERCENT_1_DECIMAL_KEYS.has(metricKey)) {
     return `${(value * 100).toFixed(1)}%`
   }
 
-  // Entiers : pas de décimales
-  if (INTEGER_KEYS.has(metricKey)) {
+  // Glicko Rating : entier
+  if (metricKey === 'glicko_rating_p1' || metricKey === 'glicko_rating_p2') {
     return Math.round(value).toString()
   }
 
-  // Autres : 3 décimales avec préfixe ↑/↓
-  const sign = value >= 0 ? '↑' : '↓'
-  return `${sign}${Math.abs(value).toFixed(3)}`
+  // TSD et BPPI : 2 décimales, préfixe + si >= 0
+  if (DECIMAL_2_SIGNED_KEYS.has(metricKey)) {
+    const sign = value >= 0 ? '+' : ''
+    return `${sign}${Math.abs(value).toFixed(2)}`
+  }
+
+  // MAP, Win Rate TD, Win Rate Surface TD : ×100, Math.round, %
+  if (PERCENT_ROUNDED_KEYS.has(metricKey)) {
+    return `${Math.round(value * 100)}%`
+  }
+
+  // Momentum TD : 2 décimales, ↑/↓ + signe
+  if (metricKey === 'momentum_td_p1' || metricKey === 'momentum_td_p2') {
+    const arrow = value >= 0 ? '↑' : '↓'
+    const sign = value >= 0 ? '+' : '-'
+    return `${arrow} ${sign}${Math.abs(value).toFixed(2)}`
+  }
+
+  // Breaks Won/Lost TD : 1 décimale, sans signe
+  if (DECIMAL_1_NO_SIGN_KEYS.has(metricKey)) {
+    return Math.abs(value).toFixed(1)
+  }
+
+  // Fatigue 72H : entier, suffixe ' min'
+  if (metricKey === 'fatigue_72h_p1' || metricKey === 'fatigue_72h_p2') {
+    return `${Math.round(value)} min`
+  }
+
+  // Jours de repos : entier, suffixe ' jour' / ' jours'
+  if (metricKey === 'jours_repos_p1' || metricKey === 'jours_repos_p2') {
+    const rounded = Math.round(value)
+    return `${rounded} jour${rounded === 1 ? '' : 's'}`
+  }
+
+  // Forme : valeur brute (le formatage coloré est géré par formatForme dans MatchRow)
+  if (metricKey === 'form_p1' || metricKey === 'form_p2') {
+    return String(value)
+  }
+
+  // Glicko RD : entier (fallback, utilisé séparément dans MatchRow)
+  if (metricKey === 'glicko_rd_p1' || metricKey === 'glicko_rd_p2') {
+    return Math.round(value).toString()
+  }
+
+  // Fallback : nombre arrondi sans décimale
+  return Math.round(value).toString()
 }
