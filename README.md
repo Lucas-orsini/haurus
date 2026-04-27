@@ -4,10 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Match Stats System** — Type-safe match statistics using TypeScript interfaces
-- **Dashboard** — Dashboard layout at `/dashboard` with sidebar navigation
-- **Supabase Integration** — Client-side Supabase setup with SSR support
-- **Authentication Flow** — Login page with Supabase integration
+- **Dashboard** — Interactive dashboard displaying match statistics and data rows
+- **Match Statistics** — Type-safe match data components using TypeScript interfaces
+- **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
 
@@ -51,7 +50,7 @@ touch .env.local
 
 Open `.env.local` in your code editor and paste the following template:
 
-```env
+```bash
 # Supabase project URL — https://app.supabase.com/project/<project>/settings/api
 NEXT_PUBLIC_SUPABASE_URL=
 
@@ -102,38 +101,39 @@ Run a specific test file:
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- **PASS** — All tests passed, your code is working correctly
-- **FAIL** — Something broke, look at the error message below to see which test failed and why
+**Reading the output:**
 
-The test suite covers authentication validators.
+- `PASS` — All tests in that file passed, everything works correctly
+- `FAIL` — Something broke, check the error message below to see which test failed and why
+
+The test suite covers authentication validation logic.
 
 ## 📁 Project Structure
 
 - `src/app` — Next.js App Router pages and layouts
-- `src/components/dashboard` — Dashboard UI components (sidebar, overview, match rows)
-- `src/lib/types` — TypeScript type definitions (match statistics)
-- `__tests__` — Jest unit tests
+- `src/components/dashboard` — Dashboard-specific components including match row display
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. Add your environment variables:
    - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are also added in Vercel, otherwise your app won't work properly.
+That's it! Your app will be live on a Vercel URL within seconds.
 
 ## 📝 License
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 
@@ -41,7 +40,6 @@ const METRIC_DEFS: MetricDef[] = [
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '—'
   if (typeof value === 'number') {
-    // Format with appropriate decimal places
     if (Number.isInteger(value)) return value.toString()
     return value.toFixed(3)
   }
@@ -96,7 +94,6 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
       {/* Accordion panel — separate table row */}
       <tr className="border-b border-[var(--border)] last:border-0">
         <td colSpan={4} className="p-0">
-          {/* Animated panel using max-height transition */}
           <div
             className={cn(
               'overflow-hidden transition-all duration-200',
@@ -104,71 +101,60 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
             )}
           >
             <div className="px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
-              {/* Player headers */}
-              <div className="grid grid-cols-[1fr_1fr_2fr] gap-3 mb-4">
-                <div className="col-span-2" />
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                      {match.player1}
+              {/* Player headers — aligned with the 3-column metrics grid below */}
+              <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4">
+                {/* Col 1: player 1 name + rank, right-aligned */}
+                <div className="flex flex-col items-end min-w-0">
+                  <span className="text-xs font-medium text-[var(--text-1)] truncate">
+                    {match.player1}
+                  </span>
+                  {match.rank_p1 && (
+                    <span className="text-[11px] text-[var(--text-3)] font-mono">
+                      #{match.rank_p1}
                     </span>
-                    {match.rank_p1 && (
-                      <span className="text-[11px] text-[var(--text-3)] font-mono">
-                        #{match.rank_p1}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-col min-w-0 text-right">
-                    <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                      {match.player2}
+                  )}
+                </div>
+
+                {/* Col 2: empty — metric labels occupy this space below */}
+                <div />
+
+                {/* Col 3: player 2 name + rank, left-aligned */}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-medium text-[var(--text-1)] truncate">
+                    {match.player2}
+                  </span>
+                  {match.rank_p2 && (
+                    <span className="text-[11px] text-[var(--text-3)] font-mono">
+                      #{match.rank_p2}
                     </span>
-                    {match.rank_p2 && (
-                      <span className="text-[11px] text-[var(--text-3)] font-mono">
-                        #{match.rank_p2}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
 
-              {/* Metrics grid */}
-              <div className="grid grid-cols-[1fr_1fr_2fr] gap-3">
-                {METRIC_DEFS.map(({ label, p1Key, p2Key }) => {
-                  const val1 = match[p1Key]
-                  const val2 = match[p2Key]
-                  const display1 = formatValue(val1)
-                  const display2 = formatValue(val2)
+              {/* Metrics grid — true 3-column: P1 values | labels | P2 values */}
+              <div className="grid grid-cols-[1fr_2fr_1fr] gap-3">
+                {/* Column 1: player 1 metric values — right-aligned */}
+                <div className="flex flex-col gap-3">
+                  {METRIC_DEFS.map(({ label, p1Key }) => {
+                    const val1 = match[p1Key]
+                    return (
+                      <div key={label} className="flex items-center justify-end h-[20px]">
+                        <span
+                          className={cn(
+                            'text-xs font-mono tabular-nums',
+                            val1 === null || val1 === undefined
+                              ? 'text-[var(--text-3)]'
+                              : 'text-[var(--text-1)]'
+                          )}
+                        >
+                          {formatValue(val1)}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
 
-                  return (
-                    <div
-                      key={label}
-                      className="flex items-center justify-between col-span-2"
-                    >
-                      <span
-                        className={cn(
-                          'text-xs font-mono tabular-nums',
-                          val1 === null || val1 === undefined
-                            ? 'text-[var(--text-3)]'
-                            : 'text-[var(--text-1)]'
-                        )}
-                      >
-                        {display1}
-                      </span>
-                      <span
-                        className={cn(
-                          'text-xs font-mono tabular-nums',
-                          val2 === null || val2 === undefined
-                            ? 'text-[var(--text-3)]'
-                            : 'text-[var(--text-1)]'
-                        )}
-                      >
-                        {display2}
-                      </span>
-                    </div>
-                  )
-                })}
-
-                {/* Labels column */}
+                {/* Column 2: metric labels — left-aligned */}
                 <div className="flex flex-col gap-3">
                   {METRIC_DEFS.map(({ label }) => (
                     <div key={label} className="flex items-center h-[20px]">
@@ -177,6 +163,27 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                       </span>
                     </div>
                   ))}
+                </div>
+
+                {/* Column 3: player 2 metric values — left-aligned */}
+                <div className="flex flex-col gap-3">
+                  {METRIC_DEFS.map(({ label, p2Key }) => {
+                    const val2 = match[p2Key]
+                    return (
+                      <div key={label} className="flex items-center h-[20px]">
+                        <span
+                          className={cn(
+                            'text-xs font-mono tabular-nums',
+                            val2 === null || val2 === undefined
+                              ? 'text-[var(--text-3)]'
+                              : 'text-[var(--text-1)]'
+                          )}
+                        >
+                          {formatValue(val2)}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>
