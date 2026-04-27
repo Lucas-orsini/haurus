@@ -65,7 +65,7 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
         </td>
 
         {/* Joueurs */}
-        <td className="px-4 py-3.5 min-w-0">
+        <td className="px-4 py-3.5">
           <span className="text-sm text-[var(--text-1)] whitespace-nowrap">
             {match.player1}{' '}
             <span className="text-[var(--text-3)] text-xs mx-1">vs</span>{' '}
