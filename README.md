@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Sidebar** — Navigation sidebar component for the dashboard interface
+- **Dashboard** — Interactive dashboard with stats and overview components
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -42,13 +42,13 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
+Create a `.env.local` file in the project root:
 
 ```bash
 touch .env.local
 ```
 
-Open `.env.local` in your code editor and paste the following template:
+Open `.env.local` in your code editor and paste:
 
 ```bash
 # Supabase project URL
@@ -107,35 +107,33 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- **PASS** — All tests in that file passed successfully
-- **FAIL** — Something broke; Jest will show which test failed and why
+- `PASS` = all good, the code works correctly
+- `FAIL` = something broke, check the error message to see what failed
 
-The test suite covers:
-- Auth validators (email/password validation logic)
-- Dashboard formatting utilities (metric display formatting)
-- General utility functions
+**What the tests cover:**
+
+- Authentication validators
+- Auth integration
+- Dashboard metrics formatting
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the sidebar navigation
-- `__tests__` — Jest test files for auth validators, dashboard formatting, and utilities
+- `src/app/dashboard` — Dashboard page and layout files
+- `src/components/dashboard` — Dashboard UI components (stats, overview)
+- `src/lib/types` — TypeScript type definitions
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
+1. Click **Import a Git Repository** and select your repo
+2. Go to **Settings > Environment Variables** and add all variables from `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Click **Deploy**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
-
-> ⚠️ **Important**: Make sure all `.env.local` variables are added to Vercel before deploying, otherwise your app will crash.
+Your app will be live at a `.vercel.app` URL once deployment completes.
 
 ## 📝 License
 

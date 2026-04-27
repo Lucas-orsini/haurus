@@ -76,3 +76,33 @@ export type MatchStats = {
   jours_repos_p1: number | null
   jours_repos_p2: number | null
 }
+
+/**
+ * DashboardStatsData — Type representing the computed statistics for the
+ * 3 dashboard stat cards (Card 1: Matchs du jour, Card 2: Spécialiste surface,
+ * Card 3: Momentum extrême).
+ *
+ * This type is calculated server-side in src/app/dashboard/page.tsx
+ * from match_stats WHERE date_match = today, then passed as a prop to
+ * DashboardOverview which renders DashboardStats.
+ *
+ * Nullable contract: card2 and card3 are all-null when no match data exists
+ * for the day, or when the relevant metric fields are all null in the data.
+ */
+export interface DashboardStatsData {
+  card1: {
+    matchCount: number
+    tournaments: Array<{ name: string; surface: string }>
+  }
+  card2: {
+    playerName: string | null
+    winRate: number | null
+    surface: string | null
+    opponent: string | null
+  }
+  card3: {
+    playerName: string | null
+    momentum: number | null
+    opponent: string | null
+  }
+}
