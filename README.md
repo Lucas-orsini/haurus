@@ -5,11 +5,10 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **MatchRow Component** — Reusable, type-safe component for rendering individual match statistics in a dashboard row
-- **Utils Library** — Shared utility functions for data manipulation and Supabase integration
+- **Dashboard Sidebar** — Responsive sidebar navigation for the dashboard interface
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
-- **Authentication Validation** — Unit tests for auth-related validation logic
 
 ## 🛠️ Tech Stack
 
@@ -53,7 +52,7 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
+# Supabase project URL
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
@@ -78,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+\`` (Windows/Linux) or `Cmd+\`` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -89,54 +88,56 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like validation logic) work correctly without needing the whole app running.
+Unit tests automatically check that specific parts of your code work correctly without needing to run the whole app.
 
-Run all tests:
+### Run all tests
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+### Run a specific test file
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
-npx jest __tests__/dashboard/formatMetric.test.ts
-npx jest __tests__/utils.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+### Run tests in watch mode (re-runs automatically when files change)
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- `PASS` — All tests passed, everything works correctly
-- `FAIL` — Something broke, check the error message below for which test failed
+### Understanding test output
 
-**What the tests cover:**
-- `auth-validators.test.ts` — Authentication validation logic
-- `dashboard/formatMetric.test.ts` — Dashboard metric formatting utilities
-- `utils.test.ts` — General utility functions (className merging, data manipulation)
+- **PASS** — Everything is working correctly
+- **FAIL** — Something broke; the error message shows which test failed and why
+
+### What the tests cover
+
+- **auth-validators.test.ts** — Authentication validation logic
+- **dashboard/formatMetric.test.ts** — Metric formatting in the dashboard
+- **utils.test.ts** — Shared utility functions
 
 ## 📁 Project Structure
 
-- `src/lib` — Shared utility functions and Supabase client configuration
-- `src/components/dashboard` — Dashboard-specific components (MatchRow)
+- `src/components/dashboard` — Dashboard UI components including MatchRow and DashboardSidebar
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+### Step by step:
+
 1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
 3. Add your environment variables in Vercel dashboard:
    - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` with the same values from your `.env.local`
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables from `.env.local` to Vercel before deploying, otherwise your app will not connect to Supabase.
+> ⚠️ **Important**: Make sure all environment variables from `.env.local` are added to Vercel before deploying, otherwise your app may crash.
 
 ## 📝 License
 
