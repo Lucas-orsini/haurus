@@ -1,12 +1,17 @@
 import { fetchMatchStats } from '@/lib/supabase/match-stats'
 import { MatchTable } from '@/components/dashboard/MatchTable'
+import type { MatchStats } from '@/types/match-stats'
 
 export default async function DashboardPage() {
-  let matches: Awaited<ReturnType<typeof fetchMatchStats>> = []
+  let matches: MatchStats[] = []
   let error: string | null = null
 
   try {
-    matches = await fetchMatchStats()
+    const result = await fetchMatchStats()
+    matches = result.matches
+    if (result.error) {
+      error = result.error.message
+    }
   } catch (e) {
     error = e instanceof Error ? e.message : 'Impossible de charger les matchs'
   }
