@@ -24,7 +24,10 @@ export default function LoginPage() {
   function getRedirectTo(): string {
     if (typeof window === 'undefined') return '/dashboard'
     const params = new URLSearchParams(window.location.search)
-    return params.get('redirectTo') ?? '/dashboard'
+    const raw = params.get('redirectTo')
+    // Security: only follow absolute-path redirects
+    if (raw && raw.startsWith('/')) return raw
+    return '/dashboard'
   }
 
   // Check for existing session on mount — redirect if already authenticated

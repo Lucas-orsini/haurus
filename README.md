@@ -7,7 +7,7 @@ The metrics bookmakers use. Now yours.
 - **Match Stats System** — Type-safe match statistics using TypeScript interfaces
 - **Dashboard** — Dashboard layout at `/dashboard` with sidebar navigation
 - **Supabase Integration** — Client-side Supabase setup with SSR support
-- **Authentication Flow** — Login and signup pages with Supabase integration
+- **Authentication Flow** — Login page with Supabase integration
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
 
@@ -88,7 +88,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Jest is configured for this project. Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they reach your users.
+Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they reach your browser.
 
 Run all tests:
 
@@ -102,40 +102,38 @@ Run a specific test file:
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Watch mode (re-runs tests automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- **PASS** — All tests in that file passed ✓
-- **FAIL** — Something broke. Look for the red error message showing which test failed and why
+**How to read the output:**
+- **PASS** — All tests passed, your code is working correctly
+- **FAIL** — Something broke, look at the error message below to see which test failed and why
 
-**What the tests cover:**
-- Authentication validators (`__tests__/auth-validators.test.ts`)
+The test suite covers authentication validators.
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts (dashboard)
-- `src/lib/supabase` — Supabase client configuration and utilities (match-stats)
-- `src/types` — TypeScript type definitions and interfaces (match-stats)
+- `src/app` — Next.js App Router pages and layouts
+- `src/components/dashboard` — Dashboard UI components (sidebar, overview, match rows)
+- `src/lib/types` — TypeScript type definitions (match statistics)
+- `__tests__` — Jest unit tests
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
+2. Import your GitHub repository
+3. Add your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+4. Click **Deploy**
 
-   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your anon public key
-
-5. Click **Deploy** — Vercel will automatically build and deploy your app
-
-> ⚠️ **Important**: All environment variables must be added in Vercel before deployment. Without them, your app will crash on load.
+> ⚠️ **Important**: Make sure all environment variables from `.env.local` are also added in Vercel, otherwise your app won't work properly.
 
 ## 📝 License
 
