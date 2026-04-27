@@ -47,8 +47,8 @@ function formatValue(value: unknown, key?: keyof MatchStats): string {
   if (value === null || value === undefined) return '—'
   if (typeof value === 'number') {
     // Entiers pour Rank ATP et Jours de repos
-    if (Number.isInteger(value)) return value.toString()
-    // 3 décimales pour toutes les autres valeurs numériques
+    if (key && INTEGER_KEYS.has(key)) return Math.round(value).toString()
+    // Sinon 3 décimales pour les autres valeurs numériques
     return value.toFixed(3)
   }
   return String(value)
