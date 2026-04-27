@@ -63,7 +63,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
 2. Click **New Project** and follow the steps
 3. Wait for your project to be created (about 2 minutes)
-4. In the left sidebar, click **Settings** (gear icon)
+4. In the left sidebar, click **Project Settings** (gear icon)
 5. Click **API** in the settings menu
 6. Copy the **Project URL** → paste into `NEXT_PUBLIC_SUPABASE_URL`
 7. Copy the **anon public** key from the "Project API keys" table → paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -76,7 +76,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+\`` (Windows/Linux) or `Cmd+\`` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -109,37 +109,30 @@ npx jest __tests__/utils.test.ts
 npx jest --watch
 ```
 
-### Understanding test output
+### Reading test output
 
-- **PASS** — All assertions in the test passed ✅
-- **FAIL** — Something broke. The output shows which test failed and on which line
+- **PASS** — All assertions passed, the code works as expected
+- **FAIL** — Something broke. Look for the error message and which line in the test file caused the failure
 
-**What the tests cover:**
-- Authentication validators (email format, password strength)
-- Dashboard metric formatting utilities
-- General utility functions
+The tests cover: authentication validators, dashboard metric formatting, and utility functions.
 
 ## 📁 Project Structure
 
-- src/components/dashboard — MatchRow component and related dashboard UI components
+- `src/components/dashboard` — Dashboard components including MatchRow for rendering match statistics
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
-
-1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
+3. In the Vercel dashboard, add your environment variables:
    - Go to **Settings** → **Environment Variables**
    - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
    - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
 4. Click **Deploy**
 
-Your app will be live at a URL like `your-app.vercel.app`.
-
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are also added in Vercel, otherwise your app will break.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 

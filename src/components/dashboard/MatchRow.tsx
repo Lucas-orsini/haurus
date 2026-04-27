@@ -93,8 +93,8 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
             <div className="px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
               {/* Player headers — aligned with the 3-column metrics grid below */}
               <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4">
-                {/* Col 1: player 1 name, right-aligned */}
-                <div className="flex flex-col items-end min-w-0">
+                {/* Col 1: player 1 name, centered */}
+                <div className="flex flex-col items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player1}
                   </span>
@@ -103,8 +103,8 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                 {/* Col 2: empty — metric labels occupy this space below */}
                 <div />
 
-                {/* Col 3: player 2 name, left-aligned */}
-                <div className="flex flex-col min-w-0">
+                {/* Col 3: player 2 name, centered */}
+                <div className="flex flex-col items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player2}
                   </span>
