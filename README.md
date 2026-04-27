@@ -108,34 +108,34 @@ npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed, everything works correctly
-- `FAIL` — Something broke, check the error message below for which test failed and why
+- `PASS` — all tests in that file passed, everything is working
+- `FAIL` — something broke, check the error message below for which test failed and why
 
-**Tests cover:**
-- Authentication validators — form validation logic for auth inputs
-- Authentication — auth flow components and behavior
-- Dashboard formatting — metric display formatting utilities
-- Utility functions — helper functions used across the app
+**What the tests cover:**
+- `auth-validators.test.ts` — Authentication validation logic
+- `auth.test.ts` — Authentication flows and behavior
+- `dashboard/formatMetric.test.ts` — Dashboard metric formatting utilities
+- `utils.test.ts` — General utility functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts
-- `src/components/dashboard` — Dashboard UI components
-- `src/lib` — Shared utilities, types, and dashboard logic
+- `src/lib/dashboard` — Dashboard utility functions and statistics
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+**Step by step:**
 
-> ⚠️ **Important**: Don't forget to add both Supabase environment variables in Vercel — the app won't connect to your database without them.
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository (`haraus`)
+3. Vercel will auto-detect Next.js — click **Deploy**
+4. Once deployed, go to your project in Vercel Dashboard → **Settings** → **Environment Variables**
+5. Add both variables:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon public key
+6. **Redeploy** (Redeploy button at top of Deployments tab) so the new env vars take effect
+7. Your app is live! 🎉
 
 ## 📝 License
 
