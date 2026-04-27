@@ -107,35 +107,36 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- **PASS** — All tests in that file passed successfully
-- **FAIL** — Something broke; Jest will show which test failed and why
+**How to read the output:**
+- `PASS` — All assertions in the test passed, your code works correctly
+- `FAIL` — Something broke; check the error message below for what went wrong
 
-The test suite covers:
-- Auth validators (email/password validation logic)
-- Dashboard formatting utilities (metric display formatting)
-- General utility functions
+**What the tests cover:**
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flow and behavior
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting utilities
+- `__tests__/utils.test.ts` — General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the sidebar navigation
-- `__tests__` — Jest test files for auth validators, dashboard formatting, and utilities
+`src/components/dashboard` — Dashboard UI components including the sidebar navigation
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+3. Vercel will auto-detect Next.js — click **Deploy**
+4. Once deployed, go to your project in Vercel → **Settings** → **Environment Variables**
+5. Add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Redeploy to apply the new environment variables (click **Redeploy** on the Deployments page)
 
-> ⚠️ **Important**: Make sure all `.env.local` variables are added to Vercel before deploying, otherwise your app will crash.
+> 💡 Without these environment variables, your deployed app won't be able to connect to Supabase!
 
 ## 📝 License
 

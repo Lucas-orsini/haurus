@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, LogOut, ChevronDown, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
+import type { AuthUser } from '@/lib/auth'
+import { getSession } from '@/lib/auth'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
