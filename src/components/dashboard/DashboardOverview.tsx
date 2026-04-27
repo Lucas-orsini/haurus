@@ -193,11 +193,7 @@ export default function DashboardOverview({ matches, fetchError }: DashboardOver
                   Tournoi
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
-                  <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 items-center">
-                    <div className="flex justify-end min-w-0" />
-                    <div className="text-center">Joueurs</div>
-                    <div className="min-w-0" />
-                  </div>
+                  Joueurs
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
                   Surface

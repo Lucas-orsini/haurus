@@ -66,20 +66,11 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
 
         {/* Joueurs */}
         <td className="px-4 py-3.5 min-w-0">
-          <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 items-center">
-            {/* Col 1: empty — player1 name below in metrics panel */}
-            <div />
-            {/* Col 2: separator centered */}
-            <div className="text-center">
-              <span className="text-xs text-[var(--text-3)]">
-                {match.player1}
-                <span className="mx-1">·</span>
-                {match.player2}
-              </span>
-            </div>
-            {/* Col 3: empty — player2 name below in metrics panel */}
-            <div />
-          </div>
+          <span className="text-sm text-[var(--text-1)] whitespace-nowrap">
+            {match.player1}{' '}
+            <span className="text-[var(--text-3)] text-xs mx-1">vs</span>{' '}
+            {match.player2}
+          </span>
         </td>
 
         {/* Surface */}
