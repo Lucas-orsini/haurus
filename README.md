@@ -4,11 +4,12 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard** — Interactive dashboard displaying match statistics and data rows
-- **Match Statistics** — Type-safe match data components using TypeScript interfaces
+- **MatchRow Component** — Reusable, type-safe component for rendering individual match statistics in a dashboard row
+- **Utils Library** — Shared utility functions for data manipulation and Supabase integration
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
+- **Authentication Validation** — Unit tests for auth-related validation logic
 
 ## 🛠️ Tech Stack
 
@@ -18,6 +19,7 @@ The metrics bookmakers use. Now yours.
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Auth & Database**: Supabase
+- **Testing**: Jest with React Testing Library
 
 ## 🚀 Quick Start
 
@@ -101,23 +103,23 @@ Run a specific test file:
 npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Run in watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
+**How to read Jest output:**
+- `PASS` — all tests passed, your code is working correctly
+- `FAIL` — something broke, check the error message below for which test failed and why
 
-- `PASS` — All tests in that file passed, everything works correctly
-- `FAIL` — Something broke, check the error message below to see which test failed and why
-
-The test suite covers authentication validation logic.
+**Tests included:**
+- Auth validation tests (`__tests__/auth-validators.test.ts`)
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts
-- `src/components/dashboard` — Dashboard-specific components including match row display
+- `src/lib` — Utility functions and Supabase client setup
+- `src/components/dashboard` — Dashboard UI components including MatchRow
 
 ## 🚀 Deploy to Vercel
 
@@ -127,13 +129,13 @@ The test suite covers authentication validation logic.
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add each variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy** — Vercel will automatically build and deploy your app
 
-That's it! Your app will be live on a Vercel URL within seconds.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may fail to connect to Supabase.
 
 ## 📝 License
 

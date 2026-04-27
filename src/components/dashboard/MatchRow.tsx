@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 
 interface MatchRowProps {
@@ -14,33 +14,41 @@ interface MetricDef {
   label: string
   p1Key: keyof MatchStats
   p2Key: keyof MatchStats
+  mode: 'higher' | 'lower' | 'neutral'
 }
 
 const METRIC_DEFS: MetricDef[] = [
-  { label: 'Classement ATP', p1Key: 'rank_p1', p2Key: 'rank_p2' },
-  { label: 'Évolution rank 6 mois', p1Key: 'delta_rank_6m_p1', p2Key: 'delta_rank_6m_p2' },
-  { label: 'P-Serve', p1Key: 'p_serve_p1', p2Key: 'p_serve_p2' },
-  { label: 'P-Return', p1Key: 'p_return_p1', p2Key: 'p_return_p2' },
-  { label: 'Glicko Rating', p1Key: 'glicko_rating_p1', p2Key: 'glicko_rating_p2' },
-  { label: 'Glicko RD', p1Key: 'glicko_rd_p1', p2Key: 'glicko_rd_p2' },
-  { label: 'TSD', p1Key: 'tsd_p1', p2Key: 'tsd_p2' },
-  { label: 'BPPI', p1Key: 'bppi_p1', p2Key: 'bppi_p2' },
-  { label: 'MAP', p1Key: 'map_p1', p2Key: 'map_p2' },
-  { label: 'Win Rate TD', p1Key: 'win_rate_td_p1', p2Key: 'win_rate_td_p2' },
-  { label: 'Win Rate Surface TD', p1Key: 'win_rate_surf_td_p1', p2Key: 'win_rate_surf_td_p2' },
-  { label: 'Win Rate 5M', p1Key: 'win_rate_5m_p1', p2Key: 'win_rate_5m_p2' },
-  { label: 'Momentum TD', p1Key: 'momentum_td_p1', p2Key: 'momentum_td_p2' },
-  { label: 'Breaks Won TD', p1Key: 'breaks_won_td_p1', p2Key: 'breaks_won_td_p2' },
-  { label: 'Breaks Lost TD', p1Key: 'breaks_lost_td_p1', p2Key: 'breaks_lost_td_p2' },
-  { label: 'Fatigue 72H', p1Key: 'fatigue_72h_p1', p2Key: 'fatigue_72h_p2' },
-  { label: 'Jours de repos', p1Key: 'jours_repos_p1', p2Key: 'jours_repos_p2' },
-  { label: 'Forme', p1Key: 'form_p1', p2Key: 'form_p2' },
+  { label: 'Classement ATP',         p1Key: 'rank_p1',              p2Key: 'rank_p2',              mode: 'lower'   },
+  { label: 'Évolution rank 6 mois', p1Key: 'delta_rank_6m_p1',     p2Key: 'delta_rank_6m_p2',     mode: 'lower'   },
+  { label: 'P-Serve',               p1Key: 'p_serve_p1',            p2Key: 'p_serve_p2',            mode: 'higher'  },
+  { label: 'P-Return',              p1Key: 'p_return_p1',           p2Key: 'p_return_p2',           mode: 'higher'  },
+  { label: 'Glicko Rating',          p1Key: 'glicko_rating_p1',      p2Key: 'glicko_rating_p2',      mode: 'higher'  },
+  { label: 'Glicko RD',             p1Key: 'glicko_rd_p1',          p2Key: 'glicko_rd_p2',          mode: 'neutral' },
+  { label: 'TSD',                   p1Key: 'tsd_p1',                p2Key: 'tsd_p2',                mode: 'higher'  },
+  { label: 'BPPI',                  p1Key: 'bppi_p1',               p2Key: 'bppi_p2',               mode: 'higher'  },
+  { label: 'MAP',                   p1Key: 'map_p1',                p2Key: 'map_p2',                mode: 'higher'  },
+  { label: 'Win Rate TD',           p1Key: 'win_rate_td_p1',        p2Key: 'win_rate_td_p2',        mode: 'higher'  },
+  { label: 'Win Rate Surface TD',   p1Key: 'win_rate_surf_td_p1',   p2Key: 'win_rate_surf_td_p2',   mode: 'higher'  },
+  { label: 'Win Rate 5M',          p1Key: 'win_rate_5m_p1',        p2Key: 'win_rate_5m_p2',        mode: 'neutral' },
+  { label: 'Momentum TD',           p1Key: 'momentum_td_p1',        p2Key: 'momentum_td_p2',        mode: 'higher'  },
+  { label: 'Breaks Won TD',        p1Key: 'breaks_won_td_p1',      p2Key: 'breaks_won_td_p2',      mode: 'higher'  },
+  { label: 'Breaks Lost TD',       p1Key: 'breaks_lost_td_p1',     p2Key: 'breaks_lost_td_p2',     mode: 'lower'   },
+  { label: 'Fatigue 72H',          p1Key: 'fatigue_72h_p1',        p2Key: 'fatigue_72h_p2',        mode: 'lower'   },
+  { label: 'Jours de repos',       p1Key: 'jours_repos_p1',        p2Key: 'jours_repos_p2',        mode: 'neutral' },
+  { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral' },
 ]
 
-function formatValue(value: unknown): string {
+// Set of keys that should be displayed as integers (no decimal)
+const INTEGER_KEYS = new Set<keyof MatchStats>([
+  'rank_p1', 'rank_p2', 'jours_repos_p1', 'jours_repos_p2',
+])
+
+function formatValue(value: unknown, key?: keyof MatchStats): string {
   if (value === null || value === undefined) return '—'
   if (typeof value === 'number') {
+    // Entiers pour Rank ATP et Jours de repos
     if (Number.isInteger(value)) return value.toString()
+    // 3 décimales pour toutes les autres valeurs numériques
     return value.toFixed(3)
   }
   return String(value)
@@ -131,56 +139,57 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                 </div>
               </div>
 
-              {/* Metrics grid — true 3-column: P1 values | labels | P2 values */}
-              <div className="grid grid-cols-[1fr_2fr_1fr] gap-3">
-                {/* Column 1: player 1 metric values — right-aligned */}
-                <div className="flex flex-col gap-3">
-                  {METRIC_DEFS.map(({ label, p1Key }) => {
-                    const val1 = match[p1Key]
-                    return (
-                      <div key={label} className="flex items-center justify-end h-[20px]">
-                        <span
-                          className={cn(
-                            'text-xs font-mono tabular-nums',
-                            val1 === null || val1 === undefined
-                              ? 'text-[var(--text-3)]'
-                              : 'text-[var(--text-1)]'
-                          )}
-                        >
-                          {formatValue(val1)}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
+              {/* Metrics grid — scrollable, comparative, 3-column per row */}
+              <div className="overflow-y-auto max-h-[420px] pr-1 -mr-1">
+                <div className="space-y-0">
+                  {METRIC_DEFS.map(({ label, p1Key, p2Key, mode }, idx) => {
+                    const val1 = match[p1Key] as number | null
+                    const val2 = match[p2Key] as number | null
+                    const [classA, classB] = getMetricColor(val1, val2, mode)
 
-                {/* Column 2: metric labels — left-aligned */}
-                <div className="flex flex-col gap-3">
-                  {METRIC_DEFS.map(({ label }) => (
-                    <div key={label} className="flex items-center h-[20px]">
-                      <span className="text-[11px] text-[var(--text-3)] leading-none">
-                        {label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Column 3: player 2 metric values — left-aligned */}
-                <div className="flex flex-col gap-3">
-                  {METRIC_DEFS.map(({ label, p2Key }) => {
-                    const val2 = match[p2Key]
                     return (
-                      <div key={label} className="flex items-center h-[20px]">
-                        <span
-                          className={cn(
-                            'text-xs font-mono tabular-nums',
-                            val2 === null || val2 === undefined
-                              ? 'text-[var(--text-3)]'
-                              : 'text-[var(--text-1)]'
-                          )}
-                        >
-                          {formatValue(val2)}
-                        </span>
+                      <div
+                        key={label}
+                        className={cn(
+                          'grid grid-cols-[1fr_2fr_1fr] gap-3 py-2.5',
+                          // Séparation visuelle : border-bottom sur toutes les lignes sauf la dernière
+                          idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
+                        )}
+                      >
+                        {/* Valeur P1 — right-aligned */}
+                        <div className="flex items-center justify-end">
+                          <span
+                            className={cn(
+                              'text-xs font-mono tabular-nums',
+                              val1 === null || val1 === undefined
+                                ? 'text-[var(--text-3)]'
+                                : classA
+                            )}
+                          >
+                            {formatValue(val1, p1Key)}
+                          </span>
+                        </div>
+
+                        {/* Label — centered, non coloré */}
+                        <div className="flex items-center justify-center">
+                          <span className="text-[11px] text-[var(--text-3)] leading-none text-center">
+                            {label}
+                          </span>
+                        </div>
+
+                        {/* Valeur P2 — left-aligned */}
+                        <div className="flex items-center justify-start">
+                          <span
+                            className={cn(
+                              'text-xs font-mono tabular-nums',
+                              val2 === null || val2 === undefined
+                                ? 'text-[var(--text-3)]'
+                                : classB
+                            )}
+                          >
+                            {formatValue(val2, p2Key)}
+                          </span>
+                        </div>
                       </div>
                     )
                   })}
