@@ -4,8 +4,10 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Authentication Flow** — Login page with Supabase integration
-- **Next.js App Router** — Modern routing with route groups for organized code structure
+- **Authentication Flow** — Login and signup pages with Supabase integration
+- **Dashboard** — Dashboard layout with sidebar navigation
+- **TypeScript** — Fully typed codebase for better developer experience
+- **Responsive Design** — Mobile-first Tailwind CSS styling
 
 ## 🛠️ Tech Stack
 
@@ -39,7 +41,7 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env.local` file in the project root:
+Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
 
 ```bash
 touch .env.local
@@ -55,7 +57,15 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-For each variable below: copy the value from Supabase and paste it after the `=` sign in your `.env.local` file.
+**How to get these values:**
+
+1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
+2. Click **New Project** and follow the steps
+3. Wait for your project to be created (about 2 minutes)
+4. In the left sidebar, click **Settings** (gear icon)
+5. Click **API** in the settings menu
+6. Copy the **Project URL** → paste into `NEXT_PUBLIC_SUPABASE_URL`
+7. Copy the **anon public** key from the "Project API keys" table → paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ### 4. Run the development server
 
@@ -74,36 +84,54 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security |
 
-### How to get your Supabase credentials
+## 🧪 Running Tests
 
-1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
-2. Click **New Project** and follow the steps to create a new Supabase project
-3. Wait for your project to be created (this takes about 2 minutes)
-4. In the left sidebar, click **Settings** (the gear icon)
-5. Click **API** in the settings menu
-6. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL` in your `.env.local`
-7. In the same page, copy the **anon public** key from the "Project API keys" table and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY` in your `.env.local`
+Jest is configured for this project. Unit tests check that small pieces of code (like functions) work correctly — helpful for catching bugs before they reach your users.
+
+When test files are added, run all tests:
+
+```bash
+npx jest
+```
+
+Run a specific test file:
+
+```bash
+npx jest path/to/file.test.ts
+```
+
+Watch mode (re-runs tests automatically when you save a file):
+
+```bash
+npx jest --watch
+```
+
+**Reading the output:**
+- `PASS` — all tests passed ✅
+- `FAIL` — something broke, check the error message below for what needs fixing
 
 ## 📁 Project Structure
 
-- `src/app/(auth)/login` — Login page
+- `src/app/(auth)` — Authentication pages (login, signup)
+- `src/app/dashboard` — Dashboard layout
+- `src/components/dashboard` — Dashboard components (Sidebar)
+- `src/lib` — Utility functions (auth helpers)
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
 ### Step by step:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
-3. Vercel will auto-detect Next.js settings — click **Deploy**
-4. Once deployed, go to your project in Vercel dashboard → **Settings** → **Environment Variables**
-5. Add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-6. Click **Save** and trigger a **redeploy** so the new env vars take effect
+2. Import your GitHub repository
+3. Add your environment variables in Vercel:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+4. Click **Deploy**
 
-> ⚠️ **Important**: Environment variables must be added in Vercel BEFORE the app will work. Without them, Supabase connections will fail.
+> ⚠️ Make sure all `.env.local` variables are added to Vercel, otherwise your app will crash on deploy.
 
 ## 📝 License
 

@@ -3,10 +3,9 @@
  * Session is stored in HTTP-only cookies via @supabase/ssr (no localStorage).
  *
  * Client Components use createClient() from @/lib/supabase/client.
- * Server Components use createClient() from @/lib/supabase/server.
  */
 
-import { createClient as createBrowserClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 // ── Shared type ────────────────────────────────────────────────────────────────
 
@@ -16,7 +15,7 @@ export interface AuthUser {
   email: string
 }
 
-// ── Validation helpers (unchanged — no Supabase dependency) ───────────────────
+// ── Validation helpers ────────────────────────────────────────────────────────
 
 /**
  * Validate email format.
@@ -74,7 +73,7 @@ export function validateName(name: string): string | null {
  * Safe to call from Client Components only.
  */
 export async function getSession(): Promise<AuthUser | null> {
-  const supabase = createBrowserClient()
+  const supabase = createClient()
   if (!supabase) return null
 
   const { data } = await supabase.auth.getSession()
@@ -90,15 +89,14 @@ export async function getSession(): Promise<AuthUser | null> {
   }
 }
 
-// ── Auth actions (Supabase-backed) ────────────────────────────────────────────
+// ── Auth actions (Supabase-backed) ───────────────────────────────────────────
 
 /**
  * Sign in with email + password via Supabase Auth.
- * Session is persisted in HTTP-only cookies by the SSR client.
  * @throws Error with user-friendly message on failure.
  */
 export async function login(email: string, password: string): Promise<AuthUser> {
-  const supabase = createBrowserClient()
+  const supabase = createClient()
   if (!supabase) {
     throw new Error('Service temporarily unavailable. Please refresh and try again.')
   }
@@ -129,7 +127,7 @@ export async function signup(
   email: string,
   password: string
 ): Promise<AuthUser> {
-  const supabase = createBrowserClient()
+  const supabase = createClient()
   if (!supabase) {
     throw new Error('Service temporarily unavailable. Please refresh and try again.')
   }
@@ -164,7 +162,7 @@ export async function signup(
  * Sign out the current user — clears the session cookie.
  */
 export async function signOut(): Promise<void> {
-  const supabase = createBrowserClient()
+  const supabase = createClient()
   if (!supabase) return
 
   await supabase.auth.signOut()
