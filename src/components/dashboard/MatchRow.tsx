@@ -130,8 +130,8 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                           idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                         )}
                       >
-                        {/* Valeur P1 — right-aligned */}
-                        <div className="flex items-center justify-end">
+                        {/* Valeur P1 — centered */}
+                        <div className="flex items-center justify-center">
                           <span
                             className={cn(
                               'text-xs font-mono tabular-nums',
@@ -165,8 +165,8 @@ export default function MatchRow({ match, isEven }: MatchRowProps) {
                           </span>
                         </div>
 
-                        {/* Valeur P2 — left-aligned */}
-                        <div className="flex items-center justify-start">
+                        {/* Valeur P2 — centered */}
+                        <div className="flex items-center justify-center">
                           <span
                             className={cn(
                               'text-xs font-mono tabular-nums',
