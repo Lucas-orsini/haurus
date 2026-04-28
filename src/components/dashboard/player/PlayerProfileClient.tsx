@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
@@ -8,7 +8,6 @@ import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
 import PlayerMatchHistory from './PlayerMatchHistory'
 import PlayerMatchModal from './PlayerMatchModal'
-import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
@@ -94,7 +93,7 @@ export default function PlayerProfileClient() {
   useEffect(() => {
     if (!selectedPlayer) return
     loadPlayerProfile(selectedPlayer, selectedSurface)
-  }, [selectedSurface]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedSurface, selectedPlayer, loadPlayerProfile])
 
   function handleSelectPlayer(player: PlayerStats) {
     setSelectedPlayer(player)
@@ -102,7 +101,6 @@ export default function PlayerProfileClient() {
   }
 
   function handleOpenMetrics(matchId: string) {
-    // Fetch les match_stats pour ce matchId et ouvre la modal
     const supabase = createClient()
     if (!supabase) return
 
