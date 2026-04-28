@@ -54,7 +54,7 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL
+# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
@@ -92,52 +92,53 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Unit tests automatically check that individual pieces of code work correctly without needing the whole app running.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Reading test output:**
+**Reading the output:**
 - `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, check the error message below for details ❌
+- `FAIL` — Something broke, see the error message below for details
 
-The test suite covers:
-- Authentication validation logic (`__tests__/auth-validators.test.ts`, `__tests__/auth.test.ts`)
-- Dashboard utilities and formatting (`__tests__/dashboard/formatMetric.test.ts`, `__tests__/lib/dashboard/stats.test.ts`)
-- Utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+**What the tests cover:**
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Additional utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including player search and sidebar navigation
+- `src/components/dashboard/player` — Player dashboard components including search functionality
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+3. Add your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+4. Click **Deploy**
 
-Your app will be live at a URL like `your-project.vercel.app` within seconds.
+> ⚠️ **Important**: Make sure all environment variables from your `.env.local` file are added to Vercel before deploying.
 
 ## 📝 License
 
