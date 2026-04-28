@@ -4,8 +4,11 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Player Search** — Search for players by name via API endpoint
+- **Player Dashboard** — Detailed player profile page with metrics and statistics
+- **Metric Visualization** — Charts and cards displaying player evolution over time
+- **Match History** — Track player performance across matches with detailed metrics
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
-- **Dashboard Sidebar** — Reusable dashboard navigation component
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
 
@@ -17,7 +20,6 @@ The metrics bookmakers use. Now yours.
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Auth & Database**: Supabase
-- **Charts**: Recharts
 - **Testing**: Jest with React Testing Library
 
 ## 🚀 Quick Start
@@ -88,53 +90,58 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like functions) work correctly without needing the full app running.
+Unit tests automatically check that specific parts of your code work correctly without needing the whole app running.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
-npx jest __tests__/utils.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- **PASS** — All tests in that file passed ✅
-- **FAIL** — Something broke. The error message shows which test failed and why
+- `PASS` — all tests in that file passed ✅
+- `FAIL` — at least one test failed ❌, look at the error message to see what broke
 
-**Tests included:**
+The test suite covers:
 - Auth validators and authentication logic
-- Dashboard metric formatting
-- Dashboard statistics calculations
-- Utility functions and helpers
+- Dashboard formatting utilities and metrics display
+- Utility functions and helper methods
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the sidebar navigation
+- `src/app/api` — Backend API routes (player search, player details)
+- `src/app/dashboard` — Player dashboard pages
+- `src/components/dashboard/player` — Player dashboard UI components (profile, search, metrics, charts, match history)
+- `src/lib/types` — TypeScript type definitions
+- `src/lib/player` — Player-related utility functions
+- `__tests__` — Jest unit tests
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
 4. Click **Deploy**
 
-Your app will be live at a URL like `your-app.vercel.app`.
+Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`) once deployment finishes.
 
 ## 📝 License
 
