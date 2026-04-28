@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { MatchRow } from '@/lib/dashboard/stats'
 
 /**
  * GET /api/match-favorites
- * Returns the list of match_ids favorited by the authenticated user.
- * 200 { favoriteMatchIds: string[] }
+ * Returns the list of favorited matches by the authenticated user.
+ * Each entry contains the favorite record (id, match_id, created_at)
+ * joined with the associated match_stats row.
+ * Orphaned favorites (match no longer exists in match_stats) are silently excluded.
+ * 200 { favorites: Array<{ id: string, match_id: string, created_at: string, match_stats: MatchRow }> }
  * 401 if not authenticated
  */
 export async function GET() {
@@ -23,7 +27,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('match_favorites')
-    .select('match_id')
+    .select('*, match_stats:match_id (*)')
     .eq('user_id', user.id)
 
   if (error) {
@@ -33,8 +37,23 @@ export async function GET() {
     )
   }
 
+  // Filter out favorites whose match no longer exists in match_stats
+  const validFavorites = (data ?? []).filter(
+    (fav: { match_stats: MatchRow | null }) => fav.match_stats != null
+  )
+
   return NextResponse.json({
-    favoriteMatchIds: (data ?? []).map((row: { match_id: string }) => row.match_id),
+    favorites: validFavorites.map((fav: {
+      id: string
+      match_id: string
+      created_at: string
+      match_stats: MatchRow
+    }) => ({
+      id: fav.id,
+      match_id: fav.match_id,
+      created_at: fav.created_at,
+      match_stats: fav.match_stats,
+    })),
   })
 }
 
