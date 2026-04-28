@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Search** — Search functionality to find players with real-time results
+- **Player Stats Visualization** — Interactive charts displaying player performance metrics with Recharts
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -108,34 +108,35 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-### Understanding test output
-
+**How to read Jest output:**
 - **PASS** — All tests in that file passed ✅
-- **FAIL** — Something broke, check the error message below for details
-- Tests cover: auth validation, auth integration, metric formatting, dashboard stats, and utility functions
+- **FAIL** — Something broke. Jest will show which test failed and why (expected vs received value)
+
+The test suite covers:
+- Authentication validators and logic
+- Dashboard utility functions
+- Chart data formatting
+- General utility helpers
 
 ## 📁 Project Structure
 
-- src/app — Next.js App Router pages and API routes
-- src/components — Reusable React components including player search
-- src/lib — Utility functions and Supabase client setup
-- __tests__ — Jest unit and integration tests
+- `src/components/dashboard/player` — Player stats dashboard components including chart visualization
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
+### Step by step:
 
-1. Click the **Deploy with Vercel** button above
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
 4. Add each variable from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` — paste your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — paste your Supabase anon key
-5. Click **Deploy** — Vercel will automatically build and deploy your app
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may crash.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. Without them, your app will not connect to Supabase.
 
 ## 📝 License
 
