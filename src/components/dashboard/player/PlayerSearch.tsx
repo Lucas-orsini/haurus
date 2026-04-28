@@ -87,11 +87,19 @@ export default function PlayerSearch({ defaultValue = '' }: PlayerSearchProps) {
     }
   }
 
+  /**
+   * Navigate to the player profile page.
+   * Uses encodeURIComponent so that special characters (apostrophes,
+   * accented letters, etc.) are properly encoded in the URL segment.
+   * The player page decodes with decodeURIComponent + hyphens → spaces,
+   * so this produces a matching player_name for the DB query.
+   */
   const navigateTo = (playerName: string) => {
+    if (!playerName || !playerName.trim()) return
     setQuery('')
     setOpen(false)
     setResults([])
-    const slug = playerName.replace(/\s+/g, '-')
+    const slug = encodeURIComponent(playerName.trim())
     router.push(`/dashboard/player/${slug}`)
   }
 
