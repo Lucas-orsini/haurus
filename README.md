@@ -4,12 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Dashboard** — View detailed player profiles with metrics and statistics
-- **Player Search** — Search functionality to find players
-- **Dashboard Sidebar** — Navigation sidebar for the dashboard interface
-- **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
-- **TypeScript** — Fully typed codebase for better developer experience
-- **Responsive Design** — Mobile-first Tailwind CSS styling
+- **Player Search** — Search functionality to find players with real-time results
 
 ## 🛠️ Tech Stack
 
@@ -101,43 +96,35 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest path/to/file.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading test output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, check the error message below for details ❌
+How to read the output:
+- **PASS** = all tests passed, your code is working correctly
+- **FAIL** = something broke, check the error message above the failure for details
 
-The test suite covers:
-- Authentication validation logic (`__tests__/auth-validators.test.ts`, `__tests__/auth.test.ts`)
-- Dashboard utilities and formatting (`__tests__/dashboard/formatMetric.test.ts`, `__tests__/lib/dashboard/stats.test.ts`)
-- Utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+The tests cover: auth validation, authentication, dashboard metrics formatting, stats calculation, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including player search and sidebar navigation
+`src/components/dashboard/player` — Player dashboard components including search functionality
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
+3. Add your environment variables in **Vercel → Settings → Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
-
-Your app will be live at a URL like `your-project.vercel.app` within seconds.
+4. Click **Deploy**
 
 ## 📝 License
 
