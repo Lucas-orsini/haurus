@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, LogOut, ChevronDown, User } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
@@ -102,19 +103,39 @@ export default function DashboardSidebar() {
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
           const isActive = pathname === href || pathname.startsWith(href + '/')
           return (
-            <Link
+            <motion.div
               key={href}
-              href={href}
-              className={cn(
-                'flex items-center gap-2.5 px-2 h-8 rounded-md text-sm transition-all duration-150',
-                isActive
-                  ? 'bg-white/[0.07] text-[var(--text-1)] font-medium border-l-2 border-[var(--accent)] pl-[6px]'
-                  : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] border-l-2 border-transparent pl-[6px]'
-              )}
+              className="relative"
+              initial={false}
             >
-              <Icon size={15} strokeWidth={1.5} className="shrink-0" />
-              <span className="truncate">{label}</span>
-            </Link>
+              {/* Sliding active indicator */}
+              <AnimatePresence initial={false} mode="wait">
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-indicator"
+                    className="absolute inset-0 bg-white/[0.07] rounded-md"
+                    style={{ borderLeft: '2px solid var(--accent)' }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                  />
+                )}
+              </AnimatePresence>
+
+              <Link
+                href={href}
+                className={cn(
+                  'relative flex items-center gap-2.5 px-2 h-8 rounded-md text-sm',
+                  isActive
+                    ? 'text-[var(--text-1)] font-medium pl-[6px]'
+                    : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-[6px]'
+                )}
+              >
+                <Icon size={15} strokeWidth={1.5} className="shrink-0" />
+                <span className="truncate">{label}</span>
+              </Link>
+            </motion.div>
           )
         })}
       </nav>
