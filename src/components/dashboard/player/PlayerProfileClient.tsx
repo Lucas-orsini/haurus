@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
@@ -8,6 +8,7 @@ import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
 import PlayerMatchHistory from './PlayerMatchHistory'
 import PlayerMatchModal from './PlayerMatchModal'
+import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
@@ -42,7 +43,6 @@ export default function PlayerProfileClient() {
         supabase
           .from('match_results')
           .select('*')
-          .not('winner', 'is', null)
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
           .order('date_match', { ascending: false })
           .limit(5),
