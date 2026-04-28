@@ -31,8 +31,8 @@ The metrics bookmakers use. Now yours.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/haraus.git
-cd haurus
+git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+cd REPO_NAME
 ```
 
 ### 2. Install dependencies
@@ -88,59 +88,52 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
+Unit tests are small, fast checks that verify a specific piece of code works correctly — for example, that a function returns the right output for a given input.
 
-Run all tests:
-
+**Run all tests:**
 ```bash
 npx jest
 ```
 
-Run a specific test file:
-
+**Run a specific test file:**
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
-
+**Watch mode (re-runs on file change):**
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — everything works correctly
-- `FAIL` — something broke; the output shows which test failed and why
+- `PASS` ✅ — The test passed, everything works correctly
+- `FAIL` ❌ — Something broke, check the error message below for details
 
-**What the tests cover:**
-
-| Test File | What it Tests |
-|-----------|--------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and components |
-| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
-| `__tests__/lib/utils.test.ts` | Shared utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+**What gets tested:**
+- Auth validators and authentication logic
+- Dashboard metric formatting
+- Statistics utilities
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Dashboard player components
+src/components/dashboard/player — Player profile dashboard components
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the **Environment Variables** section, add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Click **Deploy**
-
-Your app is live! 🎉
+1. Push your code to GitHub (if you haven't already)
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Click **Add New Project** → select your repository
+4. Vercel will auto-detect Next.js — click **Deploy**
+5. Add your environment variables:
+   - Go to your project → **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+6. Redeploy: go to **Deployments** → click the **...** menu → **Redeploy**
 
 ## 📝 License
 
