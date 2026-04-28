@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Search, X, Loader2 } from 'lucide-react'
+import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
@@ -12,6 +12,8 @@ interface PlayerSearchBarProps {
   onSelectPlayer: (player: PlayerStats) => void
 }
 
+type SearchState = 'idle' | 'searching' | 'success' | 'empty' | 'error'
+
 const MAX_RESULTS = 8
 const MIN_CHARS = 2
 const DEBOUNCE_MS = 300
@@ -19,7 +21,8 @@ const DEBOUNCE_MS = 300
 export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<PlayerStats[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+  const [searchState, setSearchState] = useState<SearchState>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIdx, setActiveIdx] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -31,27 +34,41 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
     if (query.length < MIN_CHARS) {
       setResults([])
       setOpen(false)
-      setIsSearching(false)
+      setSearchState('idle')
       return
     }
 
-    setIsSearching(true)
+    setSearchState('searching')
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       const supabase = createClient()
-      if (!supabase) { setIsSearching(false); return }
+      if (!supabase) {
+        setSearchState('error')
+        setErrorMessage('Service indisponible. Veuillez réessayer.')
+        return
+      }
 
-      const { data } = await supabase
-        .from('player_stats')
-        .select('player_name, rank')
-        .ilike('player_name', `%${query}%`)
-        .order('rank', { ascending: true })
-        .limit(MAX_RESULTS)
+      try {
+        const { data, error } = await supabase
+          .from('player_stats')
+          .select('*')
+          .textSearch('player_name', query, { type: 'websearch' })
+          .order('rank', { ascending: true, nullsFirst: false })
+          .limit(MAX_RESULTS)
 
-      setResults((data ?? []) as PlayerStats[])
-      setOpen(true)
-      setActiveIdx(-1)
-      setIsSearching(false)
+        if (error) throw error
+
+        const rows = (data ?? []) as PlayerStats[]
+        setResults(rows)
+        setOpen(true)
+        setActiveIdx(-1)
+        setSearchState(rows.length > 0 ? 'success' : 'empty')
+      } catch (err) {
+        setSearchState('error')
+        setErrorMessage('Échec de la recherche. Veuillez réessayer.')
+        setResults([])
+        setOpen(true)
+      }
     }, DEBOUNCE_MS)
 
     return () => clearTimeout(debounceRef.current)
@@ -95,6 +112,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
     setQuery('')
     setResults([])
     setOpen(false)
+    setSearchState('idle')
     inputRef.current?.focus()
   }
 
@@ -124,7 +142,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         />
         {/* Right icon */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-          {isSearching ? (
+          {searchState === 'searching' ? (
             <Loader2 size={13} className="animate-spin text-[var(--text-3)]" />
           ) : query ? (
             <button
@@ -142,6 +160,15 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         <div className="absolute top-full left-0 right-0 mt-1.5 z-50
                         bg-[var(--surface-2)] border border-[var(--border-md)]
                         rounded-lg shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto">
+          {/* Error state — visible message */}
+          {searchState === 'error' && (
+            <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[var(--border-md)]">
+              <AlertCircle size={13} className="text-[var(--red)] shrink-0" strokeWidth={1.5} />
+              <p className="text-xs text-[var(--red)]">{errorMessage}</p>
+            </div>
+          )}
+
+          {/* Results list */}
           {results.length > 0 ? (
             results.map((player, i) => (
               <button
@@ -163,7 +190,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
                 )}
               </button>
             ))
-          ) : !isSearching && query.length >= MIN_CHARS ? (
+          ) : searchState === 'empty' ? (
             <div className="px-3 py-4 text-center">
               <p className="text-sm text-[var(--text-3)]">Aucun joueur trouvé</p>
             </div>
