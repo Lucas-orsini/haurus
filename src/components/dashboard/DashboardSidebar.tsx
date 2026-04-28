@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Player', icon: User, href: '/dashboard/player' },
 ]
 
 export default function DashboardSidebar() {
