@@ -77,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -88,44 +88,36 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
-
-Run all tests:
+Unit tests are automated checks that verify specific parts of your code work correctly — like making sure a function returns the right result or a component displays correctly.
 
 ```bash
+# Run all tests
 npx jest
-```
 
-Run a specific test file:
+# Run a specific test file
+npx jest __tests__/dashboard/player/PlayerMatchHistory.test.tsx
 
-```bash
-npx jest __tests__/auth.test.ts
-```
-
-Run tests in watch mode (re-runs automatically when you save a file):
-
-```bash
+# Watch mode — re-runs tests automatically when files change
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — everything works correctly
-- `FAIL` — something broke; the output shows which test failed and why
+**How to read Jest output:**
+- **PASS** — all tests in that file passed ✅
+- **FAIL** — something broke, Jest shows exactly which test failed and why
 
 **What the tests cover:**
-
-| Test File | What it Tests |
-|-----------|--------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and components |
-| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
-| `__tests__/lib/utils.test.ts` | Shared utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+- Player match history component rendering and behavior
+- Authentication validation logic
+- Authentication flows and error handling
+- Metric formatting utilities
+- Dashboard statistics calculations
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Dashboard player components
+- `src/components/dashboard/player/` — Player dashboard components (profile client, match history)
+- `components/dashboard/player/` — Legacy player dashboard components
+- `__tests__/` — Jest test suites for components and utilities
 
 ## 🚀 Deploy to Vercel
 
@@ -135,12 +127,13 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the **Environment Variables** section, add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anonymous key
+5. Click **Deploy**
 
-Your app is live! 🎉
+> ⚠️ **Important**: Make sure all environment variables are added to Vercel before deploying. Without them, your app won't connect to Supabase.
 
 ## 📝 License
 
