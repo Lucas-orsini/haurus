@@ -43,7 +43,7 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
+Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase. You can create it from your terminal:
 
 ```bash
 touch .env.local
@@ -59,15 +59,15 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-**How to get these values:**
+**How to get these values (step by step for no-code users):**
 
-1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
-2. Click **New Project** and follow the steps
-3. Wait for your project to be created (about 2 minutes)
-4. In the left sidebar, click **Project Settings** (gear icon)
+1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account — it's free)
+2. Click **New Project** and follow the setup steps
+3. Wait about 2 minutes for your project to be created
+4. In the left sidebar, click the **gear icon** (Project Settings)
 5. Click **API** in the settings menu
-6. Copy the **Project URL** → paste into `NEXT_PUBLIC_SUPABASE_URL`
-7. Copy the **anon public** key from the "Project API keys" table → paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Find **Project URL** at the top → copy it → paste into `NEXT_PUBLIC_SUPABASE_URL`
+7. In the "Project API keys" table, copy the **anon public** key → paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 ### 4. Run the development server
 
@@ -77,66 +77,70 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings → API → **anon public** row in "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security enabled |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings (gear icon) → API → **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Your project → Project Settings (gear icon) → API → **anon public** row in the "Project API keys" table | Anonymous (public) key — safe for client-side use with Row Level Security enabled |
 
 ## 🧪 Running Tests
 
 Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
 
-### Run all tests
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-### Run a specific test file
+Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+Run tests in watch mode (re-runs automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- **PASS** — All tests in that file passed ✅
-- **FAIL** — Something broke. Jest will show which test failed and why (expected vs received value)
+**How to read the output:**
+- `PASS` — everything works correctly
+- `FAIL` — something broke; the output shows which test failed and why
 
-The test suite covers:
-- Authentication validators and logic
-- Dashboard utility functions
-- Chart data formatting
-- General utility helpers
+**What the tests cover:**
+
+| Test File | What it Tests |
+|-----------|--------------|
+| `__tests__/auth-validators.test.ts` | Authentication validation logic |
+| `__tests__/auth.test.ts` | Authentication flows and components |
+| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
+| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
+| `__tests__/lib/utils.test.ts` | Shared utility functions |
+| `__tests__/utils.test.ts` | General utility functions |
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player stats dashboard components including chart visualization
+- `src/components/dashboard/player` — Dashboard player components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step:
+**Step by step:**
 
-1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. Without them, your app will not connect to Supabase.
+Your app is live! 🎉
 
 ## 📝 License
 
