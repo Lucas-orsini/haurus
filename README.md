@@ -4,8 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Profile Visualization** — Display player metrics and statistics through an interactive dashboard component
-- **Player Match History API** — Server-side API route for retrieving player match data
+- **Player Stats Visualization** — Interactive charts displaying player performance metrics with Recharts
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -89,52 +88,59 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of your app work correctly without needing to run the whole app.
+Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
 
 Run all tests:
+
 ```bash
 npx jest
 ```
 
 Run a specific test file:
+
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Run tests in watch mode (re-runs automatically when you save a file):
+
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — everything is working correctly
-- `FAIL` — something broke; look at the error message below for details
+- `PASS` — everything works correctly
+- `FAIL` — something broke; the output shows which test failed and why
 
 **What the tests cover:**
-- Authentication validation logic
-- Authentication flows and behavior
-- Dashboard metric formatting utilities
-- Dashboard statistics calculations
-- General utility functions
+
+| Test File | What it Tests |
+|-----------|--------------|
+| `__tests__/auth-validators.test.ts` | Authentication validation logic |
+| `__tests__/auth.test.ts` | Authentication flows and components |
+| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
+| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
+| `__tests__/lib/utils.test.ts` | Shared utility functions |
+| `__tests__/utils.test.ts` | General utility functions |
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages, layouts, and API routes
-- `src/components/dashboard/player` — Player dashboard UI components
+- `src/components/dashboard/player` — Dashboard player components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+4. Click **Deploy**
 
-Your app will be live at a URL like `your-app.vercel.app`.
+Your app is live! 🎉
 
 ## 📝 License
 

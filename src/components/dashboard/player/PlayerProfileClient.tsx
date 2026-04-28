@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
@@ -20,8 +20,6 @@ export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<MatchResult[]>([])
-  const [matchesLoading, setMatchesLoading] = useState(false)
-  const [matchesError, setMatchesError] = useState<string | null>(null)
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
   const [modalMatchStats, setModalMatchStats] = useState<MatchStat | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -30,24 +28,24 @@ export default function PlayerProfileClient() {
   // Charge les stats du joueur + historique + moyennes ATP quand un joueur est sélectionné
   const loadPlayerProfile = useCallback(async (player: PlayerStats, surface: 'Hard' | 'Clay' | 'Grass') => {
     setLoadingProfile(true)
-    setMatchesLoading(true)
-    setMatchesError(null)
-
     const supabase = createClient()
-    if (!supabase) {
-      setLoadingProfile(false)
-      setMatchesLoading(false)
-      return
-    }
+    if (!supabase) { setLoadingProfile(false); return }
 
     try {
-      const [statsRes, atpRes] = await Promise.all([
+      const [statsRes, historyRes, atpRes] = await Promise.all([
         // Stats surface du joueur
         supabase
           .from('player_stats')
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
+        // 5 derniers matchs du joueur (via match_results)
+        supabase
+          .from('match_results')
+          .select('*')
+          .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
+          .order('date_match', { ascending: false })
+          .limit(5),
         // Moyennes ATP par surface
         supabase
           .from('atp_averages')
@@ -59,6 +57,8 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
+      setMatchHistory((historyRes.data ?? []) as MatchResult[])
+
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])
       } else {
@@ -68,29 +68,6 @@ export default function PlayerProfileClient() {
       // Non-blocking — les données partielles sont affichées
     } finally {
       setLoadingProfile(false)
-    }
-
-    // 5 derniers matchs du joueur via l'API dédiée
-    try {
-      const encodedName = encodeURIComponent(player.player_name)
-      const res = await fetch(`/api/player-match-history?player_name=${encodedName}`)
-
-      if (!res.ok) {
-        if (res.status === 400) {
-          setMatchesError('Nom de joueur invalide.')
-        } else {
-          setMatchesError("Échec du chargement de l'historique.")
-        }
-        setMatchHistory([])
-      } else {
-        const body = await res.json()
-        setMatchHistory((body.matches ?? []) as MatchResult[])
-      }
-    } catch {
-      setMatchesError("Échec du chargement de l'historique.")
-      setMatchHistory([])
-    } finally {
-      setMatchesLoading(false)
     }
   }, [])
 
@@ -178,29 +155,12 @@ export default function PlayerProfileClient() {
           )}
 
           {/* Tableau des 5 derniers matchs */}
-          {!loadingProfile && (
-            <>
-              {matchesLoading ? (
-                <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
-                  <div className="h-3 bg-white/[0.06] rounded w-32 mb-4" />
-                  <div className="space-y-2">
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <div key={i} className="h-8 bg-white/[0.04] rounded" />
-                    ))}
-                  </div>
-                </div>
-              ) : matchesError ? (
-                <div className="bg-[var(--surface-1)] border border-[var(--red)]/20 rounded-lg p-4">
-                  <p className="text-xs text-[var(--red)]">{matchesError}</p>
-                </div>
-              ) : matchHistory.length > 0 ? (
-                <PlayerMatchHistory
-                  matches={matchHistory}
-                  playerName={selectedPlayer.player_name}
-                  onOpenMetrics={handleOpenMetrics}
-                />
-              ) : null}
-            </>
+          {!loadingProfile && matchHistory.length > 0 && (
+            <PlayerMatchHistory
+              matches={matchHistory}
+              playerName={selectedPlayer.player_name}
+              onOpenMetrics={handleOpenMetrics}
+            />
           )}
         </div>
       )}
