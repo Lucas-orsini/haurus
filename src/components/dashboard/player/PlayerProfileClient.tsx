@@ -64,25 +64,6 @@ export default function PlayerProfileClient() {
       } else {
         setAtpAverages([])
       }
-
-      // Déterminer la surface par défaut : surface du prochain match si disponible
-      if (surface === 'Hard') {
-        // On essaie de deviner la surface par défaut depuis match_stats
-        const nextMatchRes = await supabase
-          .from('match_stats')
-          .select('surface')
-          .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
-          .gte('date_match', new Date().toISOString().slice(0, 10))
-          .order('date_match', { ascending: true })
-          .limit(1)
-
-        if (nextMatchRes.data && nextMatchRes.data.length > 0) {
-          const nextSurface = nextMatchRes.data[0].surface
-          if (nextSurface === 'Clay') setSelectedSurface('Clay')
-          else if (nextSurface === 'Grass') setSelectedSurface('Grass')
-          else setSelectedSurface('Hard')
-        }
-      }
     } catch {
       // Non-blocking — les données partielles sont affichées
     } finally {
