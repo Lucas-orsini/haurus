@@ -29,7 +29,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Debounced search
+  // Debounced search — fetch vers le Route Handler avec AnnulerController
   useEffect(() => {
     if (query.length < MIN_CHARS) {
       setResults([])
@@ -40,30 +40,37 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
 
     setSearchState('searching')
     clearTimeout(debounceRef.current)
+
+    const controller = new AbortController()
+
     debounceRef.current = setTimeout(async () => {
-      const supabase = createClient()
-      if (!supabase) {
-        setSearchState('error')
-        setErrorMessage('Service indisponible. Veuillez réessayer.')
-        return
-      }
-
       try {
-        const { data, error } = await supabase
-          .from('player_stats')
-          .select('*')
-          .ilike('player_name', '%' + query.trim() + '%')
-          .order('rank', { ascending: true, nullsFirst: false })
-          .limit(MAX_RESULTS)
+        const url = '/api/player-search?q=' + encodeURIComponent(query.trim())
+        const res = await fetch(url, { signal: controller.signal })
 
-        if (error) throw error
+        if (!res.ok) {
+          if (res.status === 401) {
+            setSearchState('error')
+            setErrorMessage('Session expirée. Veuillez vous reconnecter.')
+          } else {
+            setSearchState('error')
+            setErrorMessage('Échec de la recherche. Veuillez réessayer.')
+          }
+          setResults([])
+          setOpen(true)
+          return
+        }
 
-        const rows = (data ?? []) as PlayerStats[]
+        const body = await res.json()
+        const rows: PlayerStats[] = (body.players ?? []) as PlayerStats[]
         setResults(rows)
         setOpen(true)
         setActiveIdx(-1)
         setSearchState(rows.length > 0 ? 'success' : 'empty')
       } catch (err) {
+        // Annulation via AbortController — ignorer silencieusement
+        if (err instanceof Error && err.name === 'AbortError') return
+
         setSearchState('error')
         setErrorMessage('Échec de la recherche. Veuillez réessayer.')
         setResults([])
@@ -71,7 +78,10 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
       }
     }, DEBOUNCE_MS)
 
-    return () => clearTimeout(debounceRef.current)
+    return () => {
+      clearTimeout(debounceRef.current)
+      controller.abort()
+    }
   }, [query])
 
   // Close on outside click
