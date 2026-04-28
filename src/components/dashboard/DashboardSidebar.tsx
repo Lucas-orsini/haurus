@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, ChevronDown, User } from 'lucide-react'
+import { LayoutDashboard, LogOut, ChevronDown, User, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Players', icon: Search, href: '/dashboard/player' },
 ]
 
 export default function DashboardSidebar() {
