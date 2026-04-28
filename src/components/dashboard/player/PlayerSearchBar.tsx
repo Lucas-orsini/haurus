@@ -52,7 +52,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         const { data, error } = await supabase
           .from('player_stats')
           .select('*')
-          .ilike('player_name', '%' + query + '%')
+          .textSearch('player_name', query, { type: 'websearch' })
           .order('rank', { ascending: true, nullsFirst: false })
           .limit(MAX_RESULTS)
 
