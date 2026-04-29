@@ -8,7 +8,7 @@ type MatchResult = Database['public']['Tables']['match_results']['Row']
 interface PlayerMatchHistoryProps {
   matches: MatchResult[]
   playerName: string
-  onOpenMetrics: (matchId: string) => void
+  onOpenMetrics: (match: MatchResult) => void
 }
 
 function getOpponent(match: MatchResult, playerName: string): string {
@@ -25,7 +25,10 @@ function isWin(match: MatchResult, playerName: string): boolean | null {
 function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr)
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+    const day = String(d.getDate()).padStart(2, '0')
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const year = d.getFullYear()
+    return `${day}/${month}/${year}`
   } catch {
     return dateStr
   }
@@ -90,7 +93,7 @@ export default function PlayerMatchHistory({ matches, playerName, onOpenMetrics 
                   </td>
                   <td className="px-4 py-3">
                     <button
-                      onClick={() => onOpenMetrics(match.id)}
+                      onClick={() => onOpenMetrics(match)}
                       className="h-7 px-2.5 flex items-center justify-center rounded-md
                                  border border-[var(--border-md)] bg-transparent
                                  text-[var(--text-2)] text-xs font-medium

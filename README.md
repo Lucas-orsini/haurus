@@ -88,7 +88,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
+Unit tests are automated checks that verify specific parts of the code work correctly without errors.
 
 Run all tests:
 
@@ -102,45 +102,43 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — everything works correctly
-- `FAIL` — something broke; the output shows which test failed and why
+**How to read Jest output:**
+
+- `PASS` — All tests in this file passed ✓
+- `FAIL` — Something broke. Check the error message below for what failed and why
 
 **What the tests cover:**
 
-| Test File | What it Tests |
-|-----------|--------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and components |
-| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
-| `__tests__/lib/utils.test.ts` | Shared utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+- `__tests__/auth-validators.test.ts` — Auth validation logic
+- `__tests__/auth.test.ts` — Authentication functions
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics
+- `__tests__/lib/utils.test.ts` — Library utility functions
+- `__tests__/utils.test.ts` — General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Dashboard player components
+- `src/lib` — Utility functions and helpers
+- `src/components/dashboard/player` — Player dashboard components (match history, player modal, player profile client)
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the "Deploy" button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the **Environment Variables** section, add all variables from your `.env.local`:
+3. Add your environment variables in Vercel Dashboard → Settings → Environment Variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Click **Deploy**
 
-Your app is live! 🎉
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 

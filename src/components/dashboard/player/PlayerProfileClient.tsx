@@ -82,21 +82,25 @@ export default function PlayerProfileClient() {
     loadPlayerProfile(player, selectedSurface)
   }
 
-  function handleOpenMetrics(matchId: string) {
-    // Fetch les match_stats pour ce matchId et ouvre la modal
+  function handleOpenMetrics(match: MatchResult) {
+    // Fetch les match_stats pour ce match par date_match + player1 + player2
     const supabase = createClient()
     if (!supabase) return
 
     supabase
       .from('match_stats')
       .select('*')
-      .eq('id', matchId)
+      .eq('date_match', match.date_match)
+      .eq('player1', match.player1)
+      .eq('player2', match.player2)
       .single()
-      .then(({ data }) => {
-        if (data) {
+      .then(({ data, error }) => {
+        if (data && !error) {
           setModalMatchStats(data as MatchStat)
-          setModalOpen(true)
+        } else {
+          setModalMatchStats(null)
         }
+        setModalOpen(true)
       })
   }
 
