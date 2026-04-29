@@ -77,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -88,59 +88,63 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
+Unit tests are automated checks that verify specific parts of the code work correctly — like having a spell-checker that catches bugs before you ship.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
+**Watch mode (re-runs tests automatically when you save a file):**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — everything works correctly
-- `FAIL` — something broke; the output shows which test failed and why
+**Understanding the output:**
 
-**What the tests cover:**
+- `PASS` — All tests in that file passed ✓
+- `FAIL` — Something broke. The error message shows which test failed and why
+- `FAIL` example: If a test expects `login("alice")` to return `"alice@example.com"` but gets `undefined`, you'll see: `Expected: "alice@example.com", Received: undefined`
 
-| Test File | What it Tests |
-|-----------|--------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and components |
-| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
-| `__tests__/lib/utils.test.ts` | Shared utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+**Tests included:**
+
+- `auth.test.ts` — Authentication flow and user sessions
+- `auth-validators.test.ts` — Input validation for auth forms
+- `dashboard/formatMetric.test.ts` — Number and stat formatting utilities
+- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `lib/utils.test.ts` — Shared utility functions
+- `utils.test.ts` — General helper utilities
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Dashboard player components
+- `__tests__/` — Jest test files for components, utilities, and business logic
 
 ## 🚀 Deploy to Vercel
+
+The easiest way to deploy Haurus is with Vercel — the creators of Next.js.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
+1. Click the deploy button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Click **Import Git Repository** and select your GitHub repo
 3. In the **Environment Variables** section, add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon public key
 4. Click **Deploy**
 
-Your app is live! 🎉
+Vercel will automatically detect Next.js, build your app, and give you a live URL like `your-app.vercel.app`.
+
+> ⚠️ **Important**: Make sure to add all environment variables in Vercel > Settings > Environment Variables before deploying, otherwise your app will crash.
 
 ## 📝 License
 
