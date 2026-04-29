@@ -7,11 +7,9 @@
  *
  * Source: match_stats table schema from Supabase Database type.
  *
- * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
- *        - `winner` exists in match_results but not in match_stats.
- *        - `score` exists in match_results but not in match_stats.
- *        The data pipeline should add both columns directly to match_stats
- *        or maintain a join on (date_match, player1, player2) to populate them.
+ * @TODO: data pipeline — match_stats does not natively carry `score` or `winner`.
+ *        These fields are populated by joining with match_results on the shared id.
+ *        See PlayerProfileClient.tsx for the join logic.
  */
 export type MatchStats = {
   // ── Primary identifiers ──────────────────────────────────────────────────
@@ -26,8 +24,10 @@ export type MatchStats = {
   tournoi: string | null
   best_of: number | null
 
-  // ── Match result (populated via join with match_results) ──────────────
-  // TODO: data pipeline — winner exists in match_results but not in match_stats
+  // ── Match result (populated via join with match_results on id) ──────────
+  // Fields sourced from match_results table, merged into the MatchStats shape
+  // so that MatchHistoryTable can access them without additional prop drilling.
+  score: string | null
   winner: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────

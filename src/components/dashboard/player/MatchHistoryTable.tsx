@@ -118,9 +118,9 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
+                  {/* Score — enrichi via join avec match_results dans PlayerProfileClient */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {'—'}
+                    {match.score ?? '—'}
                   </td>
 
                   {/* Résultat */}
