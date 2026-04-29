@@ -72,7 +72,13 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
-          momentum !== null ? getDeltaColor(momentum) : 'text-[var(--text-1)]'
+          momentum !== null
+            ? momentum > 0
+              ? 'text-[var(--green)]'
+              : momentum < 0
+                ? 'text-[var(--red)]'
+                : 'text-[var(--text-1)]'
+            : 'text-[var(--text-1)]'
         )}>
           {momentum !== null
             ? `${momentum >= 0 ? '↑' : '↓'} ${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}`
