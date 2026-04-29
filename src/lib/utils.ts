@@ -23,18 +23,6 @@ export function getDeltaColor(value: number | null): string {
 }
 
 /**
- * Retourne les classes Tailwind de couleur pour la métrique Momentum.
- * Sémantique directe : positif = bonne forme = vert, négatif = mauvaise forme = rouge.
- *
- * @param value - Valeur du momentum (peut être null)
- * @returns Classe Tailwind : vert si > 0, rouge si < 0, neutre si null ou 0
- */
-export function getMomentumColor(value: number | null): string {
-  if (value === null || value === 0) return 'text-[var(--text-1)]'
-  return value > 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'
-}
-
-/**
  * Retourne les classes Tailwind de couleur pour une comparaison de métriques.
  *
  * @param valueA   - Valeur du joueur 1 (peut être null)

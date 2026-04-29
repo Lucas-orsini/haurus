@@ -70,6 +70,7 @@ export default function MatchHistoryTable({
           </thead>
           <tbody>
             {matchHistory.map((match) => {
+              // Winner may be null until the data pipeline populates it via join with match_results
               const isWin = match.winner !== null ? match.winner === playerName : null
               const opponent =
                 match.player1 === playerName ? match.player2 : match.player1
@@ -117,9 +118,9 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score */}
+                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {match.score ?? '—'}
+                    {'—'}
                   </td>
 
                   {/* Résultat */}
