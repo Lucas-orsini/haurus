@@ -24,6 +24,22 @@ export interface MatchRow {
 }
 
 /**
+ * LastMatch — a completed match formatted for the player profile table.
+ *
+ * Consumed by PlayerMatchHistory and PlayerProfileClient (last matches table).
+ * result: 'V' if the player won, 'D' if the player lost.
+ */
+export interface LastMatch {
+  id: string
+  date: string
+  adversaire: string
+  tournoi: string | null
+  surface: string | null
+  score: string | null
+  resultat: 'V' | 'D'
+}
+
+/**
  * Builds the TodaysStats object from raw match_stats rows.
  *
  * @param todaysMatches — match_stats rows where date_match = today
@@ -165,4 +181,53 @@ export async function computeTodaysStats(
   const tournaments = extractTournaments(todaysMatches)
 
   return buildTodaysStats(todaysMatches, tournaments)
+}
+
+/**
+ * Fetches the last N completed matches for a given player.
+ *
+ * Queries match_results for rows where the player appears as player1 or player2,
+ * orders by date_match DESC, and limits to `limit` results (default 5).
+ *
+ * Used in the Server Component of the player profile page.
+ *
+ * @param playerName - Full name of the player to search for
+ * @param limit      - Maximum number of matches to return (default: 5)
+ * @returns Array of LastMatch objects, ordered by date descending
+ */
+export async function fetchLastMatches(
+  supabase: SupabaseClient,
+  playerName: string,
+  limit = 5
+): Promise<LastMatch[]> {
+  const { data, error } = await supabase
+    .from('match_results')
+    .select('id, player1, player2, date_match, winner, tournoi, surface, score')
+    .or(`player1.ilike.${playerName},player2.ilike.${playerName}`)
+    .order('date_match', { ascending: false })
+    .limit(limit)
+
+  if (error || !data) {
+    return []
+  }
+
+  return data.map((row) => {
+    // Determine opponent: the other player in the match
+    const adversaire = row.player1 === playerName
+      ? row.player2
+      : row.player1
+
+    // Determine result: 'V' if the player won, 'D' if lost
+    const resultat: 'V' | 'D' = row.winner === playerName ? 'V' : 'D'
+
+    return {
+      id: row.id,
+      date: row.date_match,
+      adversaire,
+      tournoi: row.tournoi,
+      surface: row.surface,
+      score: row.score,
+      resultat,
+    }
+  })
 }

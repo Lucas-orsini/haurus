@@ -15,8 +15,22 @@ type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type MatchResult = Database['public']['Tables']['match_results']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
 type MatchStat = Database['public']['Tables']['match_stats']['Row']
+type LastMatch = {
+  id: string
+  date: string
+  adversaire: string
+  tournoi: string | null
+  surface: string | null
+  score: string | null
+  resultat: 'V' | 'D'
+}
 
-export default function PlayerProfileClient() {
+interface PlayerProfileClientProps {
+  /** Pre-fetched last matches from the server (e.g., via ?player= query param). */
+  initialLastMatches?: LastMatch[]
+}
+
+export default function PlayerProfileClient({ initialLastMatches }: PlayerProfileClientProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<MatchResult[]>([])
@@ -24,6 +38,30 @@ export default function PlayerProfileClient() {
   const [modalMatchStats, setModalMatchStats] = useState<MatchStat | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(false)
+
+  // Use server-fetched matches as initial state when available
+  useEffect(() => {
+    if (initialLastMatches && initialLastMatches.length > 0) {
+      const asMatchResults: MatchResult[] = initialLastMatches.map((lm) => ({
+        id: lm.id,
+        date_match: lm.date,
+        player1: '',       // not available in LastMatch, set from player name later
+        player2: lm.adversaire,
+        winner: lm.resultat === 'V' ? selectedPlayer?.player_name ?? '' : lm.adversaire,
+        loser: lm.resultat === 'D' ? selectedPlayer?.player_name ?? '' : lm.adversaire,
+        score: lm.score ?? null,
+        surface: lm.surface ?? null,
+        tournoi: lm.tournoi ?? null,
+        created_at: null,
+        best_of: null,
+        minutes: null,
+        rank_winner: null,
+        rank_loser: null,
+        round: null,
+      }))
+      setMatchHistory(asMatchResults)
+    }
+  }, [initialLastMatches])
 
   // Charge les stats du joueur + historique + moyennes ATP quand un joueur est sélectionné
   const loadPlayerProfile = useCallback(async (player: PlayerStats, surface: 'Hard' | 'Clay' | 'Grass') => {
