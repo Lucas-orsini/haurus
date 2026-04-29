@@ -90,7 +90,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your app's logic.
+Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your code.
 
 Run all tests:
 
@@ -101,51 +101,46 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/lib/utils.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke. The error message shows which test failed and why
+- `PASS` — all tests passed, everything is working
+- `FAIL` — something broke, check the error message above for which test failed
 
-The test suite covers:
-- Authentication validation logic
-- Auth helpers and utilities
+**What the tests cover:**
+- Utility functions (`src/lib/utils.ts`)
+- Authentication validators
 - Dashboard metric formatting
-- Stats calculations
-- General utilities
+- Statistics calculations
+- Auth flow logic
 
 ## 📁 Project Structure
 
-Only folders containing actual project files are listed below.
-
-- `src/components/dashboard/player` — Player profile, match history table, and metrics modal components
-- `src/lib/supabase` — Supabase client setup and database type definitions
-- `src/lib/types` — TypeScript type definitions for match data
+- `src/lib` — Utility functions and shared logic
+- `src/lib/types` — TypeScript type definitions
+- `src/components/dashboard/player` — Player dashboard components (profile, metrics, match history)
+- `__tests__` — Jest unit tests
 
 ## 🚀 Deploy to Vercel
-
-The easiest way to deploy your Next.js app is to use Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables in Vercel dashboard:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with the value from your Supabase dashboard
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with the anon public key value
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` with the values from your Supabase dashboard
+5. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables from `.env.local` to Vercel before deploying. If they're missing, your app won't connect to Supabase.
+Your app will be live at a URL like `your-app.vercel.app`.
 
 ## 📝 License
 

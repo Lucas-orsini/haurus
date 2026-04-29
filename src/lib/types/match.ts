@@ -27,8 +27,10 @@ export type MatchStats = {
   best_of: number | null
 
   // ── Match result (populated via join with match_results) ──────────────
-  // TODO: data pipeline — winner exists in match_results but not in match_stats
+  // winner: string | null (populated via join on date_match + player1 + player2)
   winner: string | null
+  // score: string | null (populated via join on date_match + player1 + player2)
+  score: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
