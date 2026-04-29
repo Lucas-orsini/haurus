@@ -1,25 +1,34 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
+import MatchHistoryTable from './MatchHistoryTable'
+import MatchMetricsModal from './MatchMetricsModal'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
+import type { MatchStats } from '@/lib/types/match'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type MatchResult = Database['public']['Tables']['match_results']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
-type MatchStat = Database['public']['Tables']['match_stats']['Row']
+
+/** Keys used to look up match_stats in the modal */
+interface SelectedMatch {
+  date_match: string
+  player1: string
+  player2: string
+}
 
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<MatchResult[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
-  const [modalMatchStats, setModalMatchStats] = useState<MatchStat | null>(null)
+  const [modalMatchStats, setModalMatchStats] = useState<MatchStats | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(false)
 
@@ -80,22 +89,25 @@ export default function PlayerProfileClient() {
     loadPlayerProfile(player, selectedSurface)
   }
 
-  function handleOpenMetrics(matchId: string) {
-    // Fetch les match_stats pour ce matchId et ouvre la modal
+  async function handleOpenMetrics(date_match: string, player1: string, player2: string) {
     const supabase = createClient()
     if (!supabase) return
 
-    supabase
-      .from('match_stats')
-      .select('*')
-      .eq('id', matchId)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setModalMatchStats(data as MatchStat)
-          setModalOpen(true)
-        }
-      })
+    try {
+      const { data } = await supabase
+        .from('match_stats')
+        .select('*')
+        .eq('date_match', date_match)
+        .eq('player1', player1)
+        .eq('player2', player2)
+        .single()
+
+      setModalMatchStats(data as MatchStats | null)
+      setModalOpen(true)
+    } catch {
+      setModalMatchStats(null)
+      setModalOpen(true)
+    }
   }
 
   function handleCloseModal() {
@@ -152,8 +164,24 @@ export default function PlayerProfileClient() {
             <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
           )}
 
-       
+          {/* Tableau des 5 derniers matchs */}
+          {!loadingProfile && (
+            <MatchHistoryTable
+              matchHistory={matchHistory}
+              playerName={selectedPlayer.player_name}
+              onOpenMetrics={handleOpenMetrics}
+            />
+          )}
         </div>
+      )}
+
+      {/* Modal des métriques pré-match */}
+      {modalOpen && (
+        <MatchMetricsModal
+          matchStats={modalMatchStats}
+          playerName={selectedPlayer?.player_name ?? ''}
+          onClose={handleCloseModal}
+        />
       )}
 
       {/* État initial — rien n'est sélectionné */}
@@ -169,7 +197,6 @@ export default function PlayerProfileClient() {
           <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
         </div>
       )}
-
 
     </div>
   )
