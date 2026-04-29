@@ -4,8 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Stats Visualization** — Interactive player statistics dashboard with match history and performance metrics
-- **Dashboard Analytics** — Stats calculation and formatting utilities for player data
+- **Player Stats Visualization** — Interactive charts displaying player performance metrics with Recharts
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -78,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -89,7 +88,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly — like a spell-checker for your app's logic.
+Unit tests automatically check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
 
 Run all tests:
 
@@ -110,23 +109,25 @@ npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests passed, everything works correctly
-- `FAIL` — Something broke, the error message shows which test failed and why
+- `PASS` — everything works correctly
+- `FAIL` — something broke; the output shows which test failed and why
 
-**Tests in this project cover:**
-- Authentication validation logic
-- Dashboard stats calculation and formatting
-- Utility functions
+**What the tests cover:**
+
+| Test File | What it Tests |
+|-----------|--------------|
+| `__tests__/auth-validators.test.ts` | Authentication validation logic |
+| `__tests__/auth.test.ts` | Authentication flows and components |
+| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
+| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics utilities |
+| `__tests__/lib/utils.test.ts` | Shared utility functions |
+| `__tests__/utils.test.ts` | General utility functions |
 
 ## 📁 Project Structure
 
-- `src/app/dashboard/player` — Player dashboard page and routing
-- `src/components/dashboard/player` — Player profile, match history, and match modal components
-- `src/lib/dashboard` — Dashboard stats and utility functions
+- `src/components/dashboard/player` — Dashboard player components
 
 ## 🚀 Deploy to Vercel
-
-The easiest way to deploy your Next.js app is to use Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
@@ -134,13 +135,12 @@ The easiest way to deploy your Next.js app is to use Vercel.
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to your project → **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your anon key
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Click **Deploy**
 
-Your app will be live at a `.vercel.app` URL within seconds.
+Your app is live! 🎉
 
 ## 📝 License
 
