@@ -29,15 +29,6 @@ function getAtpPServe(surface: string, atpAverages: AtpAverage[]): number | null
   return avg?.p_serve ?? null
 }
 
-/**
- * Momentum color — positif = vert, négatif = rouge, zéro/null = neutre.
- * Logique spécifique au momentum (inverse de getDeltaColor utilisée pour Δ rank).
- */
-function getMomentumColor(momentum: number | null): string {
-  if (momentum === null || momentum === 0) return 'text-[var(--text-1)]'
-  return momentum > 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'
-}
-
 export default function PlayerMetricCards({ surface, playerStats, atpAverages }: PlayerMetricCardsProps) {
   const glicko = getGlicko(surface, playerStats)
   const pServe = getPServe(surface, playerStats)
@@ -81,7 +72,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
-          momentum !== null ? getMomentumColor(momentum) : 'text-[var(--text-1)]'
+          momentum !== null ? getDeltaColor(momentum) : 'text-[var(--text-1)]'
         )}>
           {momentum !== null
             ? `${momentum >= 0 ? '↑' : '↓'} ${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}`
