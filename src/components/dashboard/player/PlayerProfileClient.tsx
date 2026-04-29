@@ -37,13 +37,11 @@ export default function PlayerProfileClient() {
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
-        // Historique via match_stats avec LEFT JOIN sur match_results pour winner et score
-        // Filtre winner IS NOT NULL pour ne montrer que les matchs terminés
+        // Historique via match_stats — filtre sur player1 OU player2 (clé composite)
         supabase
           .from('match_stats')
-          .select('*, match_results(winner, score)')
+          .select('*')
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
-          .not('match_results', 'is', null)
           .order('date_match', { ascending: false })
           .limit(5),
         // Moyennes ATP par surface

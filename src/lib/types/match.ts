@@ -30,9 +30,6 @@ export type MatchStats = {
   // TODO: data pipeline — winner exists in match_results but not in match_stats
   winner: string | null
 
-  // ── Score (populated via join with match_results) ────────────────────
-  score: string | null
-
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
   rank_p2: number | null
