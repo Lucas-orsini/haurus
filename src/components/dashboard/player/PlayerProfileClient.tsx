@@ -64,30 +64,15 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      if (historyRes.error) {
-        console.error('[loadPlayerProfile] historyRes error:', historyRes.error)
-      }
-      const historyData = historyRes.data ?? []
-      console.log('[loadPlayerProfile] historyRes:', {
-        playerName: player.player_name,
-        count: historyData.length,
-        firstFew: historyData.slice(0, 3).map((m: MatchResult) => ({
-          id: m.id,
-          player1: m.player1,
-          player2: m.player2,
-          date_match: m.date_match,
-        })),
-      })
-
-      setMatchHistory(historyData as MatchResult[])
+      setMatchHistory((historyRes.data ?? []) as MatchResult[])
 
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])
       } else {
         setAtpAverages([])
       }
-    } catch (err) {
-      console.error('[loadPlayerProfile] unexpected error:', err)
+    } catch {
+      // Non-blocking — les données partielles sont affichées
     } finally {
       setLoadingProfile(false)
     }

@@ -1,9 +1,8 @@
 'use client'
 
-import { useMemo } from 'react'
-import { formatDate } from '@/lib/utils'
+import { BarChart2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
-import type { MatchStats } from '@/lib/types/match'
 
 type MatchResult = Database['public']['Tables']['match_results']['Row']
 
@@ -13,8 +12,13 @@ interface MatchHistoryTableProps {
   onOpenMetrics: (date_match: string, player1: string, player2: string) => void
 }
 
-export function formatDateTest(dateStr: string): string {
-  return formatDate(dateStr)
+/**
+ * Formats a date string (YYYY-MM-DD) to DD/MM/YYYY.
+ */
+function formatDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-')
+  if (!year || !month || !day) return '—'
+  return `${day}/${month}/${year}`
 }
 
 export default function MatchHistoryTable({
@@ -22,120 +26,131 @@ export default function MatchHistoryTable({
   playerName,
   onOpenMetrics,
 }: MatchHistoryTableProps) {
-  const matches = useMemo(() => {
-    if (!matchHistory || matchHistory.length === 0) {
-      return []
-    }
-    return matchHistory
-  }, [matchHistory])
-
-  if (!matches || matches.length === 0) {
+  // Empty state
+  if (matchHistory.length === 0) {
     return (
-      <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-6">
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center mb-3">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" />
-            </svg>
+      <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-6">
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
+            <BarChart2 size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
           </div>
-          <p className="text-xs font-medium text-[var(--text-2)]">Aucun match trouvé</p>
-          <p className="text-xs text-[var(--text-3)] mt-0.5">Historique indisponible pour ce joueur</p>
+          <p className="text-sm font-medium text-[var(--text-2)]">Aucun match récent</p>
+          <p className="text-xs text-[var(--text-3)] mt-1">
+            Les derniers matchs apparaîtront ici
+          </p>
         </div>
       </div>
     )
   }
 
-  function getMatchResult(match: MatchResult): { result: 'W' | 'L' | '—'; resultClass: string } {
-    if (!match.winner || !playerName) {
-      return { result: '—', resultClass: 'text-[var(--text-3)]' }
-    }
-    const won = match.winner.toLowerCase() === playerName.toLowerCase()
-    return {
-      result: won ? 'W' : 'L',
-      resultClass: won ? 'text-green-400' : 'text-red-400',
-    }
-  }
-
-  function getScoreDisplay(match: MatchResult): string {
-    return match.score ?? '—'
-  }
-
-  function getOpponent(match: MatchResult): string {
-    const p1Lower = match.player1?.toLowerCase() ?? ''
-    const p2Lower = match.player2?.toLowerCase() ?? ''
-    const playerLower = playerName?.toLowerCase() ?? ''
-
-    if (p1Lower === playerLower) {
-      return match.player2 ?? '—'
-    }
-    if (p2Lower === playerLower) {
-      return match.player1 ?? '—'
-    }
-    return match.player2 ?? '—'
-  }
-
   return (
-    <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg overflow-hidden">
-      <div className="px-4 py-3 border-b border-[var(--border)]">
-        <h3 className="text-sm font-semibold text-[var(--text-1)]">Historique des matchs</h3>
+    <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+        <p className="text-sm font-medium text-[var(--text-1)]">Historique des matchs</p>
+        <span className="text-xs text-[var(--text-3)] font-mono tabular-nums">
+          {matchHistory.length} match{matchHistory.length > 1 ? 's' : ''}
+        </span>
       </div>
 
+      {/* Table wrapper */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[var(--border)]">
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Date</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Tournoi</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Surface</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Adversaire</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Score</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Résultat</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Métriques</th>
+              {['Date', 'Adversaire', 'Tournoi', 'Surface', 'Score', 'Résultat', ''].map(
+                (h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody>
-            {matches.map((match) => {
-              const { result, resultClass } = getMatchResult(match)
-              const opponent = getOpponent(match)
+            {matchHistory.map((match, i) => {
+              const isWin = match.winner === playerName
+              const opponent =
+                match.player1 === playerName ? match.player2 : match.player1
 
               return (
                 <tr
                   key={match.id}
-                  className="border-b border-[var(--border)] last:border-b-0 hover:bg-white/[0.02] transition-colors"
+                  className={cn(
+                    'border-b border-[var(--border)] last:border-0',
+                    'hover:bg-white/[0.02] transition-colors duration-100'
+                  )}
                 >
-                  <td className="px-4 py-3 text-sm text-[var(--text-1)] whitespace-nowrap">
+                  {/* Date */}
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
                     {formatDate(match.date_match)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)] truncate max-w-[150px]">
-                    {match.tournoi ?? '—'}
+
+                  {/* Adversaire */}
+                  <td className="px-4 py-3 text-[var(--text-1)] font-medium max-w-[160px]">
+                    <span className="truncate block">{opponent}</span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)]">
-                    {match.surface ?? '—'}
+
+                  {/* Tournoi */}
+                  <td className="px-4 py-3 text-[var(--text-2)] max-w-[140px]">
+                    <span className="truncate block">{match.tournoi ?? '—'}</span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-1)] whitespace-nowrap">
-                    {opponent}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)] text-center font-mono">
-                    {getScoreDisplay(match)}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`text-sm font-semibold ${resultClass}`}>
-                      {result}
+
+                  {/* Surface */}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium',
+                        match.surface === 'Clay' &&
+                          'bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20',
+                        match.surface === 'Hard' &&
+                          'bg-white/[0.07] text-[var(--text-2)] border border-[var(--border-md)]',
+                        match.surface === 'Grass' &&
+                          'bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20',
+                        (!match.surface ||
+                          (!['Clay', 'Hard', 'Grass'].includes(match.surface))) &&
+                          'bg-white/[0.04] text-[var(--text-3)] border border-[var(--border)]'
+                      )}
+                    >
+                      {match.surface ?? '—'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => onOpenMetrics(match.date_match, match.player1, match.player2)}
-                      className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-white/[0.06] hover:bg-white/[0.10] transition-colors text-[var(--text-2)] hover:text-[var(--text-1)]"
-                      title="Voir les métriques"
+
+                  {/* Score */}
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
+                    {match.score ?? '—'}
+                  </td>
+
+                  {/* Résultat */}
+                  <td className="px-4 py-3">
+                    <span
+                      className={cn(
+                        'inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold',
+                        isWin
+                          ? 'bg-[var(--green)]/15 text-[var(--green)] border border-[var(--green)]/25'
+                          : 'bg-[var(--red)]/15 text-[var(--red)] border border-[var(--red)]/25'
+                      )}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 3v18h18" />
-                        <path d="M18 17V9" />
-                        <path d="M13 17V5" />
-                        <path d="M8 17v-3" />
-                      </svg>
+                      {isWin ? 'V' : 'D'}
+                    </span>
+                  </td>
+
+                  {/* Bouton Métriques */}
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() =>
+                        onOpenMetrics(match.date_match, match.player1, match.player2)
+                      }
+                      className="h-7 px-2.5 flex items-center justify-center gap-1.5 rounded-md
+                                 border border-[var(--border-md)] bg-white/[0.03]
+                                 hover:bg-white/[0.07] hover:border-[var(--border-hi)]
+                                 text-[var(--text-2)] text-[11px] font-medium
+                                 transition-colors duration-150 whitespace-nowrap"
+                    >
+                      Métriques
                     </button>
                   </td>
                 </tr>
