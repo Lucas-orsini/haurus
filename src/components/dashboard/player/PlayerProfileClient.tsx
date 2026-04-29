@@ -55,48 +55,7 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      // Enrichir l'historique avec score et winner depuis match_results
-      const matchIds = (historyRes.data ?? []).map((m: MatchStats) => ({
-        date_match: m.date_match,
-        player1: m.player1,
-        player2: m.player2,
-      }))
-
-      let enrichedHistory = (historyRes.data ?? []) as MatchStats[]
-
-      if (matchIds.length > 0) {
-        // Fetch les résultats pour ce joueur sur les mêmes matchs
-        const matchResultsRes = await supabase
-          .from('match_results')
-          .select('date_match, player1, player2, score, winner')
-          .or(
-            matchIds
-              .map(
-                ({ date_match, player1, player2 }) =>
-                  `date_match.eq.${date_match},player1.eq.${encodeURIComponent(player1)},player2.eq.${encodeURIComponent(player2)}`
-              )
-              .join(',')
-          )
-
-        if (matchResultsRes.data) {
-          const resultsMap = new Map<string, { score: string | null; winner: string | null }>()
-          for (const r of matchResultsRes.data) {
-            const key = `${r.date_match}::${r.player1}::${r.player2}`
-            resultsMap.set(key, { score: r.score, winner: r.winner })
-          }
-          enrichedHistory = (historyRes.data ?? []).map((m: MatchStats) => {
-            const key = `${m.date_match}::${m.player1}::${m.player2}`
-            const result = resultsMap.get(key)
-            return {
-              ...m,
-              score: result?.score ?? null,
-              winner: result?.winner ?? null,
-            } as MatchStats
-          })
-        }
-      }
-
-      setMatchHistory(enrichedHistory)
+      setMatchHistory((historyRes.data ?? []) as MatchStats[])
 
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])
