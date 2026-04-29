@@ -70,8 +70,8 @@ export default function MatchHistoryTable({
           </thead>
           <tbody>
             {matchHistory.map((match) => {
-              // Winner may be null until the data pipeline populates it via join with match_results
-              const isWin = match.winner !== null ? match.winner === playerName : null
+              // winner et score proviennent de la jointure LEFT JOIN avec match_results
+              const isWin = match.winner === playerName
               const opponent =
                 match.player1 === playerName ? match.player2 : match.player1
 
@@ -118,29 +118,23 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
+                  {/* Score — provient de la relation join avec match_results */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {'—'}
+                    {match.score ?? '—'}
                   </td>
 
                   {/* Résultat */}
                   <td className="px-4 py-3">
-                    {isWin === null ? (
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold bg-white/[0.04] text-[var(--text-3)] border border-[var(--border)]">
-                        {'—'}
-                      </span>
-                    ) : (
-                      <span
-                        className={cn(
-                          'inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold',
-                          isWin
-                            ? 'bg-[var(--green)]/15 text-[var(--green)] border border-[var(--green)]/25'
-                            : 'bg-[var(--red)]/15 text-[var(--red)] border border-[var(--red)]/25'
-                        )}
-                      >
-                        {isWin ? 'V' : 'D'}
-                      </span>
-                    )}
+                    <span
+                      className={cn(
+                        'inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold',
+                        isWin
+                          ? 'bg-[var(--green)]/15 text-[var(--green)] border border-[var(--green)]/25'
+                          : 'bg-[var(--red)]/15 text-[var(--red)] border border-[var(--red)]/25'
+                      )}
+                    >
+                      {isWin ? 'V' : 'D'}
+                    </span>
                   </td>
 
                   {/* Bouton Métriques */}
