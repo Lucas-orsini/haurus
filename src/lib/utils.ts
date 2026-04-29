@@ -229,3 +229,44 @@ export function formatMetricValue(
   // Fallback : nombre arrondi sans décimale
   return Math.round(value).toString()
 }
+
+/**
+ * Détermine quel joueur a la meilleure valeur pour une métrique donnée.
+ *
+ * Logique :
+ * - Pour rank_*, delta_rank_6m_*, breaks_lost_td_*, fatigue_72h_* → plus petit = mieux
+ * - Pour toutes les autres métriques → plus grand = mieux
+ * - Tolérance 0.001 : si les deux valeurs sont égales à 0.001 près → null (pas de coloration)
+ * - Si l'une des valeurs est null → null (pas de coloration)
+ *
+ * @param p1Value - Valeur du joueur 1
+ * @param p2Value - Valeur du joueur 2
+ * @param metricKey - Clé de la métrique (ex: 'rank_p1', 'glicko_rating_p1')
+ * @returns 'p1' si p1 est meilleur, 'p2' si p2 est meilleur, null si égalité ou null
+ */
+export function getBetterValue(
+  p1Value: number | null,
+  p2Value: number | null,
+  metricKey: string
+): 'p1' | 'p2' | null {
+  if (p1Value === null || p2Value === null) return null
+
+  const TOLERANCE = 0.001
+  if (Math.abs(p1Value - p2Value) <= TOLERANCE) return null
+
+  // Métriques où plus petit = mieux
+  const LOWER_IS_BETTER = new Set([
+    'rank_p1', 'rank_p2',
+    'delta_rank_6m_p1', 'delta_rank_6m_p2',
+    'breaks_lost_td_p1', 'breaks_lost_td_p2',
+    'fatigue_72h_p1', 'fatigue_72h_p2',
+    'jours_repos_p1', 'jours_repos_p2',
+  ])
+
+  if (LOWER_IS_BETTER.has(metricKey)) {
+    return p1Value < p2Value ? 'p1' : 'p2'
+  }
+
+  // Toutes les autres : plus grand = mieux
+  return p1Value > p2Value ? 'p1' : 'p2'
+}
