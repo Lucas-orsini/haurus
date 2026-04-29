@@ -7,7 +7,7 @@
  *
  * Source: match_stats table schema from Supabase Database type.
  *
- * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
+ * @TODO: data pipeline — match_stats does not have `score` or `winner` columns natively.
  *        - `winner` exists in match_results but not in match_stats.
  *        - `score` exists in match_results but not in match_stats.
  *        The data pipeline should add both columns directly to match_stats
@@ -27,8 +27,9 @@ export type MatchStats = {
   best_of: number | null
 
   // ── Match result (populated via join with match_results) ──────────────
-  // TODO: data pipeline — winner exists in match_results but not in match_stats
+  // TODO: data pipeline — winner and score exist in match_results but not in match_stats
   winner: string | null
+  score: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
