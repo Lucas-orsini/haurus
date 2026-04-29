@@ -32,6 +32,20 @@ function formatDate(dateStr: string): string {
 }
 
 export default function PlayerMatchHistory({ matches, playerName, onOpenMetrics }: PlayerMatchHistoryProps) {
+  if (!matches || matches.length === 0) {
+    return (
+      <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg px-6 py-10 flex flex-col items-center text-center">
+        <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
+            <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2Zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2Z" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-[var(--text-2)]">Aucun match trouvé</p>
+        <p className="text-xs text-[var(--text-3)] mt-1">Aucun résultat pour ce joueur dans la base.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
