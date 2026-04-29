@@ -28,10 +28,17 @@ type LastMatch = {
 interface PlayerProfileClientProps {
   /** Pre-fetched last matches from the server (e.g., via ?player= query param). */
   initialLastMatches?: LastMatch[]
+  /** Pre-fetched player stats to initialize selectedPlayer on first render. */
+  initialPlayerStats?: PlayerStats | null
 }
 
-export default function PlayerProfileClient({ initialLastMatches }: PlayerProfileClientProps) {
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
+export default function PlayerProfileClient({
+  initialLastMatches,
+  initialPlayerStats,
+}: PlayerProfileClientProps) {
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(
+    initialPlayerStats ?? null
+  )
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<MatchResult[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
