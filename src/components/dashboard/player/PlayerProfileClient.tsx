@@ -14,10 +14,17 @@ import type { MatchStats } from '@/lib/types/match'
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
 
+/** Enriched match row: match_stats columns + winner/loser/score from match_results via LEFT JOIN */
+type EnrichedMatchRow = MatchStats & {
+  winner: string | null
+  loser: string | null
+  score: string | null
+}
+
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
-  const [matchHistory, setMatchHistory] = useState<MatchStats[]>([])
+  const [matchHistory, setMatchHistory] = useState<EnrichedMatchRow[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
   const [modalMatchStats, setModalMatchStats] = useState<MatchStats | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -37,10 +44,18 @@ export default function PlayerProfileClient() {
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
-        // Historique via match_stats — filtre sur player1 OU player2 (clé composite)
+        // Historique via match_stats — LEFT JOIN match_results sur (player1, player2, date_match)
+        // pour récupérer winner, loser, score. LEFT JOIN préserve les lignes sans correspondance.
         supabase
           .from('match_stats')
-          .select('*')
+          .select(`
+            *,
+            match_results (
+              winner,
+              loser,
+              score
+            )
+          `)
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
           .order('date_match', { ascending: false })
           .limit(5),
@@ -55,7 +70,21 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      setMatchHistory((historyRes.data ?? []) as MatchStats[])
+      // Transforme les lignes enrichies : déplie match_results.winner/loser/score en colonnes plates
+      if (historyRes.data && Array.isArray(historyRes.data)) {
+        const enriched: EnrichedMatchRow[] = historyRes.data.map((row) => {
+          const matchResults = (row as unknown as { match_results: { winner: string; loser: string; score: string } | null }).match_results
+          return {
+            ...(row as unknown as MatchStats),
+            winner: matchResults?.winner ?? null,
+            loser: matchResults?.loser ?? null,
+            score: matchResults?.score ?? null,
+          }
+        })
+        setMatchHistory(enriched)
+      } else {
+        setMatchHistory([])
+      }
 
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])
