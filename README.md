@@ -4,8 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Metric Cards** — Interactive display of player performance metrics
+- **Player Profile** — Interactive player profile display with performance overview
 - **Match History Table** — Sortable table view showing all player match history
+- **Match Metrics Modal** — Detailed modal breakdown of individual match performance data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -89,60 +90,62 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that specific parts of the code work correctly — like a spell checker for your app's logic.
+Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your app's logic.
 
-**Run all tests:**
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-**Run a specific test file:**
+Run a specific test file:
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs on file change):**
+Watch mode (re-runs tests automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
+**How to read the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke. The error message shows which test failed and why
 
-- **PASS** — All tests in that file passed ✓
-- **FAIL** — Something broke; the error message shows which test failed and why
-
-**What the tests cover:**
-
-- `__tests__/auth-validators.test.ts` — Authentication validation logic
-- `__tests__/auth.test.ts` — Authentication flows
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — General utility functions
-- `__tests__/utils.test.ts` — Common utility functions
+The test suite covers:
+- Authentication validation logic
+- Auth helpers and utilities
+- Dashboard metric formatting
+- Stats calculations
+- General utilities
 
 ## 📁 Project Structure
 
-- `src/lib` — Type definitions and utility functions
-- `src/components/dashboard/player` — Player metric cards and match history table components
+Only folders containing actual project files are listed below.
+
+- `src/components/dashboard/player` — Player profile, match history table, and metrics modal components
+- `src/lib/supabase` — Supabase client setup and database type definitions
+- `src/lib/types` — TypeScript type definitions for match data
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+The easiest way to deploy your Next.js app is to use Vercel.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add your environment variables:
+3. Add your environment variables in Vercel dashboard:
    - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with the value from your Supabase dashboard
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with the anon public key value
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all `.env.local` variables in Vercel before deploying, otherwise your app won't connect to Supabase.
+> ⚠️ **Important**: Make sure to add all environment variables from `.env.local` to Vercel before deploying. If they're missing, your app won't connect to Supabase.
 
 ## 📝 License
 
