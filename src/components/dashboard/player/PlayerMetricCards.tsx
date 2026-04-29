@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, getDeltaColor, getMomentumColor } from '@/lib/utils'
+import { cn, getDeltaColor } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
@@ -72,7 +72,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
-          momentum !== null ? getMomentumColor(momentum) : 'text-[var(--text-1)]'
+          momentum !== null ? getDeltaColor(momentum) : 'text-[var(--text-1)]'
         )}>
           {momentum !== null
             ? `${momentum >= 0 ? '↑' : '↓'} ${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}`

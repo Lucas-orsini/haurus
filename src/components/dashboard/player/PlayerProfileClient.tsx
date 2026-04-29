@@ -38,10 +38,9 @@ export default function PlayerProfileClient() {
           .eq('player_name', player.player_name)
           .single(),
         // Historique via match_stats — filtre sur player1 OU player2 (clé composite)
-        // Join explicite vers match_results pour ramener score (winner déjà populé via pipeline)
         supabase
           .from('match_stats')
-          .select('*, match_results(score)')
+          .select('*')
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
           .order('date_match', { ascending: false })
           .limit(5),

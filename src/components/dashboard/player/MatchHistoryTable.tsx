@@ -118,14 +118,14 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score */}
+                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {match.score ?? '—'}
+                    {'—'}
                   </td>
 
                   {/* Résultat */}
                   <td className="px-4 py-3">
-                    {match.winner === null ? (
+                    {isWin === null ? (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold bg-white/[0.04] text-[var(--text-3)] border border-[var(--border)]">
                         {'—'}
                       </span>
