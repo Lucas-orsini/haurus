@@ -3,9 +3,15 @@
  *
  * Guaranteed non-null fields: id, date_match, player1, player2, surface.
  * All other columns (metrics, rankings, ratings, etc.) are nullable.
- * This type is consumed by DashboardOverview and MatchRow components.
+ * This type is consumed by DashboardOverview, MatchRow, MatchHistoryTable, and MatchMetricsModal.
  *
  * Source: match_stats table schema from Supabase Database type.
+ *
+ * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
+ *        - `winner` exists in match_results but not in match_stats.
+ *        - `score` exists in match_results but not in match_stats.
+ *        The data pipeline should add both columns directly to match_stats
+ *        or maintain a join on (date_match, player1, player2) to populate them.
  */
 export type MatchStats = {
   // ── Primary identifiers ──────────────────────────────────────────────────
@@ -19,6 +25,10 @@ export type MatchStats = {
   surface: string | null
   tournoi: string | null
   best_of: number | null
+
+  // ── Match result (populated via join with match_results) ──────────────
+  // TODO: data pipeline — winner exists in match_results but not in match_stats
+  winner: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
@@ -48,7 +58,7 @@ export type MatchStats = {
   map_p1: number | null
   map_p2: number | null
 
-  // ── Recent form (string of V/D characters) ───────────────────────────────
+  // ── Recent form (string of V/D characters) ─────────────────────────────
   form_p1: string | null
   form_p2: string | null
 
@@ -72,7 +82,7 @@ export type MatchStats = {
   breaks_lost_td_p1: number | null
   breaks_lost_td_p2: number | null
 
-  // ── Rest days before match ───────────────────────────────────────────────
+  // ── Rest days before match ──────────────────────────────────────────────
   jours_repos_p1: number | null
   jours_repos_p2: number | null
 }

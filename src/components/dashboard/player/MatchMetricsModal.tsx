@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getMetricColor } from '@/lib/utils'
 import { formatMetricValue } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 
 interface MatchMetricsModalProps {
+  /** Datas issues de match_stats — fetched via la clé composite (date_match, player1, player2) */
   matchStats: MatchStats | null
   playerName: string
   onClose: () => void
@@ -29,7 +30,6 @@ interface MetricRow {
   p1Key: string
   p2Key: string
   mode: 'higher' | 'lower' | 'neutral' | 'delta'
-  isBreak?: boolean
   suffix?: string
 }
 
@@ -81,12 +81,8 @@ export default function MatchMetricsModal({
 
   const hasStats = matchStats !== null
 
-  // Determine which column corresponds to the current player
-  // (match_stats stores player1 = first entry, player2 = second entry)
-  const isP1 = hasStats && matchStats.player1 === playerName
-  const isP2 = hasStats && matchStats.player2 === playerName
-
   // Derive the display names based on which player is current
+  // (match_stats stores player1 = first entry, player2 = second entry)
   const p1Display = hasStats ? matchStats.player1 : 'Joueur 1'
   const p2Display = hasStats ? matchStats.player2 : 'Joueur 2'
 
@@ -120,7 +116,7 @@ export default function MatchMetricsModal({
           </button>
         </div>
 
-        {/* Body */}
+        {/* Body — match_stats fetched via handleOpenMetrics, always has data or null */}
         <div className="p-5">
           {!hasStats ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
