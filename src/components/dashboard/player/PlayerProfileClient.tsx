@@ -8,25 +8,16 @@ import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
 import MatchHistoryTable from './MatchHistoryTable'
 import MatchMetricsModal from './MatchMetricsModal'
-import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
-type MatchResult = Database['public']['Tables']['match_results']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
-
-/** Keys used to look up match_stats in the modal */
-interface SelectedMatch {
-  date_match: string
-  player1: string
-  player2: string
-}
 
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
-  const [matchHistory, setMatchHistory] = useState<MatchResult[]>([])
+  const [matchHistory, setMatchHistory] = useState<MatchStats[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
   const [modalMatchStats, setModalMatchStats] = useState<MatchStats | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -46,9 +37,9 @@ export default function PlayerProfileClient() {
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
-        // 5 derniers matchs du joueur (via match_results)
+        // Historique via match_stats — filtre sur player1 OU player2 (clé composite)
         supabase
-          .from('match_results')
+          .from('match_stats')
           .select('*')
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
           .order('date_match', { ascending: false })
@@ -64,7 +55,7 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      setMatchHistory((historyRes.data ?? []) as MatchResult[])
+      setMatchHistory((historyRes.data ?? []) as MatchStats[])
 
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])

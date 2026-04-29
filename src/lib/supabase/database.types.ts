@@ -7,6 +7,11 @@
  *   - @/lib/supabase/server
  *   - All components that use Supabase row types via
  *     Database['public']['Tables']['table_name']['Row']
+ *
+ * @TODO: data pipeline — match_stats does not have a `winner` column.
+ *        The `winner` field exists in match_results but not in match_stats.
+ *        The data pipeline should add `winner` to match_stats or maintain
+ *        a join on (date_match, player1, player2) to populate it.
  */
 
 export type Json =
@@ -153,6 +158,9 @@ export type Database = {
           surface: string | null
           tournoi: string | null
           best_of: number | null
+          // TODO: data pipeline — winner exists in match_results but not in match_stats.
+          // Populated via join on (date_match, player1, player2) until column is added.
+          winner: string | null
           rank_p1: number | null
           rank_p2: number | null
           delta_rank_6m_p1: number | null
@@ -199,6 +207,7 @@ export type Database = {
           surface?: string | null
           tournoi?: string | null
           best_of?: number | null
+          winner?: string | null
           rank_p1?: number | null
           rank_p2?: number | null
           delta_rank_6m_p1?: number | null
@@ -245,6 +254,7 @@ export type Database = {
           surface?: string | null
           tournoi?: string | null
           best_of?: number | null
+          winner?: string | null
           rank_p1?: number | null
           rank_p2?: number | null
           delta_rank_6m_p1?: number | null
