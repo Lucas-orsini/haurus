@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, getDeltaColor } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
@@ -56,7 +56,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
           {pServePct}
         </p>
         {pServeDelta !== null ? (
-          <p className={cn('text-xs mt-1 flex items-center gap-1', getDeltaColor(pServeDelta > 0 ? 1 : -1))}>
+          <p className={cn('text-xs mt-1 flex items-center gap-1')}>
             <span>{pServeDelta >= 0 ? '↑' : '↓'}</span>
             <span>
               {pServeDelta >= 0 ? '+' : ''}{(pServeDelta * 100).toFixed(1)}% vs ATP
@@ -72,7 +72,9 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
-          momentum !== null ? getDeltaColor(momentum) : 'text-[var(--text-1)]'
+          momentum !== null
+            ? momentum >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'
+            : 'text-[var(--text-1)]'
         )}>
           {momentum !== null
             ? `${momentum >= 0 ? '↑' : '↓'} ${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}`
