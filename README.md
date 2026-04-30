@@ -78,7 +78,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -100,7 +100,7 @@ npx jest
 **Run a specific test file:**
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
 **Watch mode (re-runs on file change):**
@@ -109,38 +109,39 @@ npx jest __tests__/auth-validators.test.ts
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — All tests passed, your code works correctly
-- `FAIL` — Something broke, check the error message below for what needs fixing
+**How to read the output:**
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — Auth validation logic
-- `__tests__/auth.test.ts` — Auth functionality
-- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics
-- `__tests__/lib/utils.test.ts` — Utility functions
-- `__tests__/utils.test.ts` — General utilities
+- `PASS` — all tests passed, your code is working correctly
+- `FAIL` — something broke, read the error below to see which test failed and why
+
+**What the tests cover:**
+
+- Auth validation logic (email/password requirements)
+- Auth functions and handlers
+- Dashboard metric formatting utilities
+- Dashboard stats calculations
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player profile and match history components
-- `src/lib/types` — TypeScript type definitions for match data
+- `src/components/dashboard/player` — Player profile components
+- `__tests__` — Jest test suites for auth, dashboard utilities, and general utils
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`haraus`)
-3. Add your environment variables in Vercel dashboard:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+2. Import your GitHub repository
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL` → paste your value
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your value
+5. Click **Deploy** — Vercel will build and deploy your app
 
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are added to Vercel before deploying, otherwise your app won't connect to Supabase.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may crash.
 
 ## 📝 License
 

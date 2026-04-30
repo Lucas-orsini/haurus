@@ -96,19 +96,4 @@ export type MatchStats = {
  * @see PlayerProfileClient.tsx — enriches via query on match_results
  * @see MatchHistoryTable.tsx   — consumes EnrichedMatchHistory[]
  */
-export type EnrichedMatchHistory = {
-  // ── From match_results ────────────────────────────────────────────────────
-  id: string
-  date_match: string
-  player1: string
-  player2: string
-  winner: string | null
-  score: string | null
-  tournoi: string | null
-  surface: string | null
-  best_of: number | null
-
-  // ── Computed fields (added by PlayerProfileClient before passing to MatchHistoryTable) ──
-  adversaire: string
-  resultat: 'V' | 'D' | null
-}
+export type EnrichedMatchHistory = MatchStats
