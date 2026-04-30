@@ -6,33 +6,18 @@ import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
+import MatchHistoryTable from './MatchHistoryTable'
 import type { Database } from '@/lib/supabase/database.types'
-import type { MatchStats } from '@/lib/types/match'
+import type { EnrichedMatchHistory } from '@/lib/types/match'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
-
-/** Shape of a history entry — player data from match_results with computed fields */
-export type EnrichedMatchHistory = {
-  id: string
-  date_match: string
-  player1: string
-  player2: string
-  winner: string | null
-  score: string | null
-  tournoi: string | null
-  surface: string | null
-  adversaire: string
-  resultat: 'V' | 'D' | null
-}
 
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
-  const [modalMatchStats, setModalMatchStats] = useState<MatchStats | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(false)
 
   // Charge les stats du joueur + historique + moyennes ATP quand un joueur est sélectionné
@@ -52,7 +37,7 @@ export default function PlayerProfileClient() {
         // Historique direct via match_results — seule table contenant winner, score, tournoi, surface
         supabase
           .from('match_results')
-          .select('id, date_match, player1, player2, winner, score, tournoi, surface')
+          .select('id, date_match, player1, player2, winner, score, tournoi, surface, best_of')
           .or(`player1.ilike.%${player.player_name.toLowerCase()}%,player2.ilike.%${player.player_name.toLowerCase()}%`)
           .order('date_match', { ascending: false })
           .limit(5),
@@ -89,6 +74,7 @@ export default function PlayerProfileClient() {
             score: row.score,
             tournoi: row.tournoi,
             surface: row.surface,
+            best_of: row.best_of,
             adversaire,
             resultat,
           }
@@ -114,37 +100,11 @@ export default function PlayerProfileClient() {
   useEffect(() => {
     if (!selectedPlayer) return
     loadPlayerProfile(selectedPlayer, selectedSurface)
-  }, [selectedSurface]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedSurface, selectedPlayer, loadPlayerProfile])
 
   function handleSelectPlayer(player: PlayerStats) {
     setSelectedPlayer(player)
     loadPlayerProfile(player, selectedSurface)
-  }
-
-  async function handleOpenMetrics(date_match: string, player1: string, player2: string) {
-    const supabase = createClient()
-    if (!supabase) return
-
-    try {
-      const { data } = await supabase
-        .from('match_stats')
-        .select('*')
-        .eq('date_match', date_match)
-        .eq('player1', player1)
-        .eq('player2', player2)
-        .single()
-
-      setModalMatchStats(data as MatchStats | null)
-      setModalOpen(true)
-    } catch {
-      setModalMatchStats(null)
-      setModalOpen(true)
-    }
-  }
-
-  function handleCloseModal() {
-    setModalOpen(false)
-    setTimeout(() => setModalMatchStats(null), 200)
   }
 
   return (
@@ -195,10 +155,16 @@ export default function PlayerProfileClient() {
           {!loadingProfile && (
             <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
           )}
+
+          {/* Historique des matchs */}
+          {!loadingProfile && (
+            <MatchHistoryTable
+              playerName={selectedPlayer.player_name}
+              matchHistory={matchHistory}
+            />
+          )}
         </div>
       )}
-
-
 
       {/* État initial — rien n'est sélectionné */}
       {!selectedPlayer && (
