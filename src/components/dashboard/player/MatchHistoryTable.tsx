@@ -1,16 +1,11 @@
 'use client'
 
-import { BarChart2 } from 'lucide-react'
+import { BarChart2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 
-/** Extended shape that carries score from match_results. */
-export type EnrichedMatchHistory = MatchStats & {
-  score?: string | null
-}
-
 interface MatchHistoryTableProps {
-  matchHistory: EnrichedMatchHistory[]
+  matchHistory: MatchStats[]
   playerName: string
   onOpenMetrics: (date_match: string, player1: string, player2: string) => void
 }
@@ -123,9 +118,9 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score */}
+                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {match.score ?? '—'}
+                    {'—'}
                   </td>
 
                   {/* Résultat */}

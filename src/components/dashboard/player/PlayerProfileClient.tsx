@@ -7,13 +7,17 @@ import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
 import MatchHistoryTable from './MatchHistoryTable'
-import type { EnrichedMatchHistory } from './MatchHistoryTable'
 import MatchMetricsModal from './MatchMetricsModal'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
+
+/** Shape of a merged history entry — extends MatchStats with optional score */
+export type EnrichedMatchHistory = MatchStats & {
+  score?: string | null
+}
 
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
@@ -31,29 +35,20 @@ export default function PlayerProfileClient() {
     if (!supabase) { setLoadingProfile(false); return }
 
     try {
-      const [statsRes, resultsRes, statsForResultsRes, atpRes] = await Promise.all([
+      const [statsRes, historyRes, atpRes] = await Promise.all([
         // Stats surface du joueur
         supabase
           .from('player_stats')
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
-        // match_results — source de vérité pour l'historique (winner + score toujours résolus)
-        // Filtre sur winner IS NOT NULL → matchs terminés uniquement
-        supabase
-          .from('match_results')
-          .select('date_match, player1, player2, winner, loser, score, surface, tournoi, best_of, rank_winner, rank_loser, round, minutes')
-          .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
-          .not('winner', 'is', null)
-          .order('date_match', { ascending: false })
-          .limit(5),
-        // match_stats — enrichissement optionnel (jointure sur date + joueurs)
-        // On filtre sur les dates des matchs résultats pour éviter de charger toute la table
+        // Historique via match_stats — filtre sur player1 OU player2 (clé composite)
         supabase
           .from('match_stats')
           .select('*')
           .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
-          .limit(100),
+          .order('date_match', { ascending: false })
+          .limit(5),
         // Moyennes ATP par surface
         supabase
           .from('atp_averages')
@@ -65,76 +60,34 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      const rawResults = (resultsRes.data ?? []) as Array<{
-        date_match: string; player1: string; player2: string; winner: string | null
-        loser: string | null; score: string | null; surface: string | null; tournoi: string | null
-        best_of: number | null; rank_winner: number | null; rank_loser: number | null
-        round: string | null; minutes: number | null
-      }>
+      const rawHistory = (historyRes.data ?? []) as MatchStats[]
 
-      // Si des matchs résultats existent, join avec match_stats pour enrichir
-      if (rawResults.length > 0) {
-        const resultDates = rawResults.map(m => m.date_match)
+      // Si des matchs sont trouvés, fetch match_results pour peupler winner et score
+      if (rawHistory.length > 0) {
+        // Extraire les dates uniques pour éviter de charger toute la table match_results
+        const dates = [...new Set(rawHistory.map((m) => m.date_match))]
 
-        // Construire une Map des stats additionnelles sur la clé composite
-        const statsMap = new Map<string, Partial<MatchStats>>()
-        for (const s of (statsForResultsRes.data ?? []) as MatchStats[]) {
-          if (resultDates.includes(s.date_match)) {
-            const key = `${s.date_match}||${s.player1}||${s.player2}`
-            statsMap.set(key, s)
-          }
+        const { data: resultsData } = await supabase
+          .from('match_results')
+          .select('date_match, player1, player2, winner, loser, score')
+          .in('date_match', dates)
+
+        // Construire une Map sur la clé composite (date_match, player1, player2)
+        const resultsMap = new Map<string, { winner: string | null; score: string | null }>()
+        for (const r of resultsData ?? []) {
+          const key = `${r.date_match}||${r.player1}||${r.player2}`
+          resultsMap.set(key, { winner: r.winner, score: r.score })
         }
 
-        const enrichedHistory: EnrichedMatchHistory[] = rawResults.map(r => {
-          const key = `${r.date_match}||${r.player1}||${r.player2}`
-          const stats = statsMap.get(key)
+        // Merger — LEFT JOIN sémantique : on garde toutes les lignes de match_stats,
+        // enrichies avec winner et score si une correspondance existe dans match_results
+        const enrichedHistory: EnrichedMatchHistory[] = rawHistory.map((m) => {
+          const key = `${m.date_match}||${m.player1}||${m.player2}`
+          const result = resultsMap.get(key)
           return {
-            id: `${r.date_match}-${r.player1}-${r.player2}`,
-            created_at: null,
-            date_match: r.date_match,
-            player1: r.player1,
-            player2: r.player2,
-            surface: r.surface,
-            tournoi: r.tournoi,
-            best_of: r.best_of,
-            winner: r.winner,
-            score: r.score,
-            rank_p1: stats?.rank_p1 ?? r.rank_winner ?? null,
-            rank_p2: stats?.rank_p2 ?? r.rank_loser ?? null,
-            delta_rank_6m_p1: stats?.delta_rank_6m_p1 ?? null,
-            delta_rank_6m_p2: stats?.delta_rank_6m_p2 ?? null,
-            p_serve_p1: stats?.p_serve_p1 ?? null,
-            p_serve_p2: stats?.p_serve_p2 ?? null,
-            p_return_p1: stats?.p_return_p1 ?? null,
-            p_return_p2: stats?.p_return_p2 ?? null,
-            glicko_rating_p1: stats?.glicko_rating_p1 ?? null,
-            glicko_rating_p2: stats?.glicko_rating_p2 ?? null,
-            glicko_rd_p1: stats?.glicko_rd_p1 ?? null,
-            glicko_rd_p2: stats?.glicko_rd_p2 ?? null,
-            tsd_p1: stats?.tsd_p1 ?? null,
-            tsd_p2: stats?.tsd_p2 ?? null,
-            bppi_p1: stats?.bppi_p1 ?? null,
-            bppi_p2: stats?.bppi_p2 ?? null,
-            map_p1: stats?.map_p1 ?? null,
-            map_p2: stats?.map_p2 ?? null,
-            form_p1: stats?.form_p1 ?? null,
-            form_p2: stats?.form_p2 ?? null,
-            win_rate_td_p1: stats?.win_rate_td_p1 ?? null,
-            win_rate_td_p2: stats?.win_rate_td_p2 ?? null,
-            win_rate_surf_td_p1: stats?.win_rate_surf_td_p1 ?? null,
-            win_rate_surf_td_p2: stats?.win_rate_surf_td_p2 ?? null,
-            win_rate_5m_p1: stats?.win_rate_5m_p1 ?? null,
-            win_rate_5m_p2: stats?.win_rate_5m_p2 ?? null,
-            momentum_td_p1: stats?.momentum_td_p1 ?? null,
-            momentum_td_p2: stats?.momentum_td_p2 ?? null,
-            fatigue_72h_p1: stats?.fatigue_72h_p1 ?? null,
-            fatigue_72h_p2: stats?.fatigue_72h_p2 ?? null,
-            breaks_won_td_p1: stats?.breaks_won_td_p1 ?? null,
-            breaks_won_td_p2: stats?.breaks_won_td_p2 ?? null,
-            breaks_lost_td_p1: stats?.breaks_lost_td_p1 ?? null,
-            breaks_lost_td_p2: stats?.breaks_lost_td_p2 ?? null,
-            jours_repos_p1: stats?.jours_repos_p1 ?? null,
-            jours_repos_p2: stats?.jours_repos_p2 ?? null,
+            ...m,
+            winner: result?.winner ?? null,
+            score: result?.score ?? null,
           }
         })
 
