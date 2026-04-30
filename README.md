@@ -6,7 +6,6 @@ The metrics bookmakers use. Now yours.
 
 - **Player Profile** — Interactive player profile display with performance overview
 - **Match History Table** — Sortable table view showing all player match history
-- **Match Metrics Modal** — Detailed modal breakdown of individual match performance data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -90,7 +89,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your code. When all tests pass, your code is working as expected. When a test fails, it shows exactly which part is broken so you can fix it.
+Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your app's logic.
 
 Run all tests:
 
@@ -111,19 +110,20 @@ npx jest --watch
 ```
 
 **Reading Jest output:**
-- `PASS` — All tests in that file passed ✓
-- `FAIL` — Something broke, Jest shows which test failed and why
+- **PASS** — all tests passed, everything works
+- **FAIL** — something broke, check the error message below for which test failed
 
 **What the tests cover:**
-- Auth validators — Email format, password strength, and form validation logic
-- Auth functions — Login/logout flow and session handling
-- Dashboard utilities — Metric formatting and stats calculations
-- General utilities — Common helper functions (className merging, date formatting, etc.)
+- Auth validation logic (`auth-validators.test.ts`)
+- Auth functionality (`auth.test.ts`)
+- Dashboard formatting utilities (`formatMetric.test.ts`)
+- Dashboard statistics (`stats.test.ts`)
+- General utilities (`utils.test.ts`)
 
 ## 📁 Project Structure
 
-- `src/lib` — Utility functions and helper modules
-- `src/components/dashboard/player` — Player profile and metrics components
+- `src/components/dashboard/player` — Player profile and match history components
+- `src/lib/types` — TypeScript type definitions for match data
 
 ## 🚀 Deploy to Vercel
 
@@ -131,15 +131,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Every push to `main` triggers a new deployment.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
