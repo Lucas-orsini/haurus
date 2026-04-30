@@ -14,9 +14,10 @@ import type { MatchStats } from '@/lib/types/match'
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
 
-/** Shape of a merged history entry — extends MatchStats with optional score */
+/** Shape of a merged history entry — extends MatchStats with score and hasMetrics */
 export type EnrichedMatchHistory = MatchStats & {
   score?: string | null
+  hasMetrics: boolean
 }
 
 export default function PlayerProfileClient() {
@@ -80,7 +81,8 @@ export default function PlayerProfileClient() {
         }
 
         // Merger — LEFT JOIN sémantique : on garde toutes les lignes de match_stats,
-        // enrichies avec winner et score si une correspondance existe dans match_results
+        // enrichies avec winner et score si une correspondance existe dans match_results.
+        // hasMetrics est toujours true car l'entrée provient de match_stats.
         const enrichedHistory: EnrichedMatchHistory[] = rawHistory.map((m) => {
           const key = `${m.date_match}||${m.player1}||${m.player2}`
           const result = resultsMap.get(key)
@@ -88,6 +90,7 @@ export default function PlayerProfileClient() {
             ...m,
             winner: result?.winner ?? null,
             score: result?.score ?? null,
+            hasMetrics: true,
           }
         })
 
