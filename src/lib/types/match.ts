@@ -7,11 +7,11 @@
  *
  * Source: match_stats table schema from Supabase Database type.
  *
- * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
- *        - `winner` exists in match_results but not in match_stats.
- *        - `score` exists in match_results but not in match_stats.
- *        The data pipeline should add both columns directly to match_stats
- *        or maintain a join on (date_match, player1, player2) to populate them.
+ * NOTE: `winner` and `score` are populated via join with match_results.
+ *       - `winner` exists in match_results; match_stats has no such column.
+ *       - `score` exists in match_results; match_stats has no such column.
+ *       Both are optional here so EnrichedMatchHistory can carry them without
+ *       breaking the MatchStats contract consumed by other components.
  */
 export type MatchStats = {
   // ── Primary identifiers ──────────────────────────────────────────────────
@@ -27,8 +27,12 @@ export type MatchStats = {
   best_of: number | null
 
   // ── Match result (populated via join with match_results) ──────────────
-  // TODO: data pipeline — winner exists in match_results but not in match_stats
-  winner: string | null
+  // NOTE: winner is optional here to allow EnrichedMatchHistory (which
+  // extends MatchStats) to narrow the type without breaking consumers.
+  winner?: string | null
+
+  // ── Score (populated via join with match_results — not in match_stats) ─
+  score?: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
@@ -42,7 +46,7 @@ export type MatchStats = {
   p_return_p1: number | null
   p_return_p2: number | null
 
-  // ── Glicko-2 ratings ────────────────────────────────────────────────────
+  // ── Glicko-2 ratings ──────────────────────────────────────────────────
   glicko_rating_p1: number | null
   glicko_rating_p2: number | null
   glicko_rd_p1: number | null
