@@ -12,7 +12,10 @@ interface MatchRowProps {
   onToggleFavorite: (matchId: string, favorited: boolean) => void
 }
 
-// Metric definition for the accordion panel
+/**
+ * Metric definition for the accordion panel.
+ * This local interface mirrors the MetricDef shape expected by METRIC_DEFS.
+ */
 interface MetricDef {
   label: string
   p1Key: keyof MatchStats
@@ -20,7 +23,11 @@ interface MetricDef {
   mode: 'higher' | 'lower' | 'neutral'
 }
 
-const METRIC_DEFS: MetricDef[] = [
+/**
+ * Ordered list of all 16 pre-match metrics displayed in the accordion panel.
+ * Exported so MatchMetricsModal can import the same definitions.
+ */
+export const METRIC_DEFS: MetricDef[] = [
   { label: 'Classement ATP',         p1Key: 'rank_p1',              p2Key: 'rank_p2',              mode: 'lower'   },
   { label: 'Évolution rank 6 mois', p1Key: 'delta_rank_6m_p1',     p2Key: 'delta_rank_6m_p2',     mode: 'lower'   },
   { label: 'P-Serve',               p1Key: 'p_serve_p1',            p2Key: 'p_serve_p2',            mode: 'higher'  },
@@ -162,10 +169,10 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                               <FormeCell value={match.form_p1} />
                             ) : p1Key === 'delta_rank_6m_p1' ? (
                               <span className={cn(getDeltaColor(val1))}>
-                                {formatMetricValue(val1, p1Key)}
+                                {formatMetricValue(val1, p1Key as string)}
                               </span>
                             ) : (
-                              <span>{formatMetricValue(val1, p1Key)}</span>
+                              <span>{formatMetricValue(val1, p1Key as string)}</span>
                             )}
                           </span>
                         </div>
@@ -197,10 +204,10 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                               <FormeCell value={match.form_p2} />
                             ) : p2Key === 'delta_rank_6m_p2' ? (
                               <span className={cn(getDeltaColor(val2))}>
-                                {formatMetricValue(val2, p2Key)}
+                                {formatMetricValue(val2, p2Key as string)}
                               </span>
                             ) : (
-                              <span>{formatMetricValue(val2, p2Key)}</span>
+                              <span>{formatMetricValue(val2, p2Key as string)}</span>
                             )}
                           </span>
                         </div>

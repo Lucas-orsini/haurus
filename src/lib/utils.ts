@@ -35,21 +35,40 @@ export function getMomentumColor(value: number | null): string {
 }
 
 /**
+ * Mode de coloration pour getMetricColor — étendue pour couvrir tous les modes
+ * utilisés par les composants dashboard (MatchRow, MatchMetricsModal).
+ */
+export type MetricColorMode =
+  | 'higher'
+  | 'lower'
+  | 'neutral'
+  | 'delta'
+  | 'rank'
+  | 'breaks_lost'
+  | 'fatigue'
+  | 'delta_rank'
+
+/**
  * Retourne les classes Tailwind de couleur pour une comparaison de métriques.
  *
  * @param valueA   - Valeur du joueur 1 (peut être null)
  * @param valueB   - Valeur du joueur 2 (peut être null)
- * @param mode     - 'higher' : plus grand = vert, plus petit = rouge
- *                   'lower'   : plus petit = vert, plus grand = rouge
- *                   'neutral' : aucune coloration
- *                   'delta'   : inversé — négatif = vert (amélioration), positif = rouge (dégradation)
+ * @param mode     - Mode de coloration :
+ *                   'higher'     : plus grand = vert, plus petit = rouge
+ *                   'lower'     : plus petit = vert, plus grand = rouge
+ *                   'neutral'   : aucune coloration
+ *                   'delta'     : inversé — négatif = vert (amélioration), positif = rouge
+ *                   'rank'      : rank plus bas = vert (meilleur)
+ *                   'breaks_lost': moins de breaks perdus = vert
+ *                   'fatigue'   : moins de fatigue = vert
+ *                   'delta_rank': négatif = vert (amélioration classement)
  * @param tolerance - Seuil sous lequel aucune coloration n'est appliquée (défaut 0.001)
  * @returns [classA, classB] - Tuple de classes Tailwind
  */
 export function getMetricColor(
   valueA: number | null,
   valueB: number | null,
-  mode: 'higher' | 'lower' | 'neutral' | 'delta',
+  mode: MetricColorMode,
   tolerance = 0.001
 ): [string, string] {
   const greenClass   = 'text-[var(--green)]'
@@ -71,8 +90,28 @@ export function getMetricColor(
   }
 
   // Mode delta : valeur la plus négative = mieux
-  if (mode === 'delta') {
-    // Plus la valeur est négative, meilleure elle est
+  if (mode === 'delta' || mode === 'delta_rank') {
+    return valueA < valueB
+      ? [greenClass, redClass]
+      : [redClass, greenClass]
+  }
+
+  // Mode rank : plus bas = mieux (inversé par rapport à 'higher')
+  if (mode === 'rank') {
+    return valueA < valueB
+      ? [greenClass, redClass]
+      : [redClass, greenClass]
+  }
+
+  // Mode breaks_lost : moins = mieux (même logique que 'lower')
+  if (mode === 'breaks_lost') {
+    return valueA < valueB
+      ? [greenClass, redClass]
+      : [redClass, greenClass]
+  }
+
+  // Mode fatigue : moins = mieux (même logique que 'lower')
+  if (mode === 'fatigue') {
     return valueA < valueB
       ? [greenClass, redClass]
       : [redClass, greenClass]

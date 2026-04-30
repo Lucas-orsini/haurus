@@ -97,3 +97,48 @@ export type MatchStats = {
  * @see MatchHistoryTable.tsx   — consumes EnrichedMatchHistory[]
  */
 export type EnrichedMatchHistory = MatchStats
+
+/**
+ * Metric definition for the metrics comparison panel.
+ * Used by MatchRow, MatchMetricsModal, and any other component
+ * that needs to render the comparative metrics table.
+ */
+export type MetricDefMode =
+  | 'higher'
+  | 'lower'
+  | 'neutral'
+  | 'delta'
+  | 'rank'
+  | 'breaks_lost'
+  | 'fatigue'
+  | 'delta_rank'
+
+export interface MetricDef {
+  label: string
+  p1Key: keyof MatchStats
+  p2Key: keyof MatchStats
+  mode: MetricDefMode
+}
+
+/**
+ * Ordered list of all 16 pre-match metrics to display in the comparison table.
+ * Forme is excluded from the modal (only used in MatchRow).
+ */
+export const METRIC_DEFS: MetricDef[] = [
+  { label: 'Classement ATP',         p1Key: 'rank_p1',              p2Key: 'rank_p2',              mode: 'rank'       },
+  { label: 'Évolution rank 6 mois', p1Key: 'delta_rank_6m_p1',     p2Key: 'delta_rank_6m_p2',     mode: 'delta_rank' },
+  { label: 'P-Serve',               p1Key: 'p_serve_p1',            p2Key: 'p_serve_p2',            mode: 'higher'     },
+  { label: 'P-Return',              p1Key: 'p_return_p1',           p2Key: 'p_return_p2',           mode: 'higher'     },
+  { label: 'Glicko Rating',          p1Key: 'glicko_rating_p1',      p2Key: 'glicko_rating_p2',      mode: 'higher'     },
+  { label: 'TSD',                   p1Key: 'tsd_p1',                p2Key: 'tsd_p2',                mode: 'higher'     },
+  { label: 'BPPI',                  p1Key: 'bppi_p1',               p2Key: 'bppi_p2',               mode: 'higher'     },
+  { label: 'MAP',                   p1Key: 'map_p1',                p2Key: 'map_p2',                mode: 'higher'     },
+  { label: 'Win Rate TD',           p1Key: 'win_rate_td_p1',        p2Key: 'win_rate_td_p2',        mode: 'higher'     },
+  { label: 'Win Rate Surface TD',   p1Key: 'win_rate_surf_td_p1',   p2Key: 'win_rate_surf_td_p2',   mode: 'higher'     },
+  { label: 'Momentum TD',           p1Key: 'momentum_td_p1',        p2Key: 'momentum_td_p2',        mode: 'higher'     },
+  { label: 'Breaks Won TD',        p1Key: 'breaks_won_td_p1',      p2Key: 'breaks_won_td_p2',      mode: 'higher'     },
+  { label: 'Breaks Lost TD',       p1Key: 'breaks_lost_td_p1',     p2Key: 'breaks_lost_td_p2',     mode: 'breaks_lost'},
+  { label: 'Fatigue 72H',          p1Key: 'fatigue_72h_p1',        p2Key: 'fatigue_72h_p2',        mode: 'fatigue'    },
+  { label: 'Jours de repos',       p1Key: 'jours_repos_p1',        p2Key: 'jours_repos_p2',        mode: 'neutral'    },
+  { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral'    },
+]
