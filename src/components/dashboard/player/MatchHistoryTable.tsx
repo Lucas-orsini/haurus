@@ -1,11 +1,11 @@
 'use client'
 
-import { BarChart2 } from 'lucide-react'
+import { BarChart2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { EnrichedMatchHistory } from './PlayerProfileClient'
+import type { MatchStats } from '@/lib/types/match'
 
 interface MatchHistoryTableProps {
-  matchHistory: EnrichedMatchHistory[]
+  matchHistory: MatchStats[]
   playerName: string
   onOpenMetrics: (date_match: string, player1: string, player2: string) => void
 }
@@ -118,9 +118,9 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score — from match_results via EnrichedMatchHistory enrichment */}
+                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {match.score ?? '—'}
+                    {'—'}
                   </td>
 
                   {/* Résultat */}
@@ -143,33 +143,20 @@ export default function MatchHistoryTable({
                     )}
                   </td>
 
-                  {/* Bouton Métriques — disabled si hasMetrics est false */}
+                  {/* Bouton Métriques */}
                   <td className="px-4 py-3">
-                    {match.hasMetrics ? (
-                      <button
-                        onClick={() =>
-                          onOpenMetrics(match.date_match, match.player1, match.player2)
-                        }
-                        className="h-7 px-2.5 flex items-center justify-center gap-1.5 rounded-md
-                                   border border-[var(--border-md)] bg-white/[0.03]
-                                   hover:bg-white/[0.07] hover:border-[var(--border-hi)]
-                                   text-[var(--text-2)] text-[11px] font-medium
-                                   transition-colors duration-150 whitespace-nowrap"
-                      >
-                        Métriques
-                      </button>
-                    ) : (
-                      <button
-                        disabled
-                        title="Pas de métriques disponibles"
-                        className="h-7 px-2.5 flex items-center justify-center gap-1.5 rounded-md
-                                   border border-[var(--border-md)] bg-white/[0.02]
-                                   text-[var(--text-3)] text-[11px] font-medium
-                                   opacity-40 cursor-not-allowed whitespace-nowrap"
-                      >
-                        Métriques
-                      </button>
-                    )}
+                    <button
+                      onClick={() =>
+                        onOpenMetrics(match.date_match, match.player1, match.player2)
+                      }
+                      className="h-7 px-2.5 flex items-center justify-center gap-1.5 rounded-md
+                                 border border-[var(--border-md)] bg-white/[0.03]
+                                 hover:bg-white/[0.07] hover:border-[var(--border-hi)]
+                                 text-[var(--text-2)] text-[11px] font-medium
+                                 transition-colors duration-150 whitespace-nowrap"
+                    >
+                      Métriques
+                    </button>
                   </td>
                 </tr>
               )
