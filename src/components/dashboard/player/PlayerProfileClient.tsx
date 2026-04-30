@@ -72,14 +72,11 @@ export default function PlayerProfileClient() {
           .select('date_match, player1, player2, winner, loser, score')
           .in('date_match', dates)
 
-        // Construire une Map sur la clé composite (date_match, player1, player2).
-        // On insère DEUX entrées par résultat pour matcher l'ordre normal ET inversé
-        // entre match_stats et match_results.
+        // Construire une Map sur la clé composite (date_match, player1, player2)
         const resultsMap = new Map<string, { winner: string | null; score: string | null }>()
         for (const r of resultsData ?? []) {
-          const entry = { winner: r.winner, score: r.score }
-          resultsMap.set(`${r.date_match}||${r.player1}||${r.player2}`, entry)
-          resultsMap.set(`${r.date_match}||${r.player2}||${r.player1}`, entry)
+          const key = `${r.date_match}||${r.player1}||${r.player2}`
+          resultsMap.set(key, { winner: r.winner, score: r.score })
         }
 
         // Merger — LEFT JOIN sémantique : on garde toutes les lignes de match_stats,

@@ -7,9 +7,11 @@
  *
  * Source: match_stats table schema from Supabase Database type.
  *
- * @TODO: data pipeline — winner and score are populated via a client-side
- *        join with match_results (date_match, player1, player2) rather than
- *        as native columns in this table.
+ * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
+ *        - `winner` exists in match_results but not in match_stats.
+ *        - `score` exists in match_results but not in match_stats.
+ *        The data pipeline should add both columns directly to match_stats
+ *        or maintain a join on (date_match, player1, player2) to populate them.
  */
 export type MatchStats = {
   // ── Primary identifiers ──────────────────────────────────────────────────
@@ -25,8 +27,8 @@ export type MatchStats = {
   best_of: number | null
 
   // ── Match result (populated via join with match_results) ──────────────
+  // TODO: data pipeline — winner exists in match_results but not in match_stats
   winner: string | null
-  score: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
@@ -34,7 +36,7 @@ export type MatchStats = {
   delta_rank_6m_p1: number | null
   delta_rank_6m_p2: number | null
 
-  // ── Serve / Return percentages ──────────────────────────────────────────
+  // ── Serve / Return percentages ─────────────────────────────────────────
   p_serve_p1: number | null
   p_serve_p2: number | null
   p_return_p1: number | null
