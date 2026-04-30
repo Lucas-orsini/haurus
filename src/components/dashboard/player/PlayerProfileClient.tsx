@@ -6,8 +6,6 @@ import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
-import MatchHistoryTable from './MatchHistoryTable'
-import MatchMetricsModal from './MatchMetricsModal'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
 
@@ -197,26 +195,10 @@ export default function PlayerProfileClient() {
           {!loadingProfile && (
             <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
           )}
-
-          {/* Tableau des 5 derniers matchs */}
-          {!loadingProfile && (
-            <MatchHistoryTable
-              matchHistory={matchHistory}
-              playerName={selectedPlayer.player_name}
-              onOpenMetrics={handleOpenMetrics}
-            />
-          )}
         </div>
       )}
 
-      {/* Modal des métriques pré-match */}
-      {modalOpen && (
-        <MatchMetricsModal
-          matchStats={modalMatchStats}
-          playerName={selectedPlayer?.player_name ?? ''}
-          onClose={handleCloseModal}
-        />
-      )}
+
 
       {/* État initial — rien n'est sélectionné */}
       {!selectedPlayer && (
