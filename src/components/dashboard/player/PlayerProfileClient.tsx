@@ -55,7 +55,7 @@ export default function PlayerProfileClient() {
         supabase
           .from('match_results')
           .select('id, date_match, player1, player2, winner, score, tournoi, surface')
-          .or(`player1.ilike.${player.player_name},player2.ilike.${player.player_name}`)
+          .or(`player1.ilike.%${player.player_name.toLowerCase()}%,player2.ilike.%${player.player_name.toLowerCase()}%`)
           .order('date_match', { ascending: false })
           .limit(5),
         // Moyennes ATP par surface

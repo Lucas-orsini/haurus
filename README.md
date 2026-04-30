@@ -103,26 +103,29 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs tests when files change):**
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- `PASS` — All assertions passed, the code works as expected
-- `FAIL` — Something broke. The output shows which test failed and why
+**How to read the output:**
 
-**What gets tested:**
-- Auth validators (input validation, format checks)
-- Authentication flow (sign in, sign out, session handling)
-- Dashboard stats and metric formatting
-- Utility functions (class merging, color utilities)
+- `PASS` — all tests passed, your code is working correctly
+- `FAIL` — something broke, read the error below to see which test failed and why
+
+**What the tests cover:**
+
+- Auth validation logic (email/password requirements)
+- Auth functions and handlers
+- Dashboard metric formatting utilities
+- Dashboard stats calculations
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/lib` — TypeScript types and utilities
-- `src/components/dashboard/player` — Player profile and match history components
+- `src/components/dashboard/player` — Player profile components
+- `__tests__` — Jest test suites for auth, dashboard utilities, and general utils
 
 ## 🚀 Deploy to Vercel
 
@@ -132,13 +135,13 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
 4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+   - `NEXT_PUBLIC_SUPABASE_URL` → paste your value
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your value
+5. Click **Deploy** — Vercel will build and deploy your app
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. Your app will crash on startup if they're missing.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may crash.
 
 ## 📝 License
 
