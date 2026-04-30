@@ -6,6 +6,8 @@ The metrics bookmakers use. Now yours.
 
 - **Player Profile** — Interactive player profile display with performance overview
 - **Match History Table** — Sortable table view showing all player match history
+- **Match Metrics Modal** — Detailed modal component for displaying player performance metrics
+- **Match Row Component** — Reusable row component for displaying individual match data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -53,7 +55,7 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL
+# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
@@ -109,23 +111,23 @@ npx jest __tests__/auth.test.ts
 npx jest --watch
 ```
 
-**How to read the output:**
+**Reading Jest output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke, look at the error message below for details
 
-- `PASS` — all tests passed, your code is working correctly
-- `FAIL` — something broke, read the error below to see which test failed and why
-
-**What the tests cover:**
-
-- Auth validation logic (email/password requirements)
-- Auth functions and handlers
-- Dashboard metric formatting utilities
-- Dashboard stats calculations
-- General utility functions
+The test suite covers:
+- Auth validators and authentication logic
+- Dashboard formatting utilities
+- Statistics calculations
+- Utility functions and shared helpers
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player profile components
-- `__tests__` — Jest test suites for auth, dashboard utilities, and general utils
+```
+src/lib/types — TypeScript type definitions for match data
+src/lib/utils — Shared utility functions
+src/components/dashboard — Dashboard UI components including player profiles and match displays
+```
 
 ## 🚀 Deploy to Vercel
 
@@ -133,15 +135,16 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your value
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your value
-5. Click **Deploy** — Vercel will build and deploy your app
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository (`haraus`)
+3. In the **Environment Variables** section, add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your anon public key
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may crash.
+Vercel will automatically detect Next.js and configure the build settings.
+
+> ⚠️ **Important**: Make sure to add all environment variables in Vercel → Settings → Environment Variables before deploying, otherwise your app will crash.
 
 ## 📝 License
 
