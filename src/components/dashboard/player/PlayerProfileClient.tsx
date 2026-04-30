@@ -193,6 +193,11 @@ export default function PlayerProfileClient() {
             />
           )}
 
+          {/* Chart d'évolution des métriques */}
+          {!loadingProfile && (
+            <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
+          )}
+
           {/* Historique des matchs */}
           {!loadingProfile && (
             <MatchHistoryTable
