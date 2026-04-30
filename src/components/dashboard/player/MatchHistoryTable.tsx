@@ -1,11 +1,11 @@
 'use client'
 
-import { BarChart2, Loader2 } from 'lucide-react'
+import { BarChart2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { MatchStats } from '@/lib/types/match'
+import type { EnrichedMatchHistory } from './PlayerProfileClient'
 
 interface MatchHistoryTableProps {
-  matchHistory: MatchStats[]
+  matchHistory: EnrichedMatchHistory[]
   playerName: string
   onOpenMetrics: (date_match: string, player1: string, player2: string) => void
 }
@@ -32,9 +32,9 @@ export default function MatchHistoryTable({
           <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
             <BarChart2 size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
           </div>
-          <p className="text-sm font-medium text-[var(--text-2)]">Aucun match récent</p>
+          <p className="text-sm font-medium text-[var(--text-2)]">Aucun match enregistré pour ce joueur</p>
           <p className="text-xs text-[var(--text-3)] mt-1">
-            Les derniers matchs apparaîtront ici
+            L'historique des matchs apparaîtra ici
           </p>
         </div>
       </div>
@@ -70,10 +70,7 @@ export default function MatchHistoryTable({
           </thead>
           <tbody>
             {matchHistory.map((match) => {
-              // Winner may be null until the data pipeline populates it via join with match_results
-              const isWin = match.winner !== null ? match.winner === playerName : null
-              const opponent =
-                match.player1 === playerName ? match.player2 : match.player1
+              const resultat = match.resultat
 
               return (
                 <tr
@@ -90,7 +87,7 @@ export default function MatchHistoryTable({
 
                   {/* Adversaire */}
                   <td className="px-4 py-3 text-[var(--text-1)] font-medium max-w-[160px]">
-                    <span className="truncate block">{opponent}</span>
+                    <span className="truncate block">{match.adversaire}</span>
                   </td>
 
                   {/* Tournoi */}
@@ -118,14 +115,14 @@ export default function MatchHistoryTable({
                     </span>
                   </td>
 
-                  {/* Score — match_stats has no score column, display '—' until data pipeline adds it */}
+                  {/* Score */}
                   <td className="px-4 py-3 font-mono text-xs text-[var(--text-2)] whitespace-nowrap">
-                    {'—'}
+                    {match.score ?? '—'}
                   </td>
 
                   {/* Résultat */}
                   <td className="px-4 py-3">
-                    {isWin === null ? (
+                    {resultat === null ? (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold bg-white/[0.04] text-[var(--text-3)] border border-[var(--border)]">
                         {'—'}
                       </span>
@@ -133,12 +130,12 @@ export default function MatchHistoryTable({
                       <span
                         className={cn(
                           'inline-flex items-center justify-center w-6 h-6 rounded text-[11px] font-bold',
-                          isWin
+                          resultat === 'V'
                             ? 'bg-[var(--green)]/15 text-[var(--green)] border border-[var(--green)]/25'
                             : 'bg-[var(--red)]/15 text-[var(--red)] border border-[var(--red)]/25'
                         )}
                       >
-                        {isWin ? 'V' : 'D'}
+                        {resultat}
                       </span>
                     )}
                   </td>
