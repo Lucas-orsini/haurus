@@ -7,11 +7,10 @@
  *
  * Source: match_stats table schema from Supabase Database type.
  *
- * @TODO: data pipeline — match_stats does not have `score` or `winner` columns.
- *        - `winner` exists in match_results but not in match_stats.
- *        - `score` exists in match_results but not in match_stats.
- *        The data pipeline should add both columns directly to match_stats
- *        or maintain a join on (date_match, player1, player2) to populate them.
+ * Note: `winner` and `score` live here for backward compatibility with consumers
+ * that spread MatchStats (e.g. EnrichedMatchHistory). When the source is
+ * match_results, these fields are populated. When the source is match_stats,
+ * they are always null — the join logic in PlayerProfileClient is the gatekeeper.
  */
 export type MatchStats = {
   // ── Primary identifiers ──────────────────────────────────────────────────
@@ -26,9 +25,9 @@ export type MatchStats = {
   tournoi: string | null
   best_of: number | null
 
-  // ── Match result (populated via join with match_results) ──────────────
-  // TODO: data pipeline — winner exists in match_results but not in match_stats
+  // ── Match result — populated via match_results; always null when sourced from match_stats ──
   winner: string | null
+  score: string | null
 
   // ── Rankings ───────────────────────────────────────────────────────────
   rank_p1: number | null
@@ -54,7 +53,7 @@ export type MatchStats = {
   bppi_p1: number | null
   bppi_p2: number | null
 
-  // ── Model prediction ────────────────────────────────────────────────────
+  // ── Model prediction ───────────────────────────────────────────────────
   map_p1: number | null
   map_p2: number | null
 
@@ -86,3 +85,15 @@ export type MatchStats = {
   jours_repos_p1: number | null
   jours_repos_p2: number | null
 }
+
+/**
+ * EnrichedMatchHistory — extends MatchStats with the fields sourced from match_results.
+ *
+ * The primary query now targets match_results (which contains winner, score, tournoi,
+ * surface) instead of the fragile join via match_stats. Computed fields
+ * (adversaire, resultat) are added at the component level before rendering.
+ *
+ * @see PlayerProfileClient.tsx — enriches via query on match_results
+ * @see MatchHistoryTable.tsx   — consumes EnrichedMatchHistory[]
+ */
+export type EnrichedMatchHistory = MatchStats

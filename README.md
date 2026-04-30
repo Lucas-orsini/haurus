@@ -6,7 +6,6 @@ The metrics bookmakers use. Now yours.
 
 - **Player Profile** — Interactive player profile display with performance overview
 - **Match History Table** — Sortable table view showing all player match history
-- **Match Metrics Modal** — Detailed modal breakdown of individual match performance data
 - **Supabase Integration** — Client-side Supabase setup with SSR support for data storage
 - **TypeScript** — Fully typed codebase for better developer experience
 - **Responsive Design** — Mobile-first Tailwind CSS styling
@@ -90,40 +89,40 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your code. When all tests pass, your code is working as expected. When a test fails, it shows exactly which part is broken so you can fix it.
+Unit tests automatically verify that specific parts of the code work correctly — like a spell-checker for your code.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+**Watch mode (re-runs tests when files change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Reading Jest output:**
-- `PASS` — All tests in that file passed ✓
-- `FAIL` — Something broke, Jest shows which test failed and why
+**Understanding test output:**
+- `PASS` — All assertions passed, the code works as expected
+- `FAIL` — Something broke. The output shows which test failed and why
 
-**What the tests cover:**
-- Auth validators — Email format, password strength, and form validation logic
-- Auth functions — Login/logout flow and session handling
-- Dashboard utilities — Metric formatting and stats calculations
-- General utilities — Common helper functions (className merging, date formatting, etc.)
+**What gets tested:**
+- Auth validators (input validation, format checks)
+- Authentication flow (sign in, sign out, session handling)
+- Dashboard stats and metric formatting
+- Utility functions (class merging, color utilities)
 
 ## 📁 Project Structure
 
-- `src/lib` — Utility functions and helper modules
-- `src/components/dashboard/player` — Player profile and metrics components
+- `src/lib` — TypeScript types and utilities
+- `src/components/dashboard/player` — Player profile and match history components
 
 ## 🚀 Deploy to Vercel
 
@@ -131,15 +130,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+4. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Every push to `main` triggers a new deployment.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. Your app will crash on startup if they're missing.
 
 ## 📝 License
 
