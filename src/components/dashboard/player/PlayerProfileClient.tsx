@@ -14,10 +14,15 @@ import type { MatchStats } from '@/lib/types/match'
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
 
+/** Shape of a merged history entry — extends MatchStats with optional score */
+export type EnrichedMatchHistory = MatchStats & {
+  score?: string | null
+}
+
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
-  const [matchHistory, setMatchHistory] = useState<MatchStats[]>([])
+  const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
   const [atpAverages, setAtpAverages] = useState<AtpAverage[]>([])
   const [modalMatchStats, setModalMatchStats] = useState<MatchStats | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -55,7 +60,41 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      setMatchHistory((historyRes.data ?? []) as MatchStats[])
+      const rawHistory = (historyRes.data ?? []) as MatchStats[]
+
+      // Si des matchs sont trouvés, fetch match_results pour peupler winner et score
+      if (rawHistory.length > 0) {
+        // Extraire les dates uniques pour éviter de charger toute la table match_results
+        const dates = [...new Set(rawHistory.map((m) => m.date_match))]
+
+        const { data: resultsData } = await supabase
+          .from('match_results')
+          .select('date_match, player1, player2, winner, loser, score')
+          .in('date_match', dates)
+
+        // Construire une Map sur la clé composite (date_match, player1, player2)
+        const resultsMap = new Map<string, { winner: string | null; score: string | null }>()
+        for (const r of resultsData ?? []) {
+          const key = `${r.date_match}||${r.player1}||${r.player2}`
+          resultsMap.set(key, { winner: r.winner, score: r.score })
+        }
+
+        // Merger — LEFT JOIN sémantique : on garde toutes les lignes de match_stats,
+        // enrichies avec winner et score si une correspondance existe dans match_results
+        const enrichedHistory: EnrichedMatchHistory[] = rawHistory.map((m) => {
+          const key = `${m.date_match}||${m.player1}||${m.player2}`
+          const result = resultsMap.get(key)
+          return {
+            ...m,
+            winner: result?.winner ?? null,
+            score: result?.score ?? null,
+          }
+        })
+
+        setMatchHistory(enrichedHistory)
+      } else {
+        setMatchHistory([])
+      }
 
       if (atpRes.data) {
         setAtpAverages(atpRes.data as AtpAverage[])
