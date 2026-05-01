@@ -115,7 +115,7 @@ function MetricCard({
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+        <div className="flex flex-col gap-1.5 min-w-0 flex-1 items-center">
           <h3 className="text-sm font-semibold text-[var(--text-1)] leading-snug">
             {metric.name}
           </h3>
