@@ -25,7 +25,7 @@ The metrics bookmakers use. Now yours.
 ### Prerequisites
 
 - Node.js 18+ — [Download here](https://nodejs.org/)
-- A code editor — [VS Code](https://code.visualstudio.com/) recommended
+- A code editor — [VS Code](https://codestudio.com/) recommended
 - Git installed
 
 ### 1. Clone the repository
@@ -102,42 +102,66 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+Run a specific test file:
+
+```bash
+npx jest __tests__/auth-validators.test.ts
+```
+
+Run tests for dashboard formatting:
+
+```bash
+npx jest __tests__/dashboard/formatMetric.test.ts
+```
+
+Run tests for dashboard stats:
+
+```bash
+npx jest __tests__/lib/dashboard/stats.test.ts
+```
+
+Run utility tests:
+
+```bash
+npx jest __tests__/lib/utils.test.ts
+```
+
+Run additional utility tests:
+
+```bash
+npx jest __tests__/utils.test.ts
+```
+
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- **PASS** — All assertions passed, the code works as expected
-- **FAIL** — Something broke; read the error message to see which test failed and why
+**How to read the output:**
+- `PASS` — All tests passed, your code is working correctly
+- `FAIL` — Something broke, look at the error message below to see which test failed and why
 
-The test suite covers:
-- Authentication utilities and validators
-- Dashboard formatting functions
-- Utility helpers
-- Dashboard statistics functions
+**Tests cover:** Authentication validation logic, auth state management, dashboard metric formatting, dashboard statistics calculations, and utility functions for the app.
 
 ## 📁 Project Structure
 
-- `src/lib` — Supabase authentication utilities and client configuration
-- `src/components/sections` — Reusable section components (Pricing section)
+- `src/lib` — Authentication utilities and helper functions
+- `src/components` — Reusable UI components including the Pricing section
+- `_internal/supabase` — Supabase database migrations
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables in Vercel dashboard:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
+3. Add your environment variables in Vercel Dashboard → Settings → Environment Variables:
+   - `NEXT_PUBLIC_SUPABASE_URL` → your Supabase Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → your Supabase anon public key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables from your `.env.local` file are added to Vercel before deploying.
+> ⚠️ **Important**: Make sure to add all environment variables before deploying. Without them, your app will not connect to Supabase.
 
 ## 📝 License
 
