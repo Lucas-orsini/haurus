@@ -151,6 +151,16 @@ export async function signup(
   }
 
   const user = data.user
+
+  // Assign 'beta' role on signup — non-blocking: log errors without failing the flow.
+  try {
+    await supabase
+      .from('profiles')
+      .upsert({ id: user.id, role: 'beta' })
+  } catch (err) {
+    console.error('[auth] Failed to set beta role for user', user.id, err)
+  }
+
   return {
     id: user.id,
     name: user.user_metadata?.name ?? '',
