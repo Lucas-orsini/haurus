@@ -99,44 +99,50 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Run in watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, the error shows which test failed and why
 
-The test suite covers:
-- Auth validators and authentication logic
-- Dashboard metrics formatting
-- Stats library functions
-- Utility functions
+- `PASS` — Everything works correctly ✅
+- `FAIL` — Something broke, check the error message below for what failed and where
+
+**Tests included:**
+
+- Auth validators and authentication flow tests
+- Dashboard metrics formatting tests
+- Dashboard statistics tests
+- Utility function tests
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/metrics` — Dashboard metrics components and client-side logic
+- `src/app` — Next.js App Router pages, layouts, and global styles
+- `src/components` — React components for the dashboard and UI elements
+- `__tests__` — Jest test files for components, utilities, and authentication
 
 ## 🚀 Deploy to Vercel
 
+The easiest way to deploy your Next.js app is to use Vercel.
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
+**Step-by-step deployment:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click "Deploy with Vercel" above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+3. Add your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your anon key
+4. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Your site will be live at a `.vercel.app` URL.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
