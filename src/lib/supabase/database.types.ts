@@ -585,6 +585,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tracked_players: {
+        Row: {
+          id: string
+          user_id: string
+          player_name: string
+          player_id: string
+          locked_until: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          player_name: string
+          player_id: string
+          locked_until: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          player_name?: string
+          player_id?: string
+          locked_until?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      tracked_players_history: {
+        Row: {
+          id: string
+          user_id: string
+          player_name: string
+          action: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          player_name: string
+          action: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          player_name?: string
+          action?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
