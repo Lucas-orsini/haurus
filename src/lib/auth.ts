@@ -120,10 +120,6 @@ export async function login(email: string, password: string): Promise<AuthUser> 
 
 /**
  * Sign up with email + password + name via Supabase Auth.
- * Creates the auth user, then best-effort inserts a profiles row with role='beta'.
- * The profile insertion is fire-and-forget — it never throws and never blocks
- * the return of the AuthUser, even if the insert fails.
- *
  * @throws Error on validation failure, email already taken, or network error.
  */
 export async function signup(
@@ -155,19 +151,6 @@ export async function signup(
   }
 
   const user = data.user
-
-  // Best-effort profile creation — fire-and-forget, never throws.
-  // The user is authenticated at this point (cookie set by createBrowserClient),
-  // so auth.uid() is valid and profiles_insert_own (USING auth.uid() = id) passes.
-  void supabase
-    .from('profiles')
-    .insert({ id: user.id, role: 'beta' })
-    .then(({ error: insertError }) => {
-      if (insertError) {
-        console.warn('[auth] Failed to create beta profile:', insertError.message)
-      }
-    })
-
   return {
     id: user.id,
     name: user.user_metadata?.name ?? '',
