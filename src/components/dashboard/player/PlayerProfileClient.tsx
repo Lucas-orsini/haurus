@@ -183,29 +183,21 @@ export default function PlayerProfileClient({
   async function handleConfirmFollow() {
     if (!pendingPlayer || isLimitReached) return
 
-    // Capture playerName before await — avoids race condition if React re-renders
-    // between the await and reads of pendingPlayer (React 18+)
-    const playerName = pendingPlayer.player_name
-
-    const result = await addTrackedPlayer(userId, playerName)
+    const result = await addTrackedPlayer(userId, pendingPlayer.player_name)
 
     if ('success' in result && result.success) {
       const lockedUntil = computeLockedUntil().toISOString().split('T')[0]
       setTrackedPlayers((prev) => [
         ...prev,
         {
-          player_name: playerName,
+          player_name: pendingPlayer.player_name,
           added_at: new Date().toISOString().split('T')[0],
           locked_until: lockedUntil,
         },
       ])
-      // pendingPlayer is still in scope after the await — use it directly.
-      // Capturing playerName above avoids stale-closure if a re-render fired
-      // during the async gap.
       handleSelectPlayer(pendingPlayer)
     }
 
-    // Post-await sequence: close modal, then clear pendingPlayer
     setModalOpen(false)
     setPendingPlayer(null)
   }
@@ -310,8 +302,7 @@ export default function PlayerProfileClient({
                   const locked = isLocked(player)
                   const lockedUntil = new Date(player.locked_until + 'T00:00:00')
                   const lockedText = formatDate(lockedUntil)
-                  // Guard: only apply lock UI if lockDays is configured for this plan
-                  const planHasLock = !!PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS]?.lockDays
+                  const isSelected = selectedPlayer?.player_name === player.player_name
 
                   return (
                     <div
@@ -338,15 +329,15 @@ export default function PlayerProfileClient({
                           <p className="text-sm text-[var(--text-1)] truncate">
                             {player.player_name}
                           </p>
-                          {planHasLock && locked && (
+                          {PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS]?.lockDays && locked && (
                             <p className="text-[11px] text-[var(--text-3)] mt-0.5">
                               Verrouillé jusqu&apos;au {lockedText}
                             </p>
                           )}
                         </button>
 
-                        {/* Remove button — disabled only when planHasLock AND locked */}
-                        {locked && planHasLock ? (
+                        {/* Remove button */}
+                        {locked ? (
                           <div className="relative shrink-0 group/tt">
                             <button
                               disabled
