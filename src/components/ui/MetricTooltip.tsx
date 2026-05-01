@@ -37,7 +37,7 @@ export default function MetricTooltip({ label, tooltip }: MetricTooltipProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Label — inherits text size from parent */}
-      <span className="text-[11px] text-[var(--text-3)] leading-none text-center cursor-default">
+      <span className="text-[13px] text-[var(--text-3)] leading-none text-center cursor-default">
         {label}
       </span>
 
@@ -45,11 +45,11 @@ export default function MetricTooltip({ label, tooltip }: MetricTooltipProps) {
       <div
         className={`
           absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-          max-w-[220px] px-2.5 py-2
+          min-w-[140px] max-w-[320px] px-2.5 py-2
           bg-[var(--surface-2)] border border-[var(--border)]
           rounded-md shadow-lg
-          z-50
-          text-[11px] leading-relaxed text-[var(--text-1)]
+          z-[60]
+          text-[13px] leading-relaxed text-[var(--text-1)]
           text-center
           pointer-events-none
           transition-opacity duration-150
