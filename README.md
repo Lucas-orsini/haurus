@@ -4,7 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Profile** — Interactive player profile display with performance overview
+- **Dashboard Metrics Display** — Display match and metric data with interactive tooltips
+- **Responsive Design** — Tailwind CSS for modern, responsive layouts
+- **Smooth Animations** — Framer Motion for polished transitions
 
 ## 🛠️ Tech Stack
 
@@ -107,24 +109,34 @@ npx jest --watch
 
 How to read the output:
 - **PASS** ✅ — All tests in that file passed
-- **FAIL** ❌ — Something broke, check the error message above for details
+- **FAIL** ❌ — Something broke, check the error message for details
 
-Tests cover: authentication validators, auth flow logic, dashboard formatting utilities, stats calculations, and general utilities.
+The test suite covers:
+- Authentication validation logic
+- Dashboard formatting utilities
+- Stats calculation helpers
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components` — Reusable React components for the dashboard UI
+- `src/components/dashboard` — Dashboard-specific components (MatchRow)
+- `src/components/ui` — Reusable UI components (MetricTooltip)
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Push your code to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new) and import your repository
-3. Add your environment variables in Vercel → Settings → Environment Variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Click **Deploy**
+**Step by step:**
+
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add each variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
+5. Click **Deploy**
+
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
