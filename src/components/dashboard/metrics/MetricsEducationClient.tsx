@@ -55,10 +55,10 @@ function MetricDetailModal({
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4">
-          <div className="flex flex-col items-center min-w-0 flex-1">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
             <h2
               id="modal-metric-name"
-              className="self-stretch text-left text-sm font-semibold text-[var(--text-1)] leading-snug"
+              className="text-sm font-semibold text-[var(--text-1)] leading-snug"
             >
               {metric.name}
             </h2>
