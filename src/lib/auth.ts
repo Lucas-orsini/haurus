@@ -152,13 +152,13 @@ export async function signup(
 
   const user = data.user
 
-  // Assign 'beta' role on signup — non-blocking: log errors without failing the flow.
-  try {
-    await supabase
-      .from('profiles')
-      .upsert({ id: user.id, role: 'beta' })
-  } catch (err) {
-    console.error('[auth] Failed to set beta role for user', user.id, err)
+  // Assign 'beta' role on signup — Supabase returns errors via { error } object, not JS exceptions.
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert({ id: user.id, role: 'beta' })
+
+  if (profileError) {
+    throw new Error('Failed to initialize user profile. Please try again.')
   }
 
   return {

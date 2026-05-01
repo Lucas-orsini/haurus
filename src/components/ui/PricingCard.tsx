@@ -81,7 +81,7 @@ export default function PricingCard({
         variant={highlighted ? 'primary' : ctaVariant}
         size="lg"
         className={cn(
-          'w-full',
+          'w-full text-center',
           highlighted && 'mt-auto',
         )}
       >
