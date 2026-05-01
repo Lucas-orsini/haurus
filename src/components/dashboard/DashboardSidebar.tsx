@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, ChevronDown, User } from 'lucide-react'
+import { LayoutDashboard, LogOut, ChevronDown, User, BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
   { label: 'Player', icon: User, href: '/dashboard/player' },
+  { label: 'Metrics', icon: BookOpen, href: '/dashboard/metrics' },
 ]
 
 export default function DashboardSidebar() {

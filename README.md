@@ -77,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -102,41 +102,34 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run in watch mode (re-runs automatically when files change):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests passed, everything works correctly
-- `FAIL` — Something broke, check the error message below for details
+**How to read the output:** `PASS` means all checks passed — your code works. `FAIL` means something broke — look at the error message below for details on what went wrong.
 
-**What the tests cover:**
-- Authentication validators and logic
-- Utility functions (class merging, Tailwind utilities)
-- Dashboard formatting and stats calculations
-- Component rendering and user interactions
+Tests cover: authentication validation logic, auth helpers, dashboard formatting utilities, stat calculations, and general utility functions.
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (match rows, metrics display)
+- `src/app` — Next.js App Router pages, layouts, and global styles
+- `src/components/dashboard` — Dashboard UI components including sidebar and metrics modules
+- `src/lib` — Shared library code for metrics definitions
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add each variable from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your anon key
-5. Click **Deploy**
+3. Add your environment variables in Vercel dashboard → Settings → Environment Variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app will fail to connect to Supabase.
+Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`) once deployment completes.
 
 ## 📝 License
 

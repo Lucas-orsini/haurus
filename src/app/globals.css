@@ -22,6 +22,12 @@
   --green:          #4ade80;
   --yellow:         #facc15;
   --orange:         #fb923c;
+  --badge-free-bg:       rgba(74, 222, 128, 0.12);
+  --badge-free-text:     #4ade80;
+  --badge-pro-bg:        rgba(99, 102, 241, 0.12);
+  --badge-pro-text:      #818cf8;
+  --badge-enterprise-bg: rgba(167, 139, 250, 0.12);
+  --badge-enterprise-text: #a78bfa;
 }
 
 *, *::before, *::after {
