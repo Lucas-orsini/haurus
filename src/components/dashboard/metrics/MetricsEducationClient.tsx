@@ -6,20 +6,17 @@ import { cn } from '@/lib/utils'
 import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
 
-function PlanBadge({ plan }: { plan: MetricDefinition['plan'] }) {
+function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
+  // @deprecated – plan prop is ignored; this badge always renders "Beta"
   return (
     <span
-      className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap',
-        plan === 'Free' &&
-          'bg-[var(--badge-free-bg)] text-[var(--badge-free-text)]',
-        plan === 'Pro' &&
-          'bg-[var(--badge-pro-bg)] text-[var(--badge-pro-text)]',
-        plan === 'Enterprise' &&
-          'bg-[var(--badge-enterprise-bg)] text-[var(--badge-enterprise-text)]'
-      )}
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap"
+      style={{
+        backgroundColor: 'var(--badge-beta-bg)',
+        color: 'var(--badge-beta-text)',
+      }}
     >
-      {plan}
+      Beta
     </span>
   )
 }

@@ -28,6 +28,8 @@
   --badge-pro-text:      #818cf8;
   --badge-enterprise-bg: rgba(167, 139, 250, 0.12);
   --badge-enterprise-text: #a78bfa;
+  --badge-beta-bg:       rgba(250, 204, 21, 0.15);
+  --badge-beta-text:     #a16207;
 }
 
 *, *::before, *::after {
