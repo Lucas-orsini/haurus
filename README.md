@@ -99,7 +99,7 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
 Watch mode (re-runs on file change):
@@ -108,21 +108,20 @@ Watch mode (re-runs on file change):
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — all tests passed, your code works correctly
-- `FAIL` — something broke, check the error message below for details
+**How to read Jest output:**
+- `PASS` — all tests in that file passed ✓
+- `FAIL` — something broke, check the error message below to see which test failed and why
 
 **What the tests cover:**
-- `__tests__/auth-validators.test.ts` — Authentication validation logic
-- `__tests__/auth.test.ts` — Authentication flow and user sessions
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — General utility functions
-- `__tests__/utils.test.ts` — Additional utility functions
+- `auth-validators.test.ts` — Authentication validation logic
+- `auth.test.ts` — Authentication functionality
+- `formatMetric.test.ts` — Metric formatting in dashboard
+- `stats.test.ts` — Dashboard statistics calculations
+- `utils.test.ts` — General utility functions
 
 ## 📁 Project Structure
 
-src/components/dashboard/metrics — Dashboard metrics components including educational metrics visualization
+- `src/components/dashboard` — Dashboard UI components including the sidebar
 
 ## 🚀 Deploy to Vercel
 
@@ -130,15 +129,15 @@ src/components/dashboard/metrics — Dashboard metrics components including educ
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables listed in the table above before deploying, otherwise your app may not work correctly.
+> ⚠️ **Important**: Make sure to add all environment variables in Vercel before deploying. If you deploy without them, the app will crash.
 
 ## 📝 License
 
