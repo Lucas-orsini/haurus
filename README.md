@@ -77,7 +77,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` ` (Windows/Linux) or `Cmd+`` ` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -102,43 +102,47 @@ Run a specific test file:
 npx jest __tests__/utils.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Run in watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — All tests passed, your code is working correctly
-- `FAIL` — Something broke, the output will show which test failed and why
+**How to read the output:**
 
-**What the tests cover:**
-- Authentication validators and functions (`__tests__/auth-validators.test.ts`, `__tests__/auth.test.ts`)
-- Dashboard utilities including format functions (`__tests__/dashboard/formatMetric.test.ts`, `__tests__/lib/dashboard/stats.test.ts`)
-- General utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+- `PASS` — Everything works correctly ✅
+- `FAIL` — Something broke, check the error message below for what failed and where
+
+**Tests included:**
+
+- Auth validators and authentication flow tests
+- Dashboard metrics formatting tests
+- Dashboard statistics tests
+- Utility function tests
 
 ## 📁 Project Structure
 
-- `src/components` — React components including the dashboard metrics visualization component
+- `src/app` — Next.js App Router pages, layouts, and global styles
+- `src/components` — React components for the dashboard and UI elements
+- `__tests__` — Jest test files for components, utilities, and authentication
 
 ## 🚀 Deploy to Vercel
 
-The easiest way to deploy your Next.js app is to use [Vercel](https://vercel.com/new).
+The easiest way to deploy your Next.js app is to use Vercel.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
+**Step-by-step deployment:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
-3. Vercel will auto-detect Next.js — click **Deploy**
-4. Once deployed, go to your project → **Settings** → **Environment Variables**
-5. Add all variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon public key
-6. Click **Save** and redeploy to apply the changes
+1. Click "Deploy with Vercel" above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. Add your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your anon key
+4. Click **Deploy**
 
-> ⚠️ **Important**: Don't forget to add all environment variables in Vercel, otherwise your app won't connect to Supabase!
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
