@@ -78,7 +78,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -89,54 +89,52 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Jest runs unit tests to check that individual functions and components work correctly. Think of it as a quality checker that automatically verifies your code.
+Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs instantly.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save changes):
+**Watch mode (re-runs tests when files change):**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests passed, everything is working correctly
-- `FAIL` — Something broke, check the error message below to see which test failed
+**Reading the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke ❌ — look for the red error message below to see which test failed and why
 
-The test suite covers authentication validation, auth flow, dashboard formatting utilities, stats calculations, and common utility functions.
+**What the tests cover:**
+- Authentication validators and logic
+- Dashboard formatting and metrics utilities
+- Utility functions and helpers
 
 ## 📁 Project Structure
 
-- `src/app/api/tracked-players` — API routes for player tracking
-- `src/components/dashboard/player` — Player dashboard components
-- `src/lib/config` — Application configuration and role limits
-- `src/lib/supabase` — Supabase database types and client setup
+- `src/components/dashboard/player` — Player profile dashboard components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
 4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your anon key
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
 5. Click **Deploy**
 
-Your app will be live at a `.vercel.app` URL within seconds.
+Your app will be live at a `vercel.app` URL within seconds.
 
 ## 📝 License
 
