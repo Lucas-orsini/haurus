@@ -4,7 +4,8 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Stats Visualization** — Interactive charts displaying player performance metrics with Recharts
+- **Tooltip System** — Custom hook and component for intelligent tooltip placement and display
+- **Player Stats Visualization** — Interactive charts displaying player performance metrics
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
 
@@ -101,45 +102,58 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Run a specific test file in the dashboard folder:
+
+```bash
+npx jest __tests__/dashboard/formatMetric.test.ts
+```
+
+Run tests in lib folder:
+
+```bash
+npx jest __tests__/lib/dashboard/stats.test.ts
+```
+
+Watch mode (re-runs on file change during development):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — all tests in that file passed ✅
-- `FAIL` — something broke, Jest shows which test failed and why
-- `Test Suites: 6 passed, 6 total` means everything is working
+**How to read the output:**
+- `PASS` — all tests passed, your code is working correctly
+- `FAIL` — something broke, the error message shows which test failed and why
 
-**What the tests cover:**
-- Authentication validators and flows
-- Dashboard formatting and metrics utilities
-- Utility functions (string formatting, date helpers, etc.)
+**Tests included:**
+- Authentication validation logic
+- Authentication flow and behavior
+- Dashboard metric formatting
+- Dashboard statistics calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-Only folders that contain actual source files are listed below.
-
+- `src/hooks` — Custom React hooks (tooltip placement logic)
 - `src/components/ui` — Reusable UI components (MetricTooltip)
-- `src/components/dashboard` — Dashboard-specific components (PlayerStatsChart)
-- `__tests__` — Jest unit tests for auth, dashboard utils, and utilities
 
 ## 🚀 Deploy to Vercel
 
+The easiest way to deploy your Next.js app is to use [Vercel](https://vercel.com/new):
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
+**Manual deployment steps:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` — paste your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — paste your anon public key
-5. Click **Deploy** — Vercel will automatically build and deploy
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and click **Import Project**
+3. Select your GitHub repository
+4. Vercel will auto-detect Next.js settings
+5. Under **Environment Variables**, add each variable from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add both Supabase environment variables in Vercel, otherwise your app won't connect to the database.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app will not connect to Supabase.
 
 ## 📝 License
 
