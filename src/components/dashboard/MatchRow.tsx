@@ -52,22 +52,22 @@ export const METRIC_DEFS: MetricDef[] = [
  * Exported so other components can reuse the same definitions.
  */
 export const METRIC_TOOLTIPS: Record<string, string> = {
-  'Classement ATP': 'Classement ATP officiel du joueur. Plus le rang est bas, meilleur est le classement.',
-  'Évolution rank 6 mois': 'Variation du classement ATP sur les 6 derniers mois. Négatif = amélioration.',
-  'P-Serve': 'Pourcentage de points gagnés lors de ses services. Indicateur de la qualité du service.',
-  'P-Return': 'Pourcentage de points gagnés lors des retours de service. Indicateur de la qualité du retour.',
-  'Glicko Rating': 'Rating Glicko-2 : évaluation de niveau intégrant la confiance (RD). Plus élevé = plus fort.',
-  'TSD': 'Taux de Smashes Directs : probabilité de gagner le point sur un smash. Positif = bon sign.',
-  'BPPI': 'Break Points Per Intercept : capacité à convertir ou sauver des bps. Positif = avantage.',
-  'MAP': 'Probabilité Model A Posteriori : estimation IA de victoire avant le match.',
-  'Win Rate TD': 'Taux de victoire sur les 30 derniers jours. Forme récente.',
-  'Win Rate Surface TD': 'Taux de victoire sur surface similaire (30 derniers jours). Adaptation à la surface.',
-  'Momentum TD': 'Dynamique récente du joueur (Tendance). Positif = en montée, négatif = en baisse.',
-  'Breaks Won TD': 'Nombre moyen de breaks réalisés par match (30 derniers jours).',
-  'Breaks Lost TD': 'Nombre moyen de breaks concédés par match (30 derniers jours).',
-  'Fatigue 72H': 'Minutes jouées sur les 72 dernières heures. Élevée = joueur potentiellement fatigué.',
-  'Jours de repos': 'Nombre de jours depuis le dernier match. Plus = mieux reposé.',
-  'Forme': '5 derniers résultats : V= Victoire, D= Défaite. Permet de visualiser la dynamique.',
+  'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
+  'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
+  'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
+  'P-Return': 'Probabilité de remporter un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
+  'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
+  'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
+  'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
+  'MAP': 'Probabilité théorique de remporter le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
+  'Win Rate TD': 'Pourcentage de victoires du joueur sur la période récente, toutes surfaces confondues. Les matchs récents ont plus de poids que les anciens.',
+  'Win Rate Surface TD': 'Pourcentage de victoires du joueur sur la surface de ce tournoi, calculé sur la période récente. Capture la spécialisation sur cette surface.',
+  'Momentum TD': 'Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu\'il surperforme en ce moment, négative qu\'il est en dessous de son niveau habituel.',
+  'Breaks Won TD': 'Nombre moyen de breaks de service réalisés par match sur cette surface récemment. Mesure la capacité à concrétiser les opportunités sur le service adverse.',
+  'Breaks Lost TD': 'Nombre moyen de breaks concédés par match sur cette surface récemment. Plus la valeur est basse, mieux le joueur tient son service sous pression.',
+  'Fatigue 72H': 'Cumul des minutes jouées dans ce tournoi et dans les 72 heures précédant le match. Plus cette valeur est haute, plus le joueur aborde ce match avec une charge physique importante.',
+  'Jours de repos': 'Nombre de jours depuis le dernier match joué. Reflète la fraîcheur physique du joueur à l\'approche du match.',
+  'Forme': "Résultats des 5 derniers matchs joués. V = victoire, D = défaite. Le match le plus récent est affiché en dernier.",
 }
 
 export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }: MatchRowProps) {
