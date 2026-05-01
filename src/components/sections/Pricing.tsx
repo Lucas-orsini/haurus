@@ -176,8 +176,8 @@ export default function Pricing() {
           </div>
 
           {/* CTA */}
-          <div className="relative z-10">
-            <Button href="/signup" variant="primary" size="lg" className="w-full justify-center">
+          <div className="relative z-10 flex justify-center">
+            <Button href="/signup" variant="primary" size="lg" className="w-full">
               Rejoindre la beta
             </Button>
           </div>
