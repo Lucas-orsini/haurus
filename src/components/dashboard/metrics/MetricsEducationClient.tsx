@@ -1,12 +1,10 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
-import { Search, ChevronDown, BookOpen } from 'lucide-react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { Search, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { METRIC_SECTIONS } from '@/lib/metrics/definitions'
+import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
-
-type ViewMode = 'simple' | 'expert'
 
 function PlanBadge({ plan }: { plan: MetricDefinition['plan'] }) {
   return (
@@ -26,37 +24,99 @@ function PlanBadge({ plan }: { plan: MetricDefinition['plan'] }) {
   )
 }
 
-function MetricCard({
+function MetricDetailModal({
   metric,
-  isExpanded,
-  onToggle,
+  onClose,
 }: {
-  metric: MetricDefinition
-  isExpanded: boolean
-  onToggle: () => void
+  metric: MetricDefinition | null
+  onClose: () => void
 }) {
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onToggle()
+  // Escape key handler
+  useEffect(() => {
+    if (!metric) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
     }
-  }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [metric, onClose])
+
+  if (!metric) return null
 
   return (
     <div
-      role="button"
-      tabIndex={0}
-      aria-expanded={isExpanded}
-      onClick={onToggle}
-      onKeyDown={handleKeyDown}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-metric-name"
+    >
+      {/* Panel — stop click propagation so clicking inside doesn't close */}
+      <div
+        className="w-full max-w-md bg-[var(--surface-1)] border border-[var(--border-md)] rounded-xl shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            <h2
+              id="modal-metric-name"
+              className="text-sm font-semibold text-[var(--text-1)] leading-snug"
+            >
+              {metric.name}
+            </h2>
+            <PlanBadge plan={metric.plan} />
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Fermer"
+            className="w-7 h-7 flex items-center justify-center rounded-md
+                       hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
+                       transition-colors duration-150 shrink-0"
+          >
+            <X size={14} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 pb-5 flex flex-col gap-4">
+          {/* Short description */}
+          <p className="text-xs text-[var(--text-2)] leading-relaxed">
+            {metric.shortDescription}
+          </p>
+
+          {/* Visual separator */}
+          <div className="h-px bg-[var(--border)]" />
+
+          {/* Expert description */}
+          <p className="text-xs text-[var(--text-3)] leading-relaxed">
+            {metric.expertDescription}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MetricCard({
+  metric,
+  onOpen,
+}: {
+  metric: MetricDefinition
+  onOpen: (id: string) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(metric.id)}
+      aria-label={`Ouvrir les détails de ${metric.name}`}
       className={cn(
         'bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4',
         'hover:border-[var(--border-hi)] hover:bg-white/[0.02]',
         'transition-all duration-150 cursor-pointer select-none',
-        'flex flex-col gap-3'
+        'flex flex-col gap-3 text-left w-full'
       )}
     >
-      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1.5 min-w-0 flex-1">
           <h3 className="text-sm font-semibold text-[var(--text-1)] leading-snug">
@@ -64,45 +124,24 @@ function MetricCard({
           </h3>
           <PlanBadge plan={metric.plan} />
         </div>
-        <ChevronDown
-          size={14}
-          strokeWidth={1.5}
-          className={cn(
-            'text-[var(--text-3)] shrink-0 mt-0.5 transition-transform duration-200',
-            isExpanded && 'rotate-180'
-          )}
-        />
       </div>
 
       {/* Short description — always visible */}
       <p className="text-xs text-[var(--text-2)] leading-relaxed">
         {metric.shortDescription}
       </p>
-
-      {/* Expert description — only when expanded */}
-      {isExpanded && (
-        <div className="pt-2 border-t border-[var(--border)]">
-          <p className="text-xs text-[var(--text-3)] leading-relaxed">
-            {metric.expertDescription}
-          </p>
-        </div>
-      )}
-    </div>
+    </button>
   )
 }
 
 function MetricsSection({
   title,
   metrics,
-  expandedCards,
-  viewMode,
-  onToggle,
+  onOpen,
 }: {
   title: string
   metrics: MetricDefinition[]
-  expandedCards: Set<string>
-  viewMode: ViewMode
-  onToggle: (id: string) => void
+  onOpen: (id: string) => void
 }) {
   return (
     <section className="mb-10 last:mb-0">
@@ -117,18 +156,13 @@ function MetricsSection({
 
       {/* Metric cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {metrics.map((metric) => {
-          const isExpanded =
-            viewMode === 'expert' || expandedCards.has(metric.id)
-          return (
-            <MetricCard
-              key={metric.id}
-              metric={metric}
-              isExpanded={isExpanded}
-              onToggle={() => onToggle(metric.id)}
-            />
-          )
-        })}
+        {metrics.map((metric) => (
+          <MetricCard
+            key={metric.id}
+            metric={metric}
+            onOpen={onOpen}
+          />
+        ))}
       </div>
     </section>
   )
@@ -136,22 +170,10 @@ function MetricsSection({
 
 export default function MetricsEducationClient() {
   const [query, setQuery] = useState('')
-  const [viewMode, setViewMode] = useState<ViewMode>('simple')
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(
-    new Set()
-  )
+  const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null)
 
-  const toggleCard = useCallback((id: string) => {
-    setExpandedCards((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
-  }, [])
+  const openModal = useCallback((id: string) => setSelectedMetricId(id), [])
+  const closeModal = useCallback(() => setSelectedMetricId(null), [])
 
   // Filter sections by query — searches name + shortDescription + expertDescription
   const filteredSections = useMemo(() => {
@@ -172,6 +194,17 @@ export default function MetricsEducationClient() {
 
   const hasResults = filteredSections.length > 0
 
+  // Resolve selected metric from flat list
+  const selectedMetric = selectedMetricId
+    ? (ALL_METRICS.find((m) => m.id === selectedMetricId) ?? null)
+    : null
+
+  // Total filtered metric count for the counter
+  const totalCount = filteredSections.reduce(
+    (sum, section) => sum + section.metrics.length,
+    0
+  )
+
   return (
     <div className="max-w-5xl">
       {/* Page header */}
@@ -185,7 +218,7 @@ export default function MetricsEducationClient() {
         </p>
       </div>
 
-      {/* Toolbar: search + view mode toggle */}
+      {/* Toolbar: search + counter */}
       <div className="flex items-center gap-3 mb-8">
         {/* Search input */}
         <div className="relative flex-1 max-w-sm">
@@ -209,50 +242,11 @@ export default function MetricsEducationClient() {
           />
         </div>
 
-        {/* View mode toggle */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span
-            className={cn(
-              'text-xs font-medium transition-colors duration-150',
-              viewMode === 'simple'
-                ? 'text-[var(--text-1)]'
-                : 'text-[var(--text-3)]'
-            )}
-          >
-            Simple
-          </span>
-          <button
-            onClick={() =>
-              setViewMode((m) => (m === 'simple' ? 'expert' : 'simple'))
-            }
-            aria-label={`Mode actuel : ${viewMode}. Cliquer pour basculer.`}
-            className={cn(
-              'relative w-10 h-5 rounded-full transition-colors duration-200',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
-              viewMode === 'expert'
-                ? 'bg-[var(--accent)]'
-                : 'bg-[var(--surface-3)]'
-            )}
-          >
-            <div
-              className={cn(
-                'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow',
-                'transition-transform duration-200',
-                viewMode === 'expert' ? 'translate-x-5' : 'translate-x-0.5'
-              )}
-            />
-          </button>
-          <span
-            className={cn(
-              'text-xs font-medium transition-colors duration-150',
-              viewMode === 'expert'
-                ? 'text-[var(--text-1)]'
-                : 'text-[var(--text-3)]'
-            )}
-          >
-            Expert
-          </span>
-        </div>
+        {/* Metric count */}
+        <span className="text-xs text-[var(--text-3)] shrink-0 tabular-nums">
+          <span className="text-[var(--text-2)] font-medium">{totalCount}</span>{' '}
+          {totalCount === 1 ? 'métrique' : 'métriques'}
+        </span>
       </div>
 
       {/* Results or empty state */}
@@ -263,9 +257,7 @@ export default function MetricsEducationClient() {
               key={section.title}
               title={section.title}
               metrics={section.metrics}
-              expandedCards={expandedCards}
-              viewMode={viewMode}
-              onToggle={toggleCard}
+              onOpen={openModal}
             />
           ))}
         </div>
@@ -283,6 +275,9 @@ export default function MetricsEducationClient() {
           </p>
         </div>
       )}
+
+      {/* Detail modal */}
+      <MetricDetailModal metric={selectedMetric} onClose={closeModal} />
     </div>
   )
 }

@@ -4,10 +4,10 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Tooltip System** — Custom hook and component for intelligent tooltip placement and display
-- **Player Stats Visualization** — Interactive charts displaying player performance metrics
+- **Metrics Visualization** — Dashboard component for displaying educational metrics data
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
+- **Supabase Integration** — Real-time data with Row Level Security
 
 ## 🛠️ Tech Stack
 
@@ -108,28 +108,35 @@ Watch mode (re-runs on file change):
 npx jest --watch
 ```
 
-**How to read the output:** `PASS` means all checks passed — your code works. `FAIL` means something broke — look at the error message below for details on what went wrong.
+**How to read the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke, the error shows which test failed and why
 
-Tests cover: authentication validation logic, auth helpers, dashboard formatting utilities, stat calculations, and general utility functions.
+The test suite covers:
+- Auth validators and authentication logic
+- Dashboard metrics formatting
+- Stats library functions
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages, layouts, and global styles
-- `src/components/dashboard` — Dashboard UI components including sidebar and metrics modules
-- `src/lib` — Shared library code for metrics definitions
+- `src/components/dashboard/metrics` — Dashboard metrics components and client-side logic
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables in Vercel dashboard → Settings → Environment Variables:
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Click **Deploy**
+5. Click **Deploy**
 
-Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`) once deployment completes.
+Vercel will automatically build and deploy your app. Your site will be live at a `.vercel.app` URL.
 
 ## 📝 License
 
