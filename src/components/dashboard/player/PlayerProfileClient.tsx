@@ -8,6 +8,8 @@ import PlayerMetricCards from './PlayerMetricCards'
 import PlayerStatsChart from './PlayerStatsChart'
 import MatchHistoryTable from './MatchHistoryTable'
 import MatchMetricsModal from './MatchMetricsModal'
+import TrackedPlayersList from './TrackedPlayersList'
+import TrackPlayerModal from './TrackPlayerModal'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
 
@@ -28,6 +30,22 @@ export type EnrichedMatchHistory = {
   resultat: 'V' | 'D' | null
 }
 
+/** Type aligné avec la réponse GET /api/tracked-players */
+interface TrackedPlayer {
+  id: string
+  player_name: string
+  player_id: string
+  locked_until: string
+  created_at: string
+}
+
+interface TrackedPlayersResponse {
+  trackedPlayers: TrackedPlayer[]
+  count: number
+  limit: number | null
+  role: string
+}
+
 export default function PlayerProfileClient() {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
@@ -37,6 +55,16 @@ export default function PlayerProfileClient() {
   const [modalOpen, setModalOpen] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(false)
 
+  // --- Tracked players state ---
+  const [trackedPlayers, setTrackedPlayers] = useState<TrackedPlayer[]>([])
+  const [trackedRole, setTrackedRole] = useState<string>('user')
+  const [trackedLimit, setTrackedLimit] = useState<number | null>(null)
+  const [loadingTracked, setLoadingTracked] = useState(true)
+
+  // --- Modal "suivre ce joueur" ---
+  const [pendingPlayer, setPendingPlayer] = useState<PlayerStats | null>(null)
+  const [confirmingPending, setConfirmingPending] = useState(false)
+
   // Charge les stats du joueur + historique + moyennes ATP quand un joueur est sélectionné
   const loadPlayerProfile = useCallback(async (player: PlayerStats, surface: 'Hard' | 'Clay' | 'Grass') => {
     setLoadingProfile(true)
@@ -45,31 +73,26 @@ export default function PlayerProfileClient() {
 
     try {
       const [statsRes, historyRes, atpRes] = await Promise.all([
-        // Stats surface du joueur
         supabase
           .from('player_stats')
           .select('*')
           .eq('player_name', player.player_name)
           .single(),
-        // Historique direct via match_results — seule table contenant winner, score, tournoi, surface
         supabase
           .from('match_results')
           .select('id, date_match, player1, player2, winner, score, tournoi, surface')
           .or(`player1.ilike.%${player.player_name.toLowerCase()}%,player2.ilike.%${player.player_name.toLowerCase()}%`)
           .order('date_match', { ascending: false })
           .limit(5),
-        // Moyennes ATP par surface
         supabase
           .from('atp_averages')
           .select('*'),
       ])
 
-      // Met à jour les stats du joueur si nouveau fetch
       if (statsRes.data) {
         setSelectedPlayer(statsRes.data as PlayerStats)
       }
 
-      // Calcule adversaire et résultat pour chaque ligne
       if (historyRes.data && historyRes.data.length > 0) {
         const enrichedHistory: EnrichedMatchHistory[] = historyRes.data.map((row) => {
           const adversaire = row.player1 === player.player_name
@@ -118,9 +141,100 @@ export default function PlayerProfileClient() {
     loadPlayerProfile(selectedPlayer, selectedSurface)
   }, [selectedSurface]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleSelectPlayer(player: PlayerStats) {
-    setSelectedPlayer(player)
-    loadPlayerProfile(player, selectedSurface)
+  // Charge la liste des joueurs suivis au montage
+  useEffect(() => {
+    async function loadTracked() {
+      setLoadingTracked(true)
+      try {
+        const res = await fetch('/api/tracked-players')
+        if (res.ok) {
+          const data: TrackedPlayersResponse = await res.json()
+          setTrackedPlayers(data.trackedPlayers)
+          setTrackedRole(data.role)
+          setTrackedLimit(data.limit)
+        }
+      } catch {
+        // Silent — on reste avec un état vide
+      } finally {
+        setLoadingTracked(false)
+      }
+    }
+    loadTracked()
+  }, [])
+
+  // Sélection depuis la recherche : si déjà suivi → charger direct ; sinon → ouvrir modal
+  async function handleSelectFromSearch(player: PlayerStats) {
+    const isTracked = trackedPlayers.some(
+      (tp) => tp.player_name.toLowerCase() === player.player_name.toLowerCase()
+    )
+    if (isTracked) {
+      setSelectedPlayer(player)
+      await loadPlayerProfile(player, selectedSurface)
+    } else {
+      setPendingPlayer(player)
+    }
+  }
+
+  // Sélection depuis TrackedPlayersList : charger direct sans modal
+  function handleSelectTracked(playerName: string, playerId: string) {
+    const supabase = createClient()
+    if (!supabase) return
+    supabase
+      .from('player_stats')
+      .select('*')
+      .eq('id', playerId)
+      .single()
+      .then((res) => {
+        if (res.data) {
+          setSelectedPlayer(res.data as PlayerStats)
+          loadPlayerProfile(res.data as PlayerStats, selectedSurface)
+        }
+      })
+  }
+
+  // Confirmer le suivi dans le modal
+  async function handleConfirmTrack() {
+    if (!pendingPlayer) return
+    setConfirmingPending(true)
+    try {
+      const res = await fetch('/api/tracked-players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          player_name: pendingPlayer.player_name,
+          player_id: pendingPlayer.id,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTrackedPlayers((prev) => [data.trackedPlayer, ...prev])
+        setSelectedPlayer(pendingPlayer)
+        await loadPlayerProfile(pendingPlayer, selectedSurface)
+      } else if (res.status === 409) {
+        // Déjà suivi entre-temps — charger directement
+        setSelectedPlayer(pendingPlayer)
+        await loadPlayerProfile(pendingPlayer, selectedSurface)
+      }
+    } catch {
+      // Silent
+    } finally {
+      setConfirmingPending(false)
+      setPendingPlayer(null)
+    }
+  }
+
+  // Supprimer un joueur suivi
+  async function handleRemoveTracked(playerName: string) {
+    const res = await fetch('/api/tracked-players', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ player_name: playerName }),
+    })
+    if (res.ok) {
+      setTrackedPlayers((prev) =>
+        prev.filter((tp) => tp.player_name !== playerName)
+      )
+    }
   }
 
   async function handleOpenMetrics(date_match: string, player1: string, player2: string) {
@@ -149,65 +263,121 @@ export default function PlayerProfileClient() {
     setTimeout(() => setModalMatchStats(null), 200)
   }
 
+  // Vérifie si le joueur affiché est dans la liste des suivis
+  const isCurrentPlayerTracked = selectedPlayer
+    ? trackedPlayers.some(
+        (tp) =>
+          tp.player_name.toLowerCase() === selectedPlayer.player_name.toLowerCase()
+      )
+    : false
+
   return (
-    <div className="space-y-5">
+    <>
+      {/* Modal d'avertissement avant suivi */}
+      <TrackPlayerModal
+        isOpen={pendingPlayer !== null}
+        playerName={pendingPlayer?.player_name ?? ''}
+        role={trackedRole}
+        onConfirm={handleConfirmTrack}
+        onCancel={() => setPendingPlayer(null)}
+      />
 
-      {/* Barre de recherche — toujours visible */}
-      <PlayerSearchBar onSelectPlayer={handleSelectPlayer} />
+      {/* Layout 2 colonnes */}
+      <div className="flex gap-5">
 
-      {/* Contenu profil — apparaît après sélection */}
-      {selectedPlayer && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          {/* Header nom joueur */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
-              {selectedPlayer.rank && (
-                <p className="text-xs text-[var(--text-3)] mt-0.5">
-                  ATP #{selectedPlayer.rank}
-                </p>
+        {/* Colonne gauche — joueurs suivis (fixe 280px) */}
+        <div className="w-[280px] shrink-0">
+          <TrackedPlayersList
+            trackedPlayers={trackedPlayers}
+            role={trackedRole}
+            limit={trackedLimit}
+            onSelectPlayer={handleSelectTracked}
+            onRemovePlayer={handleRemoveTracked}
+          />
+        </div>
+
+        {/* Colonne droite — recherche + profil (flexible) */}
+        <div className="flex-1 min-w-0 space-y-5">
+
+          {/* Barre de recherche — toujours visible */}
+          <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
+
+          {/* Contenu profil — apparaît après sélection */}
+          {selectedPlayer && (
+            <div className="space-y-5 animate-in fade-in duration-200">
+              {/* Header nom joueur + badge "✓ Suivi" */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div>
+                    <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
+                    {selectedPlayer.rank && (
+                      <p className="text-xs text-[var(--text-3)] mt-0.5">
+                        ATP #{selectedPlayer.rank}
+                      </p>
+                    )}
+                  </div>
+                  {isCurrentPlayerTracked && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--green)]/10 border border-[var(--green)]/20 text-[11px] font-medium text-[var(--green)]">
+                      ✓ Suivi
+                    </span>
+                  )}
+                </div>
+                <SurfaceSelector
+                  selectedSurface={selectedSurface}
+                  onSurfaceChange={(s) => setSelectedSurface(s)}
+                />
+              </div>
+
+              {/* Loading state */}
+              {loadingProfile ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
+                      <div className="h-2.5 bg-white/[0.06] rounded w-20 mb-3" />
+                      <div className="h-6 bg-white/[0.05] rounded w-16 mb-2" />
+                      <div className="h-2 bg-white/[0.04] rounded w-28" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <PlayerMetricCards
+                  surface={selectedSurface}
+                  playerStats={selectedPlayer}
+                  atpAverages={atpAverages}
+                />
+              )}
+
+              {/* Chart d'évolution des métriques */}
+              {!loadingProfile && (
+                <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
+              )}
+
+              {/* Historique des matchs */}
+              {!loadingProfile && (
+                <MatchHistoryTable
+                  matchHistory={matchHistory}
+                  selectedPlayerName={selectedPlayer.player_name}
+                  onOpenMetrics={handleOpenMetrics}
+                />
               )}
             </div>
-            <SurfaceSelector
-              selectedSurface={selectedSurface}
-              onSurfaceChange={(s) => setSelectedSurface(s)}
-            />
-          </div>
+          )}
 
-          {/* Loading state */}
-          {loadingProfile ? (
-            <div className="grid grid-cols-3 gap-3">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
-                  <div className="h-2.5 bg-white/[0.06] rounded w-20 mb-3" />
-                  <div className="h-6 bg-white/[0.05] rounded w-16 mb-2" />
-                  <div className="h-2 bg-white/[0.04] rounded w-28" />
-                </div>
-              ))}
+          {/* État initial — rien n'est sélectionné */}
+          {!selectedPlayer && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
             </div>
-          ) : (
-            <PlayerMetricCards
-              surface={selectedSurface}
-              playerStats={selectedPlayer}
-              atpAverages={atpAverages}
-            />
-          )}
-
-          {/* Chart d'évolution des métriques */}
-          {!loadingProfile && (
-            <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
-          )}
-
-          {/* Historique des matchs */}
-          {!loadingProfile && (
-            <MatchHistoryTable
-              matchHistory={matchHistory}
-              selectedPlayerName={selectedPlayer.player_name}
-              onOpenMetrics={handleOpenMetrics}
-            />
           )}
         </div>
-      )}
+      </div>
 
       {/* Modal métriques pré-match */}
       <MatchMetricsModal
@@ -218,21 +388,6 @@ export default function PlayerProfileClient() {
         player2={modalMatchStats?.player2 ?? ''}
         onClose={handleCloseModal}
       />
-
-      {/* État initial — rien n'est sélectionné */}
-      {!selectedPlayer && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-          </div>
-          <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-          <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
-        </div>
-      )}
-
-    </div>
+    </>
   )
 }
