@@ -4,11 +4,10 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Tracking Dashboard** — Track and monitor player performance with detailed profiles
+- **Player Profile Dashboard** — Track and monitor player performance with detailed profiles
 - **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
-- **Reusable UI Components** — Modular component architecture with TypeScript
 
 ## 🛠️ Tech Stack
 
@@ -46,6 +45,10 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
 
+If you're using VS Code:
+- Open the integrated terminal with `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac)
+- Run this command:
+
 ```bash
 touch .env.local
 ```
@@ -60,7 +63,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-**How to get these values (step by step for no-code users):**
+**How to get these values (step by step):**
 
 1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account)
 2. Click **New Project** and follow the setup steps
@@ -78,7 +81,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with ``Ctrl+` `` (Windows/Linux) or ``Cmd+` `` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -89,52 +92,54 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs instantly.
+Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs instantly and catches bugs before they reach your app.
 
 **Run all tests:**
-
 ```bash
 npx jest
 ```
 
 **Run a specific test file:**
-
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs tests when files change):**
-
+**Watch mode (re-runs tests automatically when files change):**
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌ — look for the red error message below to see which test failed and why
+**How to read the output:**
+- `PASS` ✅ — Everything works correctly
+- `FAIL` ❌ — Something is broken — check the error message below for details on which test failed and why
 
-**What the tests cover:**
-- Authentication validators and logic
-- Dashboard formatting and metrics utilities
-- Utility functions and helpers
+**Tests included in this project:**
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics
+- `__tests__/lib/utils.test.ts` — Utility functions
+- `__tests__/utils.test.ts` — General utilities
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player profile dashboard components
+- `src/components` — Reusable React components including the dashboard player profile
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add both variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` — paste your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — paste your anon public key
 5. Click **Deploy**
 
-Your app will be live at a `vercel.app` URL within seconds.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
