@@ -10,7 +10,7 @@ function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
   // @deprecated – plan prop is ignored; this badge always renders "Beta"
   return (
     <span
-      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap"
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap flex-shrink-0 min-w-[52px] text-center"
       style={{
         backgroundColor: 'var(--badge-beta-bg)',
         color: 'var(--badge-beta-text)',
