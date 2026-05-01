@@ -4,10 +4,12 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Pricing Section** — Dynamic pricing display component built with Tailwind CSS
-- **Smooth Animations** — Framer Motion for polished transitions and micro-interactions
-- **Real-time Data** — Supabase integration with Row Level Security for safe data access
-- **Responsive Design** — Mobile-first layouts that work on any screen size
+- **Authentication** — Secure user authentication powered by Supabase
+- **Pricing Section** — Dynamic pricing display component
+- **Metrics Visualization** — Dashboard components for displaying educational metrics data
+- **Responsive Design** — Tailwind CSS for modern, responsive layouts
+- **Smooth Animations** — Framer Motion for polished transitions
+- **Real-time Data** — Supabase integration with Row Level Security
 
 ## 🛠️ Tech Stack
 
@@ -31,8 +33,8 @@ The metrics bookmakers use. Now yours.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/my-app.git
-cd my-app
+git clone https://github.com/YOUR_USERNAME/haraus.git
+cd haurus
 ```
 
 ### 2. Install dependencies
@@ -45,7 +47,9 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
 
-On your computer, create a new file named `.env.local` in the `my-app` folder.
+```bash
+touch .env.local
+```
 
 Open `.env.local` in your code editor and paste the following template:
 
@@ -100,27 +104,23 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save changes):
+Run tests in watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — everything works, no problems found
-- `FAIL` — something broke, the error message shows which test failed and why
+**Understanding test output:**
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — validates authentication input rules
-- `__tests__/auth.test.ts` — tests authentication flows
-- `__tests__/dashboard/formatMetric.test.ts` — tests metric formatting logic
-- `__tests__/lib/dashboard/stats.test.ts` — tests dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — tests utility helper functions
-- `__tests__/utils.test.ts` — tests general utility functions
+- **PASS** ✅ — All assertions passed, the code works correctly
+- **FAIL** ❌ — Something broke, check the error message below for details
+
+Tests cover: authentication validators, auth logic, dashboard formatting, stats calculations, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/components/sections` — Reusable UI section components (e.g., Pricing)
+- `src/lib/` — Authentication logic and Supabase client configuration
+- `src/components/sections/` — Pricing section component
 
 ## 🚀 Deploy to Vercel
 
@@ -128,14 +128,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`my-app`)
-3. Vercel will auto-detect Next.js — click **Deploy**
-4. Once deployed, go to your project → **Settings** → **Environment Variables**
-5. Add both variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your anon key
-6. **Redeploy** to apply the environment variables (top right corner → Redeploy)
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository
+3. Add your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
+4. Click **Deploy**
+
+> ⚠️ **Important**: Make sure all environment variables from `.env.local` are added to Vercel before deploying, otherwise your app will crash.
 
 ## 📝 License
 
