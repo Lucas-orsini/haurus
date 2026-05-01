@@ -152,14 +152,8 @@ export async function signup(
 
   const user = data.user
 
-  // Assign 'beta' role on signup — non-blocking: log errors without failing the flow.
-  try {
-    await supabase
-      .from('profiles')
-      .upsert({ id: user.id, role: 'beta' })
-  } catch (err) {
-    console.error('[auth] Failed to set beta role for user', user.id, err)
-  }
+  // Role 'beta' is assigned by the PostgreSQL trigger on auth.users (handle_new_user).
+  // No client-side upsert needed — the trigger runs atomically in the same transaction.
 
   return {
     id: user.id,
