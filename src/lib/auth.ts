@@ -120,6 +120,7 @@ export async function login(email: string, password: string): Promise<AuthUser> 
 
 /**
  * Sign up with email + password + name via Supabase Auth.
+ * Creates a profile with role 'beta' via client-side upsert.
  * @throws Error on validation failure, email already taken, or network error.
  */
 export async function signup(
@@ -152,8 +153,24 @@ export async function signup(
 
   const user = data.user
 
-  // Role 'beta' is assigned by the PostgreSQL trigger on auth.users (handle_new_user).
-  // No client-side upsert needed — the trigger runs atomically in the same transaction.
+  // Idempotent upsert — supports re-signup by updating existing row on conflict.
+  // Uses the anon client; RLS policy profiles_insert_own allows INSERT when auth.uid() = id.
+  try {
+    const { error: profileError } = await supabase.from('profiles').upsert(
+      {
+        id: user.id,
+        role: 'beta',
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' }
+    )
+    if (profileError) {
+      console.error('[auth] Failed to create profile:', profileError)
+    }
+  } catch (err) {
+    // Non-blocking — log and continue even if profile creation fails.
+    console.error('[auth] Failed to create profile:', err)
+  }
 
   return {
     id: user.id,

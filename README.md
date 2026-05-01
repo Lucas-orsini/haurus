@@ -5,9 +5,9 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **Authentication** — Secure user authentication powered by Supabase
-- **Pricing Section** — Component for displaying pricing information
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
+- **Reusable UI Components** — Modular component architecture with TypeScript
 
 ## 🛠️ Tech Stack
 
@@ -25,7 +25,7 @@ The metrics bookmakers use. Now yours.
 ### Prerequisites
 
 - Node.js 18+ — [Download here](https://nodejs.org/)
-- A code editor — [VS Code](https://codestudio.com/) recommended
+- A code editor — [VS Code](https://code.visualstudio.com/) recommended
 - Git installed
 
 ### 1. Clone the repository
@@ -105,28 +105,12 @@ npx jest __tests__/auth.test.ts
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
-```
-
-Run tests for dashboard formatting:
-
-```bash
+npx jest __tests__/auth.test.ts
 npx jest __tests__/dashboard/formatMetric.test.ts
-```
-
-Run tests for dashboard stats:
-
-```bash
 npx jest __tests__/lib/dashboard/stats.test.ts
 ```
 
-Run utility tests:
-
-```bash
-npx jest __tests__/lib/utils.test.ts
-```
-
-Run additional utility tests:
+Run a specific test file:
 
 ```bash
 npx jest __tests__/utils.test.ts
@@ -138,30 +122,30 @@ Watch mode (re-runs on file change):
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests passed, your code is working correctly
-- `FAIL` — Something broke, look at the error message below to see which test failed and why
+**How to read Jest output:**
+- `PASS` — all tests in that file passed, your code is working correctly
+- `FAIL` — something broke, you'll see which test failed and why (error message, expected vs. actual value)
 
-**Tests cover:** Authentication validation logic, auth state management, dashboard metric formatting, dashboard statistics calculations, and utility functions for the app.
+The test suite covers authentication logic, dashboard formatting and statistics, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/lib` — Authentication utilities and helper functions
-- `src/components` — Reusable UI components including the Pricing section
-- `_internal/supabase` — Supabase database migrations
+- `src/lib` — Core utility functions and Supabase authentication helpers
+- `src/components/ui` — Reusable UI components (Button, etc.)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the **Deploy with Vercel** button above
 2. Import your GitHub repository
-3. Add your environment variables in Vercel Dashboard → Settings → Environment Variables:
-   - `NEXT_PUBLIC_SUPABASE_URL` → your Supabase Project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → your Supabase anon public key
+3. Add your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your anon public key
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables before deploying. Without them, your app will not connect to Supabase.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 

@@ -44,7 +44,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    'font-medium select-none cursor-pointer',
+    'flex items-center justify-center font-medium select-none cursor-pointer',
     variantClasses[variant],
     sizeClasses[size],
     className,
