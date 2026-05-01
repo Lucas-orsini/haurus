@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { motion } from 'framer-motion'
+import { Users } from 'lucide-react'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -60,6 +62,9 @@ export default function PlayerProfileClient() {
   const [trackedRole, setTrackedRole] = useState<string>('user')
   const [trackedLimit, setTrackedLimit] = useState<number | null>(null)
   const [loadingTracked, setLoadingTracked] = useState(true)
+
+  // --- Sliding panel state ---
+  const [panelOpen, setPanelOpen] = useState(false)
 
   // --- Modal "suivre ce joueur" ---
   const [pendingPlayer, setPendingPlayer] = useState<PlayerStats | null>(null)
@@ -188,6 +193,7 @@ export default function PlayerProfileClient() {
         if (res.data) {
           setSelectedPlayer(res.data as PlayerStats)
           loadPlayerProfile(res.data as PlayerStats, selectedSurface)
+          setPanelOpen(false)
         }
       })
   }
@@ -263,14 +269,6 @@ export default function PlayerProfileClient() {
     setTimeout(() => setModalMatchStats(null), 200)
   }
 
-  // Vérifie si le joueur affiché est dans la liste des suivis
-  const isCurrentPlayerTracked = selectedPlayer
-    ? trackedPlayers.some(
-        (tp) =>
-          tp.player_name.toLowerCase() === selectedPlayer.player_name.toLowerCase()
-      )
-    : false
-
   return (
     <>
       {/* Modal d'avertissement avant suivi */}
@@ -282,30 +280,64 @@ export default function PlayerProfileClient() {
         onCancel={() => setPendingPlayer(null)}
       />
 
-      {/* Layout 2 colonnes */}
+      {/* Layout flex avec volet coulissant conditionnel */}
       <div className="flex gap-5">
 
-        {/* Colonne gauche — joueurs suivis (fixe 280px) */}
-        <div className="w-[280px] shrink-0">
-          <TrackedPlayersList
-            trackedPlayers={trackedPlayers}
-            role={trackedRole}
-            limit={trackedLimit}
-            onSelectPlayer={handleSelectTracked}
-            onRemovePlayer={handleRemoveTracked}
-          />
-        </div>
+        {/* Volet "Mes joueurs" — animé, sort de la gauche */}
+        {panelOpen && (
+          <motion.div
+            initial={{ x: -280 }}
+            animate={{ x: 0 }}
+            exit={{ x: -280 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="relative w-[280px] shrink-0 overflow-hidden z-50"
+          >
+            <TrackedPlayersList
+              trackedPlayers={trackedPlayers}
+              role={trackedRole}
+              limit={trackedLimit}
+              onSelectPlayer={handleSelectTracked}
+              onRemovePlayer={handleRemoveTracked}
+            />
+          </motion.div>
+        )}
 
         {/* Colonne droite — recherche + profil (flexible) */}
         <div className="flex-1 min-w-0 space-y-5">
 
-          {/* Barre de recherche — toujours visible */}
-          <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
+          {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
+          <div className="flex items-center gap-3">
+            {/* Bouton toggle — visible quand le volet est fermé */}
+            <button
+              onClick={() => setPanelOpen(!panelOpen)}
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                         text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
+              aria-label={panelOpen ? 'Fermer le panneau Mes joueurs' : 'Ouvrir le panneau Mes joueurs'}
+            >
+              <Users size={14} strokeWidth={1.5} className="shrink-0" />
+              <span className="whitespace-nowrap">Mes joueurs</span>
+            </button>
+
+            {/* Barre de recherche — prend tout l'espace restant */}
+            <div className="flex-1 min-w-0">
+              <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
+            </div>
+          </div>
+
+          {/* Backdrop — ferme le volet au clic */}
+          {panelOpen && (
+            <div
+              className="fixed inset-0 z-40 cursor-default"
+              onClick={() => setPanelOpen(false)}
+              aria-hidden="true"
+            />
+          )}
 
           {/* Contenu profil — apparaît après sélection */}
           {selectedPlayer && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              {/* Header nom joueur + badge "✓ Suivi" */}
+              {/* Header nom joueur + SurfaceSelector */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 min-w-0">
                   <div>
@@ -316,11 +348,6 @@ export default function PlayerProfileClient() {
                       </p>
                     )}
                   </div>
-                  {isCurrentPlayerTracked && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--green)]/10 border border-[var(--green)]/20 text-[11px] font-medium text-[var(--green)]">
-                      ✓ Suivi
-                    </span>
-                  )}
                 </div>
                 <SurfaceSelector
                   selectedSurface={selectedSurface}
