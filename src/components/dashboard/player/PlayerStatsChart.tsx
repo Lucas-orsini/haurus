@@ -131,6 +131,7 @@ function MetricChart({ data, color }: { data: StatsHistoryPoint[]; color: string
           tickMargin={8}
         />
         <Tooltip
+          wrapperStyle={{ zIndex: 60 }}
           contentStyle={{
             backgroundColor: 'var(--surface-2)',
             border: '1px solid var(--border-md)',
