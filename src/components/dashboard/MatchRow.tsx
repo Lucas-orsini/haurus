@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { cn, formatMetricValue, formatForme, getDeltaColor, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 import FavoriteButton from './FavoriteButton'
+import MetricTooltip from '@/components/ui/MetricTooltip'
 
 interface MatchRowProps {
   match: MatchStats
@@ -45,6 +46,29 @@ export const METRIC_DEFS: MetricDef[] = [
   { label: 'Jours de repos',       p1Key: 'jours_repos_p1',        p2Key: 'jours_repos_p2',        mode: 'neutral' },
   { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral' },
 ]
+
+/**
+ * Tooltip text for each metric label.
+ * Exported so other components can reuse the same definitions.
+ */
+export const METRIC_TOOLTIPS: Record<string, string> = {
+  'Classement ATP': 'Classement ATP officiel du joueur. Plus le rang est bas, meilleur est le classement.',
+  'Évolution rank 6 mois': 'Variation du classement ATP sur les 6 derniers mois. Négatif = amélioration.',
+  'P-Serve': 'Pourcentage de points gagnés lors de ses services. Indicateur de la qualité du service.',
+  'P-Return': 'Pourcentage de points gagnés lors des retours de service. Indicateur de la qualité du retour.',
+  'Glicko Rating': 'Rating Glicko-2 : évaluation de niveau intégrant la confiance (RD). Plus élevé = plus fort.',
+  'TSD': 'Taux de Smashes Directs : probabilité de gagner le point sur un smash. Positif = bon sign.',
+  'BPPI': 'Break Points Per Intercept : capacité à convertir ou sauver des bps. Positif = avantage.',
+  'MAP': 'Probabilité Model A Posteriori : estimation IA de victoire avant le match.',
+  'Win Rate TD': 'Taux de victoire sur les 30 derniers jours. Forme récente.',
+  'Win Rate Surface TD': 'Taux de victoire sur surface similaire (30 derniers jours). Adaptation à la surface.',
+  'Momentum TD': 'Dynamique récente du joueur (Tendance). Positif = en montée, négatif = en baisse.',
+  'Breaks Won TD': 'Nombre moyen de breaks réalisés par match (30 derniers jours).',
+  'Breaks Lost TD': 'Nombre moyen de breaks concédés par match (30 derniers jours).',
+  'Fatigue 72H': 'Minutes jouées sur les 72 dernières heures. Élevée = joueur potentiellement fatigué.',
+  'Jours de repos': 'Nombre de jours depuis le dernier match. Plus = mieux reposé.',
+  'Forme': '5 derniers résultats : V= Victoire, D= Défaite. Permet de visualiser la dynamique.',
+}
 
 export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }: MatchRowProps) {
   const [open, setOpen] = useState(false)
@@ -177,11 +201,12 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                           </span>
                         </div>
 
-                        {/* Label — centered */}
+                        {/* Label — centered with tooltip */}
                         <div className="flex items-center justify-center">
-                          <span className="text-[11px] text-[var(--text-3)] leading-none text-center">
-                            {label}
-                          </span>
+                          <MetricTooltip
+                            label={label}
+                            tooltip={METRIC_TOOLTIPS[label] ?? ''}
+                          />
                         </div>
 
                         {/* Valeur P2 — centered */}
