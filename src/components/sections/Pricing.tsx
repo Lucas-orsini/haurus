@@ -221,7 +221,6 @@ export default function Pricing() {
               'flex items-center justify-center gap-2 relative z-10',
               'bg-[var(--accent)] text-black',
               'hover:bg-[var(--accent-hi)]',
-              'shadow-[0_0_24px_rgba(242,203,56,0.30)]',
               'active:scale-[0.98]'
             )}
           >
