@@ -10,6 +10,7 @@ type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 
 interface PlayerSearchBarProps {
   onSelectPlayer: (player: PlayerStats) => void
+  trackedPlayerNames?: Set<string>
 }
 
 type SearchState = 'idle' | 'searching' | 'success' | 'empty' | 'error'
@@ -18,7 +19,10 @@ const MAX_RESULTS = 8
 const MIN_CHARS = 2
 const DEBOUNCE_MS = 300
 
-export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps) {
+export default function PlayerSearchBar({
+  onSelectPlayer,
+  trackedPlayerNames = new Set(),
+}: PlayerSearchBarProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<PlayerStats[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
@@ -29,7 +33,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Debounced search — fetch vers le Route Handler avec AnnulerController
+  // Debounced search
   useEffect(() => {
     if (query.length < MIN_CHARS) {
       setResults([])
@@ -68,7 +72,6 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         setActiveIdx(-1)
         setSearchState(rows.length > 0 ? 'success' : 'empty')
       } catch (err) {
-        // Annulation via AbortController — ignorer silencieusement
         if (err instanceof Error && err.name === 'AbortError') return
 
         setSearchState('error')
@@ -167,10 +170,12 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 z-50
-                        bg-[var(--surface-2)] border border-[var(--border-md)]
-                        rounded-lg shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto">
-          {/* Error state — visible message */}
+        <div
+          className="absolute top-full left-0 right-0 mt-1.5 z-50
+                     bg-[var(--surface-2)] border border-[var(--border-md)]
+                     rounded-lg shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto"
+        >
+          {/* Error state */}
           {searchState === 'error' && (
             <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[var(--border-md)]">
               <AlertCircle size={13} className="text-[var(--red)] shrink-0" strokeWidth={1.5} />
@@ -180,26 +185,36 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
 
           {/* Results list */}
           {results.length > 0 ? (
-            results.map((player, i) => (
-              <button
-                key={player.id}
-                onMouseDown={(e) => { e.preventDefault(); handleSelect(player) }}
-                className={cn(
-                  'w-full flex items-center justify-between gap-2 px-3 h-9 text-sm text-left',
-                  'transition-colors duration-100',
-                  i === activeIdx
-                    ? 'bg-[var(--accent)]/10 text-[var(--text-1)]'
-                    : 'text-[var(--text-2)] hover:bg-white/[0.04] hover:text-[var(--text-1)]'
-                )}
-              >
-                <span className="truncate">{player.player_name}</span>
-                {player.rank && (
-                  <span className="text-xs text-[var(--text-3)] shrink-0 font-mono tabular-nums">
-                    #{player.rank}
+            results.map((player, i) => {
+              const isTracked = trackedPlayerNames.has(player.player_name)
+              return (
+                <button
+                  key={player.id}
+                  onMouseDown={(e) => { e.preventDefault(); handleSelect(player) }}
+                  className={cn(
+                    'w-full flex items-center justify-between gap-2 px-3 h-9 text-sm text-left',
+                    'transition-colors duration-100',
+                    i === activeIdx
+                      ? 'bg-[var(--accent)]/10 text-[var(--text-1)]'
+                      : 'text-[var(--text-2)] hover:bg-white/[0.04] hover:text-[var(--text-1)]'
+                  )}
+                >
+                  <span className="truncate">{player.player_name}</span>
+                  <span className="flex items-center gap-2 shrink-0">
+                    {isTracked && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
+                        ✓ Suivi
+                      </span>
+                    )}
+                    {player.rank && (
+                      <span className="text-xs text-[var(--text-3)] font-mono tabular-nums">
+                        #{player.rank}
+                      </span>
+                    )}
                   </span>
-                )}
-              </button>
-            ))
+                </button>
+              )
+            })
           ) : searchState === 'empty' ? (
             <div className="px-3 py-4 text-center">
               <p className="text-sm text-[var(--text-3)]">Aucun joueur trouvé</p>
