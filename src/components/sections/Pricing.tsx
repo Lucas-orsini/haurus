@@ -213,20 +213,29 @@ export default function Pricing() {
             ))}
           </ul>
 
-          {/* CTA */}
-          <Link
-            href="/signup"
-            className={cn(
-              'h-11 px-6 rounded-lg text-sm font-medium transition-all duration-150',
-              'flex items-center justify-center gap-2 relative z-10',
-              'bg-[var(--accent)] text-black',
-              'hover:bg-[var(--accent-hi)]',
-              'shadow-[0_0_24px_rgba(242,203,56,0.30)]',
-              'active:scale-[0.98]'
-            )}
-          >
-            Créer un compte gratuitement
-          </Link>
+          {/* CTA premium — hover scale + glow */}
+          <div className="relative z-10">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="w-full"
+            >
+              <Link
+                href="/signup"
+                className={cn(
+                  'h-11 px-6 rounded-lg text-sm font-medium transition-all duration-150',
+                  'flex items-center justify-center gap-2',
+                  'bg-[var(--accent)] text-black',
+                  'hover:bg-[var(--accent-hi)]',
+                  'shadow-[0_0_24px_rgba(242,203,56,0.30)]',
+                  'hover:shadow-[0_0_32px_rgba(242,203,56,0.45)]',
+                  'active:scale-[0.98]'
+                )}
+              >
+                Créer un compte gratuitement
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </motion.div>
     </section>
