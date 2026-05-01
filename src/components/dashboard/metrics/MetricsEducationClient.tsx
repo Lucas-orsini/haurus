@@ -5,7 +5,6 @@ import { Search, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
-import BetaBadge from '@/components/ui/BetaBadge'
 
 function PlanBadge({ plan }: { plan: MetricDefinition['plan'] }) {
   return (
@@ -66,10 +65,7 @@ function MetricDetailModal({
             >
               {metric.name}
             </h2>
-            <div className="flex items-center gap-2 flex-wrap">
-              <PlanBadge plan={metric.plan} />
-              <BetaBadge />
-            </div>
+            <PlanBadge plan={metric.plan} />
           </div>
           <button
             onClick={onClose}
@@ -126,10 +122,7 @@ function MetricCard({
           <h3 className="text-sm font-semibold text-[var(--text-1)] leading-snug">
             {metric.name}
           </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <PlanBadge plan={metric.plan} />
-            <BetaBadge />
-          </div>
+          <PlanBadge plan={metric.plan} />
         </div>
       </div>
 

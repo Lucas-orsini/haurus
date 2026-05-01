@@ -102,34 +102,31 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+Watch mode (re-runs on file change):
 
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-
 - `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, look at the error message above for which test failed and why
+- `FAIL` — Something broke, the error shows which test failed and why
 
-**What the tests cover:**
-
-- Auth validation logic (`auth-validators.test.ts`)
-- Authentication flows (`auth.test.ts`)
-- Dashboard metric formatting (`dashboard/formatMetric.test.ts`)
-- Dashboard statistics utilities (`lib/dashboard/stats.test.ts`)
-- Utility functions (`lib/utils.test.ts`, `utils.test.ts`)
+The test suite covers:
+- Auth validators and authentication logic
+- Dashboard metrics formatting
+- Stats library functions
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components/ui` — Reusable UI components (BetaBadge)
-- `src/components/dashboard/metrics` — Dashboard-specific metric components (MetricsEducationClient)
-- `__tests__` — Jest unit and integration tests
+- `src/components/dashboard/metrics` — Dashboard metrics components and client-side logic
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+**Step by step:**
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
@@ -139,7 +136,7 @@ npx jest --watch
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. Click **Deploy**
 
-Your app will be live at a `vercel.app` URL within seconds.
+Vercel will automatically build and deploy your app. Your site will be live at a `.vercel.app` URL.
 
 ## 📝 License
 
