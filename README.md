@@ -99,7 +99,7 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest path/to/file.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
 Watch mode (re-runs on file change):
@@ -109,34 +109,35 @@ npx jest --watch
 ```
 
 **How to read Jest output:**
-- **PASS** = all good, your code works as expected
-- **FAIL** = something broke, check the error message below for which test failed and why
+- **PASS** = all checks passed, the code works correctly
+- **FAIL** = something broke, the error message shows which test failed and why
 
 **What the tests cover:**
-- Authentication validators (email/password validation, strength checks)
-- Authentication flow (sign up, sign in, sign out)
-- Dashboard formatting (metric number formatting, display logic)
-- Dashboard statistics (calculation helpers, data aggregation)
-- Utility functions (common helper functions across the app)
+- Auth validation logic (`auth-validators.test.ts`)
+- Authentication flows (`auth.test.ts`)
+- Dashboard metric formatting (`dashboard/formatMetric.test.ts`)
+- Dashboard statistics (`lib/dashboard/stats.test.ts`)
+- Utility functions (`lib/utils.test.ts`, `utils.test.ts`)
 
 ## 📁 Project Structure
 
-- `src/lib` — Core library code (Supabase auth integration)
-- `__tests__` — Jest test files organized by feature
+- `src/components/sections` — UI section components (e.g., Pricing)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables must be added in Vercel before deploying, otherwise your app will crash on load.
+Vercel will automatically build and deploy your app. Every push to `main` triggers a new deployment.
 
 ## 📝 License
 
