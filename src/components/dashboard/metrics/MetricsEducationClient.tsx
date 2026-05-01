@@ -122,6 +122,7 @@ function MetricCard({
           <h3 className="text-sm font-semibold text-[var(--text-1)] leading-snug">
             {metric.name}
           </h3>
+          <PlanBadge plan={metric.plan} />
         </div>
       </div>
 
