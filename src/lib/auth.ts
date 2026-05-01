@@ -120,7 +120,7 @@ export async function login(email: string, password: string): Promise<AuthUser> 
 
 /**
  * Sign up with email + password + name via Supabase Auth.
- * Creates a profile with role 'beta' via client-side upsert.
+ * Creates a profile with role 'user' via client-side upsert.
  * @throws Error on validation failure, email already taken, or network error.
  */
 export async function signup(
@@ -159,7 +159,7 @@ export async function signup(
     const { error: profileError } = await supabase.from('profiles').upsert(
       {
         id: user.id,
-        role: 'beta',
+        role: 'user',
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'id' }
