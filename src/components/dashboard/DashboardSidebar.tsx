@@ -127,7 +127,7 @@ export default function DashboardSidebar() {
               <Link
                 href={href}
                 className={cn(
-                  'relative flex items-center gap-2.5 px-2 h-8 rounded-md text-sm',
+                  'relative flex items-center justify-start gap-2.5 px-2 h-8 rounded-md text-sm',
                   isActive
                     ? 'text-[var(--text-1)] font-medium pl-[6px]'
                     : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-[6px]'
