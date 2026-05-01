@@ -567,75 +567,21 @@ export type Database = {
       profiles: {
         Row: {
           id: string
-          plan: string
           role: string
           created_at: string
           updated_at: string
         }
         Insert: {
           id: string
-          plan?: string
           role: string
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          plan?: string
           role?: string
           created_at?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      tracked_players: {
-        Row: {
-          id: string
-          user_id: string
-          player_name: string
-          added_at: string
-          locked_until: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          player_name: string
-          added_at?: string
-          locked_until: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          player_name?: string
-          added_at?: string
-          locked_until?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      tracked_players_history: {
-        Row: {
-          id: string
-          user_id: string
-          player_name: string
-          action: string
-          action_date: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          player_name: string
-          action: string
-          action_date?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          player_name?: string
-          action?: string
-          action_date?: string
         }
         Relationships: []
       }

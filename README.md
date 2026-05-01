@@ -4,9 +4,6 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Dashboard** — View and track player statistics and metrics
-- **Player Search** — Search and filter players with a dedicated search bar
-- **Player Profiles** — Detailed player profile display with follow functionality
 - **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
@@ -102,44 +99,45 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/utils.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs on file change):
+Run tests in watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — all tests passed, your code works correctly
-- `FAIL` — something broke, check the error message below for what went wrong
+**Understanding the output:**
 
-The tests cover:
-- Authentication validators and auth flow
-- Dashboard utility functions and metric formatting
-- General utility helpers (clsx, tailwind-merge)
+- `PASS` — All tests passed, everything is working
+- `FAIL` — Something broke, check the error message below for which test failed
+
+**What the tests cover:**
+
+- Authentication validation logic and auth flows
+- Dashboard utilities including metric formatting and statistics
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/app/dashboard/player` — Player dashboard pages and server actions
-- `src/components/dashboard/player` — Player-related UI components (search bar, profile, follow modal)
-- `src/config` — Application configuration and plan limits
-- `src/lib/supabase` — Supabase client setup and database types
-- `__tests__` — Jest unit tests
+- `src/components/sections/` — Section components (e.g., Pricing)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables in Vercel Dashboard → Settings → Environment Variables:
-   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon public key
+3. In the Vercel dashboard, add your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon key
 4. Click **Deploy**
 
-> ⚠️ Make sure all environment variables from `.env.local` are added to Vercel before deploying.
+> ⚠️ **Important**: Make sure to add all `.env.local` variables to Vercel before deploying, otherwise your app won't connect to Supabase.
 
 ## 📝 License
 
