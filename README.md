@@ -1,4 +1,4 @@
-# Haurus
+# my-app
 
 The metrics bookmakers use. Now yours.
 
@@ -31,8 +31,8 @@ The metrics bookmakers use. Now yours.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/haraus.git
-cd haurus
+git clone https://github.com/YOUR_USERNAME/my-app.git
+cd my-app
 ```
 
 ### 2. Install dependencies
@@ -99,7 +99,7 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
 Watch mode (re-runs on file change):
@@ -109,18 +109,21 @@ npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, the error shows which test failed and why
+- `PASS` — all tests passed, everything works ✅
+- `FAIL` — something broke, check the error message below for which test failed
 
-The test suite covers:
-- Auth validators and authentication logic
-- Dashboard metrics formatting
-- Stats library functions
-- Utility functions
+**What the tests cover:**
+- Authentication validators and helpers
+- Auth state and session handling
+- Dashboard metric formatting and display
+- Dashboard statistics and calculations
+- Utility functions (className merging, date formatting)
+- General utility helpers
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/metrics` — Dashboard metrics components and client-side logic
+- `src/components/dashboard/metrics` — Dashboard metrics visualization components
+- `__tests__` — Jest unit tests for components, utilities, and auth logic
 
 ## 🚀 Deploy to Vercel
 
@@ -128,15 +131,14 @@ The test suite covers:
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local`:
+3. Vercel will auto-detect Next.js — click **Deploy**
+4. Once deployed, go to your project → **Settings** → **Environment Variables**
+5. Add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
-
-Vercel will automatically build and deploy your app. Your site will be live at a `.vercel.app` URL.
+6. **Trigger a redeploy** so the new environment variables take effect
 
 ## 📝 License
 
