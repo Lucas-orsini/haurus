@@ -103,38 +103,44 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs tests when files change):**
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌ — look for the red error message below to see which test failed and why
+**How to read Jest output:**
+
+- `PASS` — all assertions in that test file passed, the code works as expected
+- `FAIL` — something broke, check the error message above for which test failed and why
 
 **What the tests cover:**
-- Authentication validators and logic
-- Dashboard formatting and metrics utilities
+
+- Auth validators and authentication logic
+- Dashboard metrics formatting and calculations
 - Utility functions and helpers
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player profile dashboard components
+- `src/components` — React components including player profile components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
-5. Click **Deploy**
+**Step by step:**
 
-Your app will be live at a `vercel.app` URL within seconds.
+1. Push your code to GitHub (if you haven't already)
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Click **Import Project** → select your repository
+4. Vercel will auto-detect Next.js — click **Deploy**
+5. Once deployed, go to **Settings** → **Environment Variables**
+6. Add all variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+7. Click **Save** — Vercel will automatically rebuild with your env vars
+
+> ⚠️ **Important**: Environment variables must be added in Vercel before the app will work. Without them, Supabase connections will fail.
 
 ## 📝 License
 
