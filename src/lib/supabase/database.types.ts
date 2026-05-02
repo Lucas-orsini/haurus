@@ -571,6 +571,9 @@ export type Database = {
           avatar_url: string | null
           role: string
           plan: string
+          telegram_token: string
+          telegram_chat_id: number | null
+          telegram_active: boolean
           created_at: string
           updated_at: string
         }
@@ -580,6 +583,9 @@ export type Database = {
           avatar_url?: string | null
           role: string
           plan: string
+          telegram_token?: string
+          telegram_chat_id?: number | null
+          telegram_active?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -589,6 +595,9 @@ export type Database = {
           avatar_url?: string | null
           role?: string
           plan?: string
+          telegram_token?: string
+          telegram_chat_id?: number | null
+          telegram_active?: boolean
           created_at?: string
           updated_at?: string
         }
