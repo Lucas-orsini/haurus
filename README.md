@@ -8,8 +8,6 @@ The metrics bookmakers use. Now yours.
 - **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
-- **Reusable UI Components** — Modular component architecture with TypeScript
-- **Type-Safe Development** — Full TypeScript support for better code quality
 
 ## 🛠️ Tech Stack
 
@@ -90,40 +88,45 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs every time you make changes to ensure nothing broke.
+Unit tests automatically verify that individual pieces of your app (like helper functions) work correctly. If a test fails, it means something broke.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
+npx jest __tests__/dashboard/formatMetric.test.ts
+npx jest __tests__/lib/dashboard/stats.test.ts
+npx jest __tests__/lib/utils.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
-Watch mode (re-runs on file change):
+**Watch mode (re-runs automatically when you save a file):**
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — Everything works correctly, all assertions passed
-- `FAIL` — Something broke, check the error message below for which test failed and why
+**How to read Jest output:**
+- `PASS` — everything is working ✅
+- `FAIL` — something broke ❌ (Jest will show which test failed and why)
 
-The test suite covers:
-- Authentication validation logic
-- Authentication integration
-- Dashboard metrics formatting
-- Dashboard statistics calculations
-- Utility functions
+**Tests cover:**
+- Authentication validators and flow
+- Dashboard utilities and metric formatting
 
 ## 📁 Project Structure
 
-`src/lib/metrics` — Metric definitions and data structures for the application
+Only folders that contain actual files are listed below.
+
+- `src/components/dashboard/player` — Player profile dashboard component
+- `__tests__` — Jest unit tests for auth, dashboard, and utilities
 
 ## 🚀 Deploy to Vercel
 
@@ -131,15 +134,15 @@ The test suite covers:
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
-5. Click **Deploy** — Vercel will automatically build and deploy your app
+4. Add each variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may not work correctly.
+> ⚠️ **Important**: Without these environment variables, your app will crash on Vercel. Make sure to add all of them before deploying.
 
 ## 📝 License
 

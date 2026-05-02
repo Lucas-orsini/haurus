@@ -346,8 +346,8 @@ export default function PlayerProfileClient() {
               </button>
             )}
 
-            {/* Barre de recherche — prend tout l'espace restant */}
-            <div className="flex-1 min-w-0">
+            {/* Barre de recherche */}
+            <div>
               <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
             </div>
           </div>
