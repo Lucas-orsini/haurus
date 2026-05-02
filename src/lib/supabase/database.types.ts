@@ -567,19 +567,28 @@ export type Database = {
       profiles: {
         Row: {
           id: string
+          name: string | null
+          avatar_url: string | null
           role: string
+          plan: string
           created_at: string
           updated_at: string
         }
         Insert: {
           id: string
+          name?: string | null
+          avatar_url?: string | null
           role: string
+          plan: string
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
+          name?: string | null
+          avatar_url?: string | null
           role?: string
+          plan?: string
           created_at?: string
           updated_at?: string
         }
@@ -610,7 +619,15 @@ export type Database = {
           locked_until?: string
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tracked_players_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tracked_players_history: {
         Row: {
@@ -634,7 +651,15 @@ export type Database = {
           action?: string
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tracked_players_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

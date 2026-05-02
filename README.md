@@ -4,8 +4,10 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Dashboard Sidebar** — Navigation component for dashboard sections
+- **User Profile Modal** — Modal interface for user profile management
+- **Authentication** — Secure authentication powered by Supabase
 - **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
-- **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
 
@@ -77,7 +79,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac)
 
 ## 🔑 Environment Variables
 
@@ -99,34 +101,30 @@ npx jest
 **Run a specific test file:**
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
 npx jest __tests__/auth.test.ts
-npx jest __tests__/dashboard/formatMetric.test.ts
-npx jest __tests__/lib/dashboard/stats.test.ts
-npx jest __tests__/lib/utils.test.ts
-npx jest __tests__/utils.test.ts
 ```
 
-**Watch mode (re-runs automatically when you save a file):**
+**Watch mode (re-runs on file change):**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — everything is working ✅
-- `FAIL` — something broke ❌ (Jest will show which test failed and why)
+**Reading Jest output:**
+- `PASS` means all tests in that file passed — everything is working correctly
+- `FAIL` means at least one test failed — Jest will show which test broke and why
+- `FAIL` with a red error message means a test crashed or threw an unexpected error
 
-**Tests cover:**
-- Authentication validators and flow
-- Dashboard utilities and metric formatting
+**Tests covered:**
+- Authentication validators and auth logic
+- Dashboard metric formatting
+- Dashboard statistics calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-Only folders that contain actual files are listed below.
-
-- `src/components/dashboard/player` — Player profile dashboard component
-- `__tests__` — Jest unit tests for auth, dashboard, and utilities
+- `src/lib/` — Core library code: authentication utilities and Supabase database type definitions
+- `src/components/dashboard/` — Dashboard UI components: sidebar navigation and user profile modal
 
 ## 🚀 Deploy to Vercel
 
@@ -134,15 +132,16 @@ Only folders that contain actual files are listed below.
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository (select your `haraus` repo)
+3. Vercel will auto-detect Next.js — click **Deploy**
+4. Once deployed, go to your project → **Settings** → **Environment Variables**
+5. Add the same variables from your `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your Supabase anon public key
+6. **Redeploy** (optional) — Vercel will rebuild with the new environment variables
 
-> ⚠️ **Important**: Without these environment variables, your app will crash on Vercel. Make sure to add all of them before deploying.
+> ⚠️ Make sure all environment variables are added in Vercel before your app can connect to Supabase in production.
 
 ## 📝 License
 

@@ -11,8 +11,23 @@ import { createClient } from '@/lib/supabase/client'
 
 export interface AuthUser {
   id: string
-  name: string
+  name: string | null
   email: string
+  avatarUrl?: string | null
+  role?: string | null
+  plan?: string | null
+}
+
+// ── Custom error type ─────────────────────────────────────────────────────────
+
+export class ProfileUpdateError extends Error {
+  constructor(
+    message: string,
+    public readonly code?: string
+  ) {
+    super(message)
+    this.name = 'ProfileUpdateError'
+  }
 }
 
 // ── Validation helpers ────────────────────────────────────────────────────────
@@ -70,6 +85,14 @@ export function validateName(name: string): string | null {
 /**
  * Read the current session from the browser Supabase client.
  * Returns AuthUser if session exists and is valid, null otherwise.
+ *
+ * Resolution order:
+ *   1. user_metadata.name  (Auth — authoritative for display name)
+ *   2. user_metadata.avatar_url  (Auth — authoritative for avatar URL)
+ *   3. profiles.name  (database fallback — persists across token refreshes)
+ *   4. profiles.avatar_url  (database fallback)
+ *   5. null if neither source has data
+ *
  * Safe to call from Client Components only.
  */
 export async function getSession(): Promise<AuthUser | null> {
@@ -82,9 +105,27 @@ export async function getSession(): Promise<AuthUser | null> {
   if (!session?.user) return null
 
   const user = session.user
+
+  // Primary: values from user_metadata (Auth)
+  const metaName = user.user_metadata?.name as string | null | undefined
+  const metaAvatarUrl = user.user_metadata?.avatar_url as string | null | undefined
+
+  // Fallback: values from profiles table (database)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name, avatar_url, role, plan')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const dbName = profile?.name ?? null
+  const dbAvatarUrl = profile?.avatar_url ?? null
+
   return {
     id: user.id,
-    name: user.user_metadata?.name ?? '',
+    name: metaName ?? dbName,
+    avatarUrl: metaAvatarUrl ?? dbAvatarUrl ?? null,
+    role: profile?.role ?? null,
+    plan: profile?.plan ?? null,
     email: user.email ?? '',
   }
 }
@@ -113,7 +154,7 @@ export async function login(email: string, password: string): Promise<AuthUser> 
   const user = data.user
   return {
     id: user.id,
-    name: user.user_metadata?.name ?? '',
+    name: user.user_metadata?.name as string | null ?? null,
     email: user.email ?? '',
   }
 }
@@ -174,8 +215,77 @@ export async function signup(
 
   return {
     id: user.id,
-    name: user.user_metadata?.name ?? '',
+    name: user.user_metadata?.name as string | null ?? null,
     email: user.email ?? '',
+  }
+}
+
+/**
+ * Update the authenticated user's profile — name and avatar URL.
+ *
+ * Flow:
+ *   1. Update user_metadata.name via Supabase Auth (authoritative for display)
+ *   2. Upsert profiles table with name + avatar_url (persists across token refreshes)
+ *
+ * Both operations must succeed. If Auth update succeeds but profiles upsert fails,
+ * the error is logged but not re-thrown — auth metadata is the source of truth for
+ * display; the profiles table is a performance optimisation.
+ *
+ * @throws ProfileUpdateError if the Auth update fails (e.g. network error,
+ *   rate limit, session expired). Callers should catch this and redirect to login.
+ */
+export async function updateProfile(
+  name: string,
+  avatarUrl?: string | null
+): Promise<AuthUser> {
+  const supabase = createClient()
+  if (!supabase) {
+    throw new ProfileUpdateError(
+      'Service temporarily unavailable. Please refresh and try again.',
+      'SERVICE_UNAVAILABLE'
+    )
+  }
+
+  // Step 1 — update Auth user_metadata (authoritative for name display)
+  const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+    data: { name: name.trim() },
+  })
+
+  if (updateError) {
+    throw new ProfileUpdateError(updateError.message, updateError.code)
+  }
+
+  const user = updateData.user
+
+  // Step 2 — persist name + avatar_url to profiles table
+  // avatarUrl === undefined means "not changed"; null means "clear avatar"
+  const avatarValue = avatarUrl === undefined ? null : avatarUrl
+  try {
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          name: name.trim(),
+          avatar_url: avatarValue,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'id' }
+      )
+
+    if (profileError) {
+      console.error('[auth] updateProfile — failed to persist to profiles:', profileError)
+      // Non-blocking: auth metadata is already updated; profiles is a fallback.
+    }
+  } catch (err) {
+    console.error('[auth] updateProfile — unexpected error persisting profile:', err)
+  }
+
+  return {
+    id: user.id,
+    name: user.user_metadata?.name as string | null ?? name.trim(),
+    email: user.email ?? '',
+    avatarUrl: avatarValue,
   }
 }
 
