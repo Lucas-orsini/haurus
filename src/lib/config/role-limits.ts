@@ -13,7 +13,7 @@ export type RoleLimits = {
   lockDays: boolean
 }
 
-export type RoleKey = 'user' | 'starter' | 'analyste' | 'pro'
+export type RoleKey = 'user' | 'starter' | 'analyste' | 'pro' | 'enterprise'
 
 export const ROLE_LIMITS: Record<RoleKey, RoleLimits> = {
   user: {
@@ -29,6 +29,10 @@ export const ROLE_LIMITS: Record<RoleKey, RoleLimits> = {
     lockDays: true,
   },
   pro: {
+    trackedPlayers: Infinity,
+    lockDays: false,
+  },
+  enterprise: {
     trackedPlayers: Infinity,
     lockDays: false,
   },

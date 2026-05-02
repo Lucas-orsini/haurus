@@ -16,6 +16,9 @@ export interface AuthUser {
   avatarUrl?: string | null
   role?: string | null
   plan?: string | null
+  telegramToken?: string | null
+  telegramChatId?: string | null
+  telegramActive?: boolean | null
 }
 
 // ── Custom error type ─────────────────────────────────────────────────────────
@@ -113,12 +116,17 @@ export async function getSession(): Promise<AuthUser | null> {
   // Fallback: values from profiles table (database)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name, avatar_url, role, plan')
+    .select('name, avatar_url, role, plan, telegram_token, telegram_chat_id, telegram_active')
     .eq('id', user.id)
     .maybeSingle()
 
   const dbName = profile?.name ?? null
   const dbAvatarUrl = profile?.avatar_url ?? null
+
+  // telegram_chat_id is bigint in DB — convert to string for the frontend
+  const rawChatId = profile?.telegram_chat_id
+  const telegramChatId: string | null =
+    rawChatId != null ? String(rawChatId) : null
 
   return {
     id: user.id,
@@ -127,6 +135,9 @@ export async function getSession(): Promise<AuthUser | null> {
     role: profile?.role ?? null,
     plan: profile?.plan ?? null,
     email: user.email ?? '',
+    telegramToken: profile?.telegram_token ?? null,
+    telegramChatId,
+    telegramActive: profile?.telegram_active ?? false,
   }
 }
 
@@ -156,6 +167,9 @@ export async function login(email: string, password: string): Promise<AuthUser> 
     id: user.id,
     name: user.user_metadata?.name as string | null ?? null,
     email: user.email ?? '',
+    telegramToken: null,
+    telegramChatId: null,
+    telegramActive: false,
   }
 }
 
@@ -217,6 +231,9 @@ export async function signup(
     id: user.id,
     name: user.user_metadata?.name as string | null ?? null,
     email: user.email ?? '',
+    telegramToken: null,
+    telegramChatId: null,
+    telegramActive: false,
   }
 }
 
@@ -286,6 +303,9 @@ export async function updateProfile(
     name: user.user_metadata?.name as string | null ?? name.trim(),
     email: user.email ?? '',
     avatarUrl: avatarValue,
+    telegramToken: null,
+    telegramChatId: null,
+    telegramActive: false,
   }
 }
 

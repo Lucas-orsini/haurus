@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Copy, Check } from 'lucide-react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Input from '@/components/ui/Input'
@@ -11,12 +11,17 @@ import { validateName } from '@/lib/auth'
 import { updateProfile } from '@/lib/auth'
 
 interface UserProfileModalProps {
-  user: AuthUser
+  user: AuthUser & {
+    telegram_token?: string | null
+    telegram_chat_id?: number | null
+    telegram_active?: boolean | null
+  }
   onClose: () => void
   onUpdateSuccess: (updatedUser: AuthUser) => void
 }
 
 type SaveState = 'idle' | 'saving' | 'error'
+type TelegramTabState = 'not-connected' | 'connected' | 'suspended'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -42,6 +47,17 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '')
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [nameError, setNameError] = useState<string | null>(null)
+  const [activeSection, setActiveSection] = useState<'profile' | 'telegram'>('profile')
+  const [copyFeedback, setCopyFeedback] = useState(false)
+  const [disconnectLoading, setDisconnectLoading] = useState(false)
+  const [disconnectError, setDisconnectError] = useState<string | null>(null)
+
+  const telegramTab: TelegramTabState =
+    user.telegram_chat_id !== null && user.telegram_chat_id !== undefined
+      ? user.telegram_active
+        ? 'connected'
+        : 'suspended'
+      : 'not-connected'
 
   // Fermer sur Escape
   useEffect(() => {
@@ -82,7 +98,36 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
     }
   }
 
+  async function handleDisconnect() {
+    setDisconnectLoading(true)
+    setDisconnectError(null)
+    try {
+      const res = await fetch('/api/telegram/disconnect', { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Erreur de déconnexion')
+      }
+      onUpdateSuccess(user)
+    } catch (err) {
+      setDisconnectError(err instanceof Error ? err.message : 'Une erreur est survenue')
+    } finally {
+      setDisconnectLoading(false)
+    }
+  }
+
+  const handleCopyToken = async () => {
+    const token = user.telegram_token ?? ''
+    try {
+      await navigator.clipboard.writeText(token)
+      setCopyFeedback(true)
+      setTimeout(() => setCopyFeedback(false), 2000)
+    } catch {
+      setCopyFeedback(false)
+    }
+  }
+
   const isSaving = saveState === 'saving'
+  const telegramBotUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? 'HaurusBot'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -127,123 +172,300 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
             </button>
           </div>
 
+          {/* Tabs */}
+          <div className="flex items-center gap-0 px-5 border-b border-[var(--border)] shrink-0">
+            <button
+              onClick={() => setActiveSection('profile')}
+              className={cn(
+                'h-10 px-3 text-sm transition-colors duration-150 border-b-2 -mb-px flex items-center justify-center',
+                activeSection === 'profile'
+                  ? 'text-[var(--text-1)] border-[var(--accent)]'
+                  : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
+              )}
+            >
+              Profil
+            </button>
+            <button
+              onClick={() => setActiveSection('telegram')}
+              className={cn(
+                'h-10 px-3 text-sm transition-colors duration-150 border-b-2 -mb-px flex items-center justify-center',
+                activeSection === 'telegram'
+                  ? 'text-[var(--text-1)] border-[var(--accent)]'
+                  : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
+              )}
+            >
+              Telegram
+            </button>
+          </div>
+
           {/* Body */}
-          <form onSubmit={handleSubmit} id="profile-form">
-            <div className="px-5 py-5 flex flex-col gap-5">
-              {/* Avatar */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-full bg-[var(--surface-3)] border border-[var(--border-md)] overflow-hidden flex items-center justify-center shrink-0">
-                  {avatarUrl.trim() ? (
-                    <img
-                      src={avatarUrl.trim()}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                      onError={() => setAvatarUrl('')}
-                    />
-                  ) : (
-                    <span className="text-lg font-semibold text-[var(--text-2)] select-none">
-                      {getInitials((name || user.name) ?? '')}
-                    </span>
+          <div className="max-h-[70vh] overflow-y-auto">
+            {/* ── Profil section ── */}
+            {activeSection === 'profile' && (
+              <form onSubmit={handleSubmit} id="profile-form">
+                <div className="px-5 py-5 flex flex-col gap-5">
+                  {/* Avatar */}
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-20 h-20 rounded-full bg-[var(--surface-3)] border border-[var(--border-md)] overflow-hidden flex items-center justify-center shrink-0">
+                      {avatarUrl.trim() ? (
+                        <img
+                          src={avatarUrl.trim()}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                          onError={() => setAvatarUrl('')}
+                        />
+                      ) : (
+                        <span className="text-lg font-semibold text-[var(--text-2)] select-none">
+                          {getInitials((name || user.name) ?? '')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par défaut</p>
+                  </div>
+
+                  {/* Photo URL */}
+                  <Input
+                    label="Photo de profil (URL)"
+                    type="url"
+                    placeholder="https://example.com/avatar.jpg"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    disabled={isSaving}
+                  />
+
+                  {/* Nom */}
+                  <Input
+                    label="Nom"
+                    type="text"
+                    placeholder="Votre nom"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      if (nameError) setNameError(null)
+                    }}
+                    error={nameError ?? undefined}
+                    disabled={isSaving}
+                    autoFocus
+                  />
+
+                  {/* Email — lecture seule */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium select-none text-[var(--text-3)]">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={user.email}
+                        readOnly
+                        disabled
+                        className={cn(
+                          'h-10 w-full rounded-lg px-3 pr-16 text-sm text-[var(--text-1)]',
+                          'bg-[var(--surface-2)] border border-[var(--border-md)]',
+                          'opacity-50 cursor-not-allowed outline-none',
+                        )}
+                      />
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[var(--text-3)] whitespace-nowrap">
+                        Non modifiable
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Erreur persistante */}
+                  {saveState === 'error' && (
+                    <p className="text-xs text-[var(--red)] leading-tight">
+                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez réessayer.
+                    </p>
                   )}
                 </div>
-                <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par défaut</p>
-              </div>
+              </form>
+            )}
 
-              {/* Photo URL */}
-              <Input
-                label="Photo de profil (URL)"
-                type="url"
-                placeholder="https://example.com/avatar.jpg"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                disabled={isSaving}
-              />
-
-              {/* Nom */}
-              <Input
-                label="Nom"
-                type="text"
-                placeholder="Votre nom"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value)
-                  if (nameError) setNameError(null)
-                }}
-                error={nameError ?? undefined}
-                disabled={isSaving}
-                autoFocus
-              />
-
-              {/* Email — lecture seule */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium select-none text-[var(--text-3)]">
-                  Email
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={user.email}
-                    readOnly
-                    disabled
-                    className={cn(
-                      'h-10 w-full rounded-lg px-3 pr-16 text-sm text-[var(--text-1)]',
-                      'bg-[var(--surface-2)] border border-[var(--border-md)]',
-                      'opacity-50 cursor-not-allowed outline-none',
-                    )}
-                  />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[var(--text-3)] whitespace-nowrap">
-                    Non modifiable
-                  </span>
+            {/* ── Telegram section ── */}
+            {activeSection === 'telegram' && (
+              <div className="px-5 py-5 flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-sm font-semibold text-[var(--text-1)]">Telegram</h3>
+                  <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                    Recevez vos alertes et predictions directement sur Telegram.
+                  </p>
                 </div>
+
+                {/* État B — Connecté et actif */}
+                {telegramTab === 'connected' && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
+                                       bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
+                        ✅ Telegram connect&eacute;
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDisconnect}
+                        disabled={disconnectLoading}
+                        className="text-[var(--red)]"
+                      >
+                        {disconnectLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin shrink-0"
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                            </svg>
+                            D&eacute;connexion...
+                          </>
+                        ) : (
+                          'D&eacute;connecter'
+                        )}
+                      </Button>
+                    </div>
+
+                    {disconnectError && (
+                      <p className="text-xs text-[var(--red)] leading-tight">{disconnectError}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* État C — Connecté mais suspendu */}
+                {telegramTab === 'suspended' && (
+                  <div className="flex flex-col gap-4">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
+                                     bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
+                      &#9888;&nbsp;Notifications suspendues
+                    </span>
+
+                    <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                      Votre plan actuel ne donne pas acc&egrave;s aux notifications Telegram.
+                    </p>
+
+                    {user.telegram_token && (
+                      <div className="flex flex-col gap-1.5">
+                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
+                                           bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
+                            {user.telegram_token}
+                          </code>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleCopyToken}
+                            disabled={copyFeedback}
+                            iconLeft={
+                              copyFeedback ? (
+                                <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
+                              ) : (
+                                <Copy size={12} strokeWidth={1.5} />
+                              )
+                            }
+                          >
+                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* État A — Non connecté */}
+                {telegramTab === 'not-connected' && (
+                  <div className="flex flex-col gap-4">
+                    {user.telegram_token ? (
+                      <div className="flex flex-col gap-1.5">
+                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
+                                           bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
+                            {user.telegram_token}
+                          </code>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleCopyToken}
+                            disabled={copyFeedback}
+                            iconLeft={
+                              copyFeedback ? (
+                                <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
+                              ) : (
+                                <Copy size={12} strokeWidth={1.5} />
+                              )
+                            }
+                          >
+                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-[var(--text-3)]">Token non disponible.</p>
+                    )}
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                        Ouvrez{' '}
+                        <span className="font-mono text-[var(--text-2)]">@{telegramBotUsername}</span>{' '}
+                        sur Telegram et envoyez&nbsp;:
+                      </p>
+                      <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
+                                       bg-[var(--surface-2)] border border-[var(--border-md)]">
+                        /connect {user.telegram_token ?? '[VOTRE_TOKEN]'}
+                      </code>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Erreur persistante */}
-              {saveState === 'error' && (
-                <p className="text-xs text-[var(--red)] leading-tight">
-                  Une erreur est survenue lors de l&apos;enregistrement. Veuillez réessayer.
-                </p>
-              )}
-            </div>
-          </form>
-
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)] shrink-0">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              disabled={isSaving}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              form="profile-form"
-              variant="primary"
-              size="sm"
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <svg
-                    className="animate-spin shrink-0"
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                  </svg>
-                  Enregistrement...
-                </>
-              ) : (
-                'Enregistrer'
-              )}
-            </Button>
+            )}
           </div>
+
+          {/* Footer — profil only */}
+          {activeSection === 'profile' && (
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)] shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                disabled={isSaving}
+              >
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                form="profile-form"
+                variant="primary"
+                size="sm"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <svg
+                      className="animate-spin shrink-0"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    Enregistrement...
+                  </>
+                ) : (
+                  'Enregistrer'
+                )}
+              </Button>
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
