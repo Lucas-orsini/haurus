@@ -17,7 +17,7 @@ export interface AuthUser {
   role?: string | null
   plan?: string | null
   telegramToken?: string | null
-  telegramChatId?: number | null
+  telegramChatId?: string | null
   telegramActive?: boolean | null
 }
 
@@ -123,6 +123,11 @@ export async function getSession(): Promise<AuthUser | null> {
   const dbName = profile?.name ?? null
   const dbAvatarUrl = profile?.avatar_url ?? null
 
+  // telegram_chat_id is bigint in DB — convert to string for the frontend
+  const rawChatId = profile?.telegram_chat_id
+  const telegramChatId: string | null =
+    rawChatId != null ? String(rawChatId) : null
+
   return {
     id: user.id,
     name: metaName ?? dbName,
@@ -131,7 +136,7 @@ export async function getSession(): Promise<AuthUser | null> {
     plan: profile?.plan ?? null,
     email: user.email ?? '',
     telegramToken: profile?.telegram_token ?? null,
-    telegramChatId: profile?.telegram_chat_id ?? null,
+    telegramChatId,
     telegramActive: profile?.telegram_active ?? false,
   }
 }

@@ -3,13 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, User, BookOpen, Settings, Send } from 'lucide-react'
+import { LayoutDashboard, LogOut, User, BookOpen, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
 import UserProfileModal from './UserProfileModal'
-import TelegramModal from './TelegramModal'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
@@ -24,7 +23,6 @@ export default function DashboardSidebar() {
   const [sessionState, setSessionState] = useState<'loading' | 'success' | 'error'>('loading')
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-  const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -222,19 +220,6 @@ export default function DashboardSidebar() {
                   </button>
 
                   <button
-                    onClick={() => {
-                      setIsTelegramModalOpen(true)
-                      setIsDropdownOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
-                               text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)]
-                               transition-colors duration-100 whitespace-nowrap"
-                  >
-                    <Send size={13} strokeWidth={1.5} className="shrink-0" />
-                    Telegram
-                  </button>
-
-                  <button
                     disabled
                     className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
                                text-[var(--text-3)] opacity-50 cursor-default pointer-events-none
@@ -275,14 +260,6 @@ export default function DashboardSidebar() {
               setUser(updated)
               setIsProfileModalOpen(false)
             }}
-          />
-        )}
-
-        {/* Modale Telegram */}
-        {sessionState === 'success' && user && isTelegramModalOpen && (
-          <TelegramModal
-            user={user}
-            onClose={() => setIsTelegramModalOpen(false)}
           />
         )}
       </div>
