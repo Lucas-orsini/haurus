@@ -11,6 +11,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Telegram webhook uses its own HMAC-based authentication (X-Telegram-Bot-Api-Secret-Token header).
+  // Bypass auth check — the handler at /api/telegram/webhook validates the signature itself.
+  if (pathname.startsWith('/api/telegram/webhook')) {
+    return NextResponse.next({ request })
+  }
+
   // Routes to protect — only (app) group routes require authentication
   const PROTECTED_PREFIXES = ['/dashboard', '/settings', '/api']
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
