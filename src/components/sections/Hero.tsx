@@ -35,7 +35,7 @@ function AnimatedBarChart() {
       ))}
       {/* Peak label */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
-        Peak
+        Pic
       </div>
       {/* Fade overlay */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#111113] to-transparent pointer-events-none" />
@@ -90,7 +90,7 @@ export default function Hero() {
           >
             <span className="flex h-2 w-2 rounded-full bg-[var(--accent)] animate-pulse" />
             <span className="text-xs font-medium text-[var(--accent-hi)] tracking-wide uppercase">
-              BETA AVAILABLE
+              BÊTA DISPONIBLE
             </span>
           </motion.div>
 
@@ -100,10 +100,10 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-5xl md:text-7xl font-medium tracking-tighter text-[var(--text-1)] mb-6 leading-[1.1]"
           >
-            The metrics{' '}
-            <span className="text-[var(--accent)]">bookmakers</span>
+            Les métriques que{' '}
+            <span className="text-[var(--accent)]">utilisent les bookmakers</span>
             <br />
-            <span className="text-[var(--text-2)]">use. Now yours.</span>
+            <span className="text-[var(--text-2)]">Maintenant les vôtres.</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -125,13 +125,13 @@ export default function Hero() {
               href="#pricing"
               className="h-10 px-6 rounded-lg bg-[var(--accent)] text-black text-sm font-medium hover:bg-[var(--accent-hi)] hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(242,203,56,0.25)]"
             >
-              Get started
+              Commencer
             </Link>
             <a
               href="#metrics"
               className="h-10 px-6 rounded-lg bg-transparent border border-[var(--border-md)] text-[var(--text-2)] text-sm font-medium hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-colors duration-150 flex items-center justify-center gap-2"
             >
-              View metrics
+              Voir les métriques
             </a>
           </motion.div>
 
@@ -185,13 +185,13 @@ export default function Hero() {
               <div className="w-16 md:w-64 border-r border-[var(--border-md)] p-4 flex flex-col gap-6 bg-[var(--surface-1)]">
                 <div className="flex flex-col gap-1">
                   <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wider mb-2 px-2">
-                    ATP Stats
+                    Stats ATP
                   </div>
                   {[
-                    { icon: <Activity size={18} strokeWidth={1.5} />, label: 'Overview', active: true },
-                    { icon: <BarChart3 size={18} strokeWidth={1.5} />, label: 'Analytics', active: false },
-                    { icon: <TrendingUp size={18} strokeWidth={1.5} />, label: 'Players', active: false },
-                    { icon: <Zap size={18} strokeWidth={1.5} />, label: 'Metrics', active: false },
+                    { icon: <Activity size={18} strokeWidth={1.5} />, label: 'Aperçu', active: true },
+                    { icon: <BarChart3 size={18} strokeWidth={1.5} />, label: 'Analytique', active: false },
+                    { icon: <TrendingUp size={18} strokeWidth={1.5} />, label: 'Joueurs', active: false },
+                    { icon: <Zap size={18} strokeWidth={1.5} />, label: 'Métriques', active: false },
                   ].map(({ icon, label, active }) => (
                     <div
                       key={label}
@@ -210,9 +210,9 @@ export default function Hero() {
                 <div className="mt-auto">
                   <div className="p-3 rounded-lg border border-[var(--accent-muted)] bg-[var(--accent-glow-sm)] hidden md:block">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-[var(--accent-hi)]">Data Status</span>
+                      <span className="text-xs text-[var(--accent-hi)]">État des données</span>
                       <span className="text-[10px] text-[var(--green)] bg-[var(--green)]/10 px-1.5 py-0.5 rounded">
-                        Live
+                        En direct
                       </span>
                     </div>
                     <div className="w-full bg-[var(--accent)]/10 h-1 rounded-full overflow-hidden">
@@ -231,15 +231,15 @@ export default function Hero() {
                 <div className="flex justify-between items-end mb-8">
                   <div>
                     <h2 className="text-xl font-medium text-[var(--text-1)] tracking-tight">
-                      Overview
+                      Aperçu
                     </h2>
                     <p className="text-sm text-[var(--text-3)] mt-1">
-                      Real-time ATP player metrics.
+                      Métriques en temps réel des joueurs ATP.
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <div className="px-3 py-1.5 rounded border border-[var(--border-md)] bg-[var(--surface-1)] text-xs text-[var(--text-2)] flex items-center gap-2">
-                      Last 30 Days
+                      30 derniers jours
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polyline points="6,9 12,15 18,9" />
                       </svg>
@@ -250,21 +250,21 @@ export default function Hero() {
                 {/* Stat cards grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   <MetricCard
-                    label="Glicko-2 differential"
+                    label="Différentiel Glicko-2"
                     value="+84"
                     change="+12 pts"
                     changePositive
                     icon={<TrendingUp size={20} strokeWidth={1.5} />}
                   />
                   <MetricCard
-                    label="Win rate (Clay)"
+                    label="Taux de victoire (Terre battue)"
                     value="71%"
                     change="+3.2%"
                     changePositive
                     icon={<Activity size={20} strokeWidth={1.5} />}
                   />
                   <MetricCard
-                    label="Points won on serve"
+                    label="Points gagnés au service"
                     value="68%"
                     change="0%"
                     icon={<Zap size={20} strokeWidth={1.5} />}

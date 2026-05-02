@@ -7,9 +7,9 @@ const fadeIn: Variants = {
 }
 
 const stats = [
-  { value: '250k', label: 'matches analysed' },
-  { value: '1,033', label: 'players tracked' },
-  { value: 'Twice daily', label: 'updated' },
+  { value: '250k', label: 'matchs analysés' },
+  { value: '1 033', label: 'joueurs suivis' },
+  { value: '2x/jour', label: 'mis à jour' },
 ]
 
 export default function SocialProof() {
