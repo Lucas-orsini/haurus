@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, ChevronDown, User, BookOpen } from 'lucide-react'
+import { LayoutDashboard, LogOut, User, BookOpen, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
@@ -24,6 +24,8 @@ export default function DashboardSidebar() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Charger la session au montage
   useEffect(() => {
@@ -46,6 +48,21 @@ export default function DashboardSidebar() {
     loadSession()
     return () => { cancelled = true }
   }, [])
+
+  // Fermer le dropdown au clic extérieur
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isDropdownOpen])
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -148,11 +165,11 @@ export default function DashboardSidebar() {
           </div>
         )}
 
-        {/* Success — bloc profil cliquable */}
+        {/* Success — bloc profil cliquable avec dropdown */}
         {sessionState === 'success' && user && (
-          <>
+          <div ref={dropdownRef} className="relative">
             <button
-              onClick={() => setIsProfileModalOpen(true)}
+              onClick={() => setIsDropdownOpen((prev: boolean) => !prev)}
               className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer transition-colors w-full"
             >
               {/* Avatar initiales ou image */}
@@ -177,18 +194,61 @@ export default function DashboardSidebar() {
               </div>
             </button>
 
-            {/* Sign out button */}
-            <button
-              onClick={handleSignOut}
-              disabled={signingOut}
-              className="mt-1 w-full flex items-center gap-2 px-2 py-2 text-xs
-                         text-[var(--red)] hover:bg-[var(--red)]/10 transition-colors
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-              {signingOut ? 'Signing out...' : 'Sign out'}
-            </button>
-          </>
+            {/* Dropdown menu */}
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className="absolute bottom-full left-0 right-0 mb-1.5 z-50
+                             bg-[var(--surface-2)] border border-[var(--border-md)]
+                             rounded-lg shadow-xl overflow-hidden py-1"
+                >
+                  <button
+                    onClick={() => {
+                      setIsProfileModalOpen(true)
+                      setIsDropdownOpen(false)
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                               text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)]
+                               transition-colors duration-100 whitespace-nowrap"
+                  >
+                    <User size={13} strokeWidth={1.5} className="shrink-0" />
+                    Profil
+                  </button>
+
+                  <button
+                    disabled
+                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                               text-[var(--text-3)] opacity-50 cursor-default pointer-events-none
+                               transition-colors duration-100 whitespace-nowrap"
+                  >
+                    <Settings size={13} strokeWidth={1.5} className="shrink-0" />
+                    Réglage
+                  </button>
+
+                  <div className="h-px bg-[var(--border)] my-1" />
+
+                  <button
+                    onClick={() => {
+                      handleSignOut()
+                      setIsDropdownOpen(false)
+                    }}
+                    disabled={signingOut}
+                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                               text-[var(--red)] hover:bg-[var(--red)]/10
+                               transition-colors duration-100 whitespace-nowrap
+                               disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
+                    {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
 
         {/* Modale profil */}
