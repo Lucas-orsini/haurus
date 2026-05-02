@@ -380,13 +380,13 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                 {/* État A — Non connecté */}
                 {telegramTab === 'not-connected' && (
                   <div className="flex flex-col gap-4">
-                    {user.telegram_token ? (
+                    {user.telegramToken ? (
                       <div className="flex flex-col gap-1.5">
                         <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
-                            {user.telegram_token}
+                            {user.telegramToken}
                           </code>
                           <Button
                             variant="secondary"
