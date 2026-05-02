@@ -100,10 +100,29 @@ async function sendTelegramMessage(
 
 export async function POST(request: Request): Promise<Response> {
   // ── Step 1: Signature validation ────────────────────────────────────────────
+  //
+  // TWO MODES OF OPERATION:
+  //
+  // • OPEN MODE (TELEGRAM_BOT_SECRET not set on Vercel):
+  //   When TELEGRAM_BOT_SECRET is absent (botSecret = ''), verification is skipped.
+  //   This is the default behaviour: Telegram does NOT send the X-Telegram-Bot-Api-Secret-Token
+  //   header unless the webhook was set up with --secret, so without the secret configured
+  //   we cannot enforce a check anyway. Any incoming request is accepted.
+  //
+  // • STRICT MODE (TELEGRAM_BOT_SECRET is set on Vercel):
+  //   When TELEGRAM_BOT_SECRET is defined, the X-Telegram-Bot-Api-Secret-Token header
+  //   must be present AND match the configured secret (HMAC-SHA256 comparison).
+  //   A mismatch or missing header returns 400.
+  //
+  // To activate strict mode: set TELEGRAM_BOT_SECRET in Vercel env vars, then
+  // reconfigure the Telegram webhook with: setWebhook --secret="YOUR_SECRET"
+  //
   const secretHeader = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
   const botSecret = process.env.TELEGRAM_BOT_SECRET ?? ''
 
-  if (!verifySignature(secretHeader, botSecret)) {
+  // Verification is conditional: skip entirely when botSecret is empty (open mode).
+  // When botSecret is non-empty, the header must be present and valid (strict mode).
+  if (botSecret && !verifySignature(secretHeader, botSecret)) {
     return Response.json({ error: 'invalid_signature' }, { status: 400 })
   }
 
