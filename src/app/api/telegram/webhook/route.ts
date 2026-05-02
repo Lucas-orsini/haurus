@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
-const ELIGIBLE_ROLES = new Set(['user', 'analyste', 'pro', 'enterprise'])
+import { hasTelegramAccess } from '@/lib/config/role-limits'
 
 interface TelegramMessage {
   message_id: number
@@ -182,9 +182,23 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: true }, { status: 200 })
   }
 
-  // ── Step 5: Determine response based on role eligibility ───────────────────
-  if (!ELIGIBLE_ROLES.has(profile.role)) {
-    // Role not eligible — notify user without changing DB state.
+  // ── Step 5: Role eligibility check via hasTelegramAccess ───────────────────
+  //
+  // FIX — ROLE_REVERSAL_BUG:
+  // When a user downgrades from pro/enterprise to a non-eligible role while already
+  // connected, the UI shows "connected" (State 2) but the bot stops sending messages.
+  // Now we explicitly check the current role at every /connect attempt.
+  //
+  // If the role is no longer eligible, we deactivate telegram_active (without clearing
+  // chat_id or token — those are preserved so the user can reconnect after upgrading).
+  //
+  if (!hasTelegramAccess(profile.role)) {
+    // Mark as inactive so the UI reflects the suspended state (State 3)
+    await adminClient
+      .from('profiles')
+      .update({ telegram_active: false })
+      .eq('id', profile.id)
+
     sendTelegramMessage(
       chatId,
       '⚠️ Votre plan actuel ne donne pas accès aux notifications Telegram.'
