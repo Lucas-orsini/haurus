@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { ChevronLeft, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -299,39 +299,31 @@ export default function PlayerProfileClient() {
               onSelectPlayer={handleSelectTracked}
               onRemovePlayer={handleRemoveTracked}
             />
-            {/* Flèche de fermeture — centrée verticalement sur le bord droit */}
-            <button
-              onClick={() => setPanelOpen(false)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2
-                         w-8 h-8 flex items-center justify-center rounded-md
-                         border border-[var(--border-md)] bg-[var(--surface-2)]
-                         hover:bg-white/[0.08] text-[var(--text-3)] hover:text-[var(--text-2)]
-                         transition-colors duration-150"
-              aria-label="Fermer le panneau Mes joueurs"
-            >
-              <ChevronLeft size={16} strokeWidth={1.5} />
-            </button>
           </motion.div>
         )}
 
         {/* Colonne droite — recherche + profil (flexible) */}
-        <div className="flex-1 min-w-0 flex flex-col min-h-0">
+        <div className="flex-1 min-w-0 space-y-5">
 
-          {/* Bouton toggle "Mes joueurs" — UNIQUEMENT quand le volet est fermé */}
-          {!panelOpen && (
-            <div className="flex items-center gap-3 mb-5">
-              <button
-                onClick={() => setPanelOpen(true)}
-                className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-                aria-label="Ouvrir le panneau Mes joueurs"
-              >
-                <Users size={14} strokeWidth={1.5} className="shrink-0" />
-                <span className="whitespace-nowrap">Mes joueurs</span>
-              </button>
+          {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
+          <div className="flex items-center gap-3">
+            {/* Bouton toggle — visible quand le volet est fermé */}
+            <button
+              onClick={() => setPanelOpen(!panelOpen)}
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                         text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
+              aria-label={panelOpen ? 'Fermer le panneau Mes joueurs' : 'Ouvrir le panneau Mes joueurs'}
+            >
+              <Users size={14} strokeWidth={1.5} className="shrink-0" />
+              <span className="whitespace-nowrap">Mes joueurs</span>
+            </button>
+
+            {/* Barre de recherche — prend tout l'espace restant */}
+            <div className="flex-1 min-w-0">
+              <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
             </div>
-          )}
+          </div>
 
           {/* Backdrop — ferme le volet au clic */}
           {panelOpen && (
@@ -342,16 +334,7 @@ export default function PlayerProfileClient() {
             />
           )}
 
-          {/* État 1 : volet fermé + aucun joueur sélectionné → centrage vertical/horizontal */}
-          {!panelOpen && !selectedPlayer && (
-            <div className="flex-1 min-h-0 flex items-center justify-center">
-              <div className="flex flex-col items-center justify-center text-center">
-                <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
-              </div>
-            </div>
-          )}
-
-          {/* État 2 : joueur sélectionné → layout colonne standard */}
+          {/* Contenu profil — apparaît après sélection */}
           {selectedPlayer && (
             <div className="space-y-5 animate-in fade-in duration-200">
               {/* Header nom joueur + SurfaceSelector */}
@@ -407,10 +390,17 @@ export default function PlayerProfileClient() {
             </div>
           )}
 
-          {/* État 3 : volet ouvert + aucun joueur sélectionné → search bar normale */}
-          {panelOpen && !selectedPlayer && (
-            <div className="mt-5">
-              <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
+          {/* État initial — rien n'est sélectionné */}
+          {!selectedPlayer && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
             </div>
           )}
         </div>
