@@ -188,3 +188,69 @@ export async function signOut(): Promise<void> {
 
   await supabase.auth.signOut()
 }
+
+// ── Profile update ─────────────────────────────────────────────────────────────
+
+/**
+ * Update the authenticated user's profile: name and/or password.
+ *
+ * - `name` lives in `auth.users.user_metadata.name` and is updated via
+ *   `supabase.auth.updateUser({ data: { name } })`.
+ * - `password` is updated via `supabase.auth.updateUser({ password })`.
+ *
+ * If both fields are provided, two separate `updateUser` calls are made
+ * because Supabase Auth only accepts one of `email` / `data` / `password`
+ * per call. Both calls run regardless of whether the first one fails —
+ * this gives the user feedback on each field.
+ *
+ * @param name     - New display name (optional). Must pass `validateName` first.
+ * @param password - New password (optional). Must pass `validatePassword` first.
+ *                  Empty / undefined = unchanged.
+ * @throws Error with user-friendly message on Supabase failure.
+ */
+export async function updateProfile(
+  name: string,
+  password?: string
+): Promise<AuthUser> {
+  const supabase = createClient()
+  if (!supabase) {
+    throw new Error('Service temporarily unavailable. Please refresh and try again.')
+  }
+
+  // ── Update name in user_metadata ────────────────────────────────────────────
+  if (name !== undefined) {
+    const { error: nameError } = await supabase.auth.updateUser({
+      data: { name: name.trim() },
+    })
+
+    if (nameError) {
+      throw new Error(nameError.message)
+    }
+  }
+
+  // ── Update password ──────────────────────────────────────────────────────────
+  if (password !== undefined && password !== '') {
+    const { error: passwordError } = await supabase.auth.updateUser({
+      password,
+    })
+
+    if (passwordError) {
+      throw new Error(passwordError.message)
+    }
+  }
+
+  // ── Return updated AuthUser ────────────────────────────────────────────────
+  const { data: sessionData, error: sessionError } =
+    await supabase.auth.getSession()
+
+  if (sessionError || !sessionData.session?.user) {
+    throw new Error('Session invalid after update. Please sign in again.')
+  }
+
+  const user = sessionData.session.user
+  return {
+    id: user.id,
+    name: user.user_metadata?.name ?? '',
+    email: user.email ?? '',
+  }
+}
