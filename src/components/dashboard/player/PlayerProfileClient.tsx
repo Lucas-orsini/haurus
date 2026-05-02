@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Users, ChevronLeft } from 'lucide-react'
+import { Users } from 'lucide-react'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -280,147 +280,130 @@ export default function PlayerProfileClient() {
         onCancel={() => setPendingPlayer(null)}
       />
 
-      {/* Bouton "Mes joueurs" — fixed, visible uniquement quand volet fermé */}
-      {!panelOpen && (
-        <button
-          onClick={() => setPanelOpen(true)}
-          className="fixed top-6 left-6 z-50 h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                     border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                     text-[var(--text-2)] text-xs font-medium transition-colors duration-150"
-          aria-label="Ouvrir le panneau Mes joueurs"
-        >
-          <Users size={14} strokeWidth={1.5} className="shrink-0" />
-          <span className="whitespace-nowrap">Mes joueurs</span>
-        </button>
-      )}
+      {/* Layout flex avec volet coulissant conditionnel */}
+      <div className="flex gap-5">
 
-      {/* Volet overlay — fixed, slide depuis la gauche */}
-      {panelOpen && (
-        <>
-          {/* Backdrop cliquable */}
-          <div
-            className="fixed inset-0 z-40 cursor-default"
-            onClick={() => setPanelOpen(false)}
-            aria-hidden="true"
-          />
-
-          {/* Panel */}
+        {/* Volet "Mes joueurs" — animé, sort de la gauche */}
+        {panelOpen && (
           <motion.div
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed top-0 left-0 h-full w-[280px] z-50 flex flex-col"
+            className="relative w-[280px] shrink-0 overflow-hidden z-50"
           >
-            {/* Contenu du volet */}
-            <div className="flex-1 overflow-y-auto bg-[var(--surface-1)] border-r border-[var(--border-md)]">
-              <TrackedPlayersList
-                trackedPlayers={trackedPlayers}
-                role={trackedRole}
-                limit={trackedLimit}
-                onSelectPlayer={handleSelectTracked}
-                onRemovePlayer={handleRemoveTracked}
-              />
-            </div>
-
-            {/* Flèche de fermeture — absolute sur le bord droit */}
-            <button
-              onClick={() => setPanelOpen(false)}
-              className="absolute -right-3 top-1/2 -translate-y-1/2 z-50
-                         w-6 h-6 flex items-center justify-center rounded-full
-                         border border-[var(--border-md)] bg-[var(--surface-2)]
-                         hover:bg-white/[0.06] text-[var(--text-2)]
-                         transition-colors duration-150 cursor-pointer"
-              aria-label="Fermer le panneau Mes joueurs"
-            >
-              <ChevronLeft size={13} strokeWidth={1.5} className="shrink-0" />
-            </button>
+            <TrackedPlayersList
+              trackedPlayers={trackedPlayers}
+              role={trackedRole}
+              limit={trackedLimit}
+              onSelectPlayer={handleSelectTracked}
+              onRemovePlayer={handleRemoveTracked}
+            />
           </motion.div>
-        </>
-      )}
-
-      {/* Colonne principale — centrée viewport quand idle, layout normal quand joueur sélectionné */}
-      <div
-        className={
-          selectedPlayer
-            ? 'flex-1 min-w-0 space-y-5'
-            : 'flex-1 min-w-0 flex flex-col items-center justify-center'
-        }
-      >
-        {/* Barre de recherche — pleine largeur, centrée dans son container */}
-        <div className={selectedPlayer ? '' : 'w-full max-w-md mx-auto px-6'}>
-          <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
-        </div>
-
-        {/* État initial — centré dans le container viewport */}
-        {!selectedPlayer && (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </div>
-            <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-            <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
-          </div>
         )}
 
-        {/* Contenu profil — apparaît après sélection */}
-        {selectedPlayer && (
-          <div className="space-y-5 animate-in fade-in duration-200">
-            {/* Header nom joueur + SurfaceSelector */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 min-w-0">
-                <div>
-                  <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
-                  {selectedPlayer.rank && (
-                    <p className="text-xs text-[var(--text-3)] mt-0.5">
-                      ATP #{selectedPlayer.rank}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <SurfaceSelector
-                selectedSurface={selectedSurface}
-                onSurfaceChange={(s) => setSelectedSurface(s)}
-              />
-            </div>
+        {/* Colonne droite — recherche + profil (flexible) */}
+        <div className="flex-1 min-w-0 space-y-5">
 
-            {/* Loading state */}
-            {loadingProfile ? (
-              <div className="grid grid-cols-3 gap-3">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
-                    <div className="h-2.5 bg-white/[0.06] rounded w-20 mb-3" />
-                    <div className="h-6 bg-white/[0.05] rounded w-16 mb-2" />
-                    <div className="h-2 bg-white/[0.04] rounded w-28" />
+          {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
+          <div className="flex items-center gap-3">
+            {/* Bouton toggle — visible quand le volet est fermé */}
+            <button
+              onClick={() => setPanelOpen(!panelOpen)}
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                         text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
+              aria-label={panelOpen ? 'Fermer le panneau Mes joueurs' : 'Ouvrir le panneau Mes joueurs'}
+            >
+              <Users size={14} strokeWidth={1.5} className="shrink-0" />
+              <span className="whitespace-nowrap">Mes joueurs</span>
+            </button>
+
+            {/* Barre de recherche — prend tout l'espace restant */}
+            <div className="flex-1 min-w-0">
+              <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
+            </div>
+          </div>
+
+          {/* Backdrop — ferme le volet au clic */}
+          {panelOpen && (
+            <div
+              className="fixed inset-0 z-40 cursor-default"
+              onClick={() => setPanelOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+
+          {/* Contenu profil — apparaît après sélection */}
+          {selectedPlayer && (
+            <div className="space-y-5 animate-in fade-in duration-200">
+              {/* Header nom joueur + SurfaceSelector */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div>
+                    <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
+                    {selectedPlayer.rank && (
+                      <p className="text-xs text-[var(--text-3)] mt-0.5">
+                        ATP #{selectedPlayer.rank}
+                      </p>
+                    )}
                   </div>
-                ))}
+                </div>
+                <SurfaceSelector
+                  selectedSurface={selectedSurface}
+                  onSurfaceChange={(s) => setSelectedSurface(s)}
+                />
               </div>
-            ) : (
-              <PlayerMetricCards
-                surface={selectedSurface}
-                playerStats={selectedPlayer}
-                atpAverages={atpAverages}
-              />
-            )}
 
-            {/* Chart d'évolution des métriques */}
-            {!loadingProfile && (
-              <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
-            )}
+              {/* Loading state */}
+              {loadingProfile ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
+                      <div className="h-2.5 bg-white/[0.06] rounded w-20 mb-3" />
+                      <div className="h-6 bg-white/[0.05] rounded w-16 mb-2" />
+                      <div className="h-2 bg-white/[0.04] rounded w-28" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <PlayerMetricCards
+                  surface={selectedSurface}
+                  playerStats={selectedPlayer}
+                  atpAverages={atpAverages}
+                />
+              )}
 
-            {/* Historique des matchs */}
-            {!loadingProfile && (
-              <MatchHistoryTable
-                matchHistory={matchHistory}
-                selectedPlayerName={selectedPlayer.player_name}
-                onOpenMetrics={handleOpenMetrics}
-              />
-            )}
-          </div>
-        )}
+              {/* Chart d'évolution des métriques */}
+              {!loadingProfile && (
+                <PlayerStatsChart statsHistory={selectedPlayer.stats_history} />
+              )}
+
+              {/* Historique des matchs */}
+              {!loadingProfile && (
+                <MatchHistoryTable
+                  matchHistory={matchHistory}
+                  selectedPlayerName={selectedPlayer.player_name}
+                  onOpenMetrics={handleOpenMetrics}
+                />
+              )}
+            </div>
+          )}
+
+          {/* État initial — rien n'est sélectionné */}
+          {!selectedPlayer && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal métriques pré-match */}
