@@ -1,9 +1,9 @@
 import Link from 'next/link'
 
 const footerLinks = {
-  Product: ['Metrics', 'Pricing', 'API Docs', 'Changelog'],
-  Legal: ['Privacy Policy', 'Terms of Service', 'Disclaimer'],
-  Company: ['About', 'Contact', 'Blog'],
+  Produit: ['Métriques', 'Tarifs', 'Docs API', 'Changelog'],
+  ['Mentions_légales']: ['Confidentialité', 'CGU', 'Avertissement'],
+  Entreprise: ['À propos', 'Contact', 'Blog'],
 }
 
 export default function Footer() {
@@ -23,11 +23,11 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-[var(--text-3)] max-w-xs leading-relaxed mb-6">
-              The analytical layer that serious bettors use to price ATP matches. Data-driven. No predictions.
+              La couche analytique que les parieurs sérieux utilisent pour évaluer les cotes des matchs ATP. Axée sur les données. Sans predictions.
             </p>
             {/* Tagline */}
             <p className="text-base font-semibold tracking-tight text-[var(--accent)]">
-              Not tips. Data.
+              Pas de tips. Des données.
             </p>
           </div>
 
@@ -56,7 +56,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center border-t border-[var(--border-md)] pt-8 gap-4">
           <p className="text-xs text-[var(--text-3)]">
-            © 2024 Haurus. All rights reserved.
+            © 2024 Haurus. Tous droits réservés.
           </p>
 
           {/* Social links */}
@@ -86,7 +86,7 @@ export default function Footer() {
 
         {/* Legal disclaimer */}
         <p className="text-xs text-[var(--text-3)] mt-6 leading-relaxed max-w-2xl">
-          Haurus provides statistical data only. No predictions or betting advice. All data is for informational purposes.
+          Haurus fournit uniquement des données statistiques. Pas de predictions ni de conseils de pari. Toutes les données sont à titre informatif uniquement.
         </p>
       </div>
     </footer>

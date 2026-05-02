@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Tracking Dashboard** — Track and monitor player performance with detailed profiles
+- **Landing Page Sections** — Hero, Why Haurus, Metrics Showcase, Social Proof, and CTA Banner components
 - **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
@@ -92,37 +92,34 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs instantly.
 
 **Run all tests:**
-
 ```bash
 npx jest
 ```
 
 **Run a specific test file:**
-
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
 **Watch mode (re-runs on file change):**
-
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — all tests in that file passed, everything works ✅
-- `FAIL` — something broke, the output shows which test failed and why ❌
+**Understanding test output:**
+- `PASS` — everything works correctly
+- `FAIL` — something broke, read the error message below to see what needs fixing
 
-**What gets tested:**
-- Auth validators (email, password strength)
-- Authentication flow
-- Dashboard metric formatting and calculations
-- Utility functions (class merging, string formatting, date helpers)
+**Tests cover:**
+- Authentication validators and helpers
+- Dashboard formatting and metrics utilities
+- Common utility functions (className merging, etc.)
 
 ## 📁 Project Structure
 
-- `src/components/ui` — Reusable UI building blocks (cards, buttons, inputs)
-- `src/components/sections` — Page section components (CTAs, banners, layouts)
+- `src/components/layout` — Navbar and Footer layout components
+- `src/components/sections` — Landing page section components (Hero, CTABanner, etc.)
+- `src/components/ui` — Reusable UI components like PricingCard
 
 ## 🚀 Deploy to Vercel
 
@@ -133,12 +130,12 @@ npx jest --watch
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL` — paste your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — paste your anon public key
-5. Click **Deploy** — Vercel will automatically detect Next.js and configure everything
+4. Add all variables from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables must be added in Vercel before deploying. If you forget one, the app will crash at runtime.
+Your app will be live on a `.vercel.app` URL within seconds.
 
 ## 📝 License
 

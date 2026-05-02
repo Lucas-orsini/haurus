@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { getSession, signOut, type AuthUser } from '@/lib/auth'
 
 const navLinks = [
-  { label: 'Metrics', href: '#metrics' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'About', href: '#about' },
+  { label: 'Métriques', href: '#metrics' },
+  { label: 'Tarifs', href: '#pricing' },
+  { label: 'À propos', href: '#about' },
 ]
 
 export default function Navbar() {
@@ -91,7 +91,7 @@ export default function Navbar() {
                       className="flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
                     >
                       <User size={13} strokeWidth={1.5} className="shrink-0" />
-                      Profile
+                      Profil
                     </Link>
                     <button
                       onClick={handleSignOut}
@@ -116,7 +116,7 @@ export default function Navbar() {
                 href="#pricing"
                 className="h-8 px-4 flex items-center justify-center rounded-full text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] hover:scale-[1.02] transition-all duration-200 shadow-[0_0_16px_rgba(242,203,56,0.25)] hover:shadow-[0_0_24px_rgba(242,203,56,0.40)]"
               >
-                Get started
+                Commencer
               </Link>
             </div>
           )}
@@ -126,7 +126,7 @@ export default function Navbar() {
         <button
           className="md:hidden w-8 h-8 flex items-center justify-center text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors"
           onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
         >
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -173,7 +173,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] transition-colors"
               >
-                Get started
+                Commencer
               </Link>
             </>
           )}

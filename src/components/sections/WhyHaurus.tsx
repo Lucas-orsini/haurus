@@ -20,8 +20,8 @@ const points = [
     iconBg: 'bg-[rgba(242,203,56,0.08)]',
     iconBorder: 'border-[rgba(242,203,56,0.15)]',
     glowColor: '#F2CB38',
-    title: 'The same layer as the books',
-    desc: 'Bookmakers price odds using Glicko-2, serve/return efficiency, and pressure indices. Haurus gives you that exact analytical layer.',
+    title: 'La même couche que les bookmakers',
+    desc: 'Les bookmakers fixent leurs cotes en utilisant Glicko-2, l\'efficacité au service/retour et les indices de pression. Haurus vous donne exactement cette couche analytique.',
   },
   {
     icon: Eye,
@@ -29,8 +29,8 @@ const points = [
     iconBg: 'bg-[rgba(59,130,246,0.08)]',
     iconBorder: 'border-[rgba(59,130,246,0.15)]',
     glowColor: '#3b82f6',
-    title: 'No predictions. No tips.',
-    desc: "We don't tell you who to bet on. We give you the raw metrics so you can form your own view — the way analysts do.",
+    title: 'Pas de prédictions. Pas de tips.',
+    desc: 'Nous ne vous disons pas sur qui parier. Nous vous donnons les métriques brutes pour que vous puissiez vous faire votre propre avis — comme les analystes.',
   },
   {
     icon: Layers,
@@ -38,8 +38,8 @@ const points = [
     iconBg: 'bg-[rgba(168,85,247,0.08)]',
     iconBorder: 'border-[rgba(168,85,247,0.15)]',
     glowColor: '#a855f7',
-    title: 'Context over gut feel',
-    desc: 'Surface-adjusted ratings, fatigue signals, and momentum decay models. Numbers over intuition. Always.',
+    title: 'Le contexte plutôt que le feeling',
+    desc: 'Classements ajustés par surface, signaux de fatigue et modèles de décroissance du momentum. Les chiffres plutôt que l\'intuition. Toujours.',
   },
 ]
 
@@ -56,13 +56,13 @@ export default function WhyHaurus() {
           className="text-center mb-16"
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border-md)] bg-[var(--surface-2)] mb-6">
-            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Not a tipster service</span>
+            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Pas un service de tipsters</span>
           </span>
           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-            Built for analysis, not advice
+            Conçu pour l\'analyse, pas pour les conseils
           </h2>
           <p className="text-[var(--text-2)] max-w-xl mx-auto text-sm leading-relaxed">
-            Haurus is a data platform. We surface the numbers. What you do with them is your edge.
+            Haurus est une plateforme de données. Nous exposons les chiffres. Ce que vous en faites constitue votre avantage.
           </p>
         </motion.div>
 
