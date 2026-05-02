@@ -5,7 +5,6 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **Dashboard Sidebar** — Navigation component for dashboard sections
-- **User Profile Modal** — Modal interface for user profile management
 - **Authentication** — Secure authentication powered by Supabase
 - **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
@@ -90,7 +89,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that individual pieces of your app (like helper functions) work correctly. If a test fails, it means something broke.
+Unit tests automatically verify that small pieces of your app (like helper functions) work correctly without needing to run the whole app.
 
 **Run all tests:**
 
@@ -104,27 +103,24 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs on file change):**
+**Watch mode (re-runs tests automatically when files change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Reading Jest output:**
-- `PASS` means all tests in that file passed — everything is working correctly
-- `FAIL` means at least one test failed — Jest will show which test broke and why
-- `FAIL` with a red error message means a test crashed or threw an unexpected error
+**Understanding the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke ❌ — the error message shows exactly which test failed and why
 
-**Tests covered:**
-- Authentication validators and auth logic
-- Dashboard metric formatting
-- Dashboard statistics calculations
-- Utility functions
+**What the tests cover:**
+- Authentication validators and authentication flow
+- Dashboard utilities (metric formatting, stats helpers)
+- General utility functions (className merging with clsx/tailwind-merge)
 
 ## 📁 Project Structure
 
-- `src/lib/` — Core library code: authentication utilities and Supabase database type definitions
-- `src/components/dashboard/` — Dashboard UI components: sidebar navigation and user profile modal
+src/components/dashboard — Dashboard navigation components
 
 ## 🚀 Deploy to Vercel
 
@@ -132,16 +128,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (select your `haraus` repo)
-3. Vercel will auto-detect Next.js — click **Deploy**
-4. Once deployed, go to your project → **Settings** → **Environment Variables**
-5. Add the same variables from your `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL` → paste your Supabase Project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → paste your Supabase anon public key
-6. **Redeploy** (optional) — Vercel will rebuild with the new environment variables
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository
+3. Add your environment variables in Vercel:
+   - Go to **Settings** → **Environment Variables**
+   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase Project URL
+   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your Supabase anon public key
+4. Click **Deploy**
 
-> ⚠️ Make sure all environment variables are added in Vercel before your app can connect to Supabase in production.
+Your app will be live at a Vercel URL (e.g., `your-app.vercel.app`) once deployment completes.
 
 ## 📝 License
 
