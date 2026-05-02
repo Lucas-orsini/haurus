@@ -19,7 +19,6 @@ export async function DELETE(): Promise<Response> {
     .update({
       telegram_chat_id: null,
       telegram_active: false,
-      telegram_token: null,
     })
     .eq('id', user.id)
 

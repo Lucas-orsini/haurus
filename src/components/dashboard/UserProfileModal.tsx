@@ -42,13 +42,6 @@ function getInitials(name: string): string {
   return (first + last).toUpperCase() || '?'
 }
 
-const TELEGRAM_ELIGIBLE_PLANS = ['starter', 'analyste', 'pro', 'enterprise']
-
-function isTelegramEligible(plan: string | null | undefined): boolean {
-  if (!plan) return false
-  return TELEGRAM_ELIGIBLE_PLANS.includes(plan)
-}
-
 export default function UserProfileModal({ user, onClose, onUpdateSuccess }: UserProfileModalProps) {
   const [name, setName] = useState(user.name ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '')
@@ -65,8 +58,6 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
         ? 'connected'
         : 'suspended'
       : 'not-connected'
-
-  const isEligible = isTelegramEligible(user.plan ?? null)
 
   // Fermer sur Escape
   useEffect(() => {
@@ -114,14 +105,9 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
       const res = await fetch('/api/telegram/disconnect', { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error ?? 'Erreur de deconnexion')
+        throw new Error(data.error ?? 'Erreur de déconnexion')
       }
-      onUpdateSuccess({
-        ...user,
-        telegramToken: null,
-        telegramChatId: null,
-        telegramActive: false,
-      } as AuthUser)
+      onUpdateSuccess(user)
     } catch (err) {
       setDisconnectError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
@@ -234,7 +220,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichees par defaut</p>
+                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par défaut</p>
                   </div>
 
                   {/* Photo URL */}
@@ -288,7 +274,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Erreur persistante */}
                   {saveState === 'error' && (
                     <p className="text-xs text-[var(--red)] leading-tight">
-                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez reessayer.
+                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez réessayer.
                     </p>
                   )}
                 </div>
@@ -305,23 +291,15 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   </p>
                 </div>
 
-                {/* etat B — Connecte et actif */}
+                {/* État B — Connecté et actif */}
                 {telegramTab === 'connected' && (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
-                        ✅ Telegram connecte
+                        ✅ Telegram connect&eacute;
                       </span>
                     </div>
-
-                    {!isEligible && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--yellow)]/10 border border-[var(--yellow)]/25">
-                        <span className="text-xs text-[var(--yellow)] leading-relaxed">
-                          Acces suspendu — votre plan ne couvre plus Telegram
-                        </span>
-                      </div>
-                    )}
 
                     <div className="flex items-center gap-2">
                       <Button
@@ -344,10 +322,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             >
                               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                             </svg>
-                            Deconnexion...
+                            D&eacute;connexion...
                           </>
                         ) : (
-                          'Deconnecter'
+                          'D&eacute;connecter'
                         )}
                       </Button>
                     </div>
@@ -358,16 +336,16 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   </div>
                 )}
 
-                {/* etat C — Connecte mais suspendu */}
+                {/* État C — Connecté mais suspendu */}
                 {telegramTab === 'suspended' && (
                   <div className="flex flex-col gap-4">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                      bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
-                      ⚠️ Notifications suspendues
+                      &#9888;&nbsp;Notifications suspendues
                     </span>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      Votre plan actuel ne donne pas acces aux notifications Telegram.
+                      Votre plan actuel ne donne pas acc&egrave;s aux notifications Telegram.
                     </p>
 
                     {user.telegram_token && (
@@ -382,6 +360,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             variant="secondary"
                             size="sm"
                             onClick={handleCopyToken}
+                            disabled={copyFeedback}
                             iconLeft={
                               copyFeedback ? (
                                 <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
@@ -390,7 +369,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copyFeedback ? 'Copie !' : "Copier le token"}
+                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
                           </Button>
                         </div>
                       </div>
@@ -398,21 +377,22 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   </div>
                 )}
 
-                {/* etat A — Non connecte */}
+                {/* État A — Non connecté */}
                 {telegramTab === 'not-connected' && (
                   <div className="flex flex-col gap-4">
-                    {user.telegram_token ? (
+                    {user.telegramToken ? (
                       <div className="flex flex-col gap-1.5">
                         <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
-                            {user.telegram_token}
+                            {user.telegramToken}
                           </code>
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={handleCopyToken}
+                            disabled={copyFeedback}
                             iconLeft={
                               copyFeedback ? (
                                 <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
@@ -421,7 +401,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copyFeedback ? 'Copie !' : "Copier le token"}
+                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
                           </Button>
                         </div>
                       </div>
@@ -433,7 +413,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       <p className="text-xs text-[var(--text-3)] leading-relaxed">
                         Ouvrez{' '}
                         <span className="font-mono text-[var(--text-2)]">@{telegramBotUsername}</span>{' '}
-                        sur Telegram et envoyez :
+                        sur Telegram et envoyez&nbsp;:
                       </p>
                       <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
