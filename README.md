@@ -4,9 +4,8 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
 - **Authentication** — Secure user authentication powered by Supabase
-- **Profile Management** — Edit and update your user profile with an intuitive form
-- **Settings Dashboard** — Manage your account settings from a dedicated settings page
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
 
@@ -18,15 +17,16 @@ The metrics bookmakers use. Now yours.
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Auth & Database**: Supabase
+- **Charts**: Recharts
 - **Testing**: Jest with React Testing Library
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Node.js 18+** — [Download here](https://nodejs.org/)
-- **A code editor** — [VS Code](https://code.visualstudio.com/) recommended
-- **Git installed**
+- Node.js 18+ — [Download here](https://nodejs.org/)
+- A code editor — [VS Code](https://code.visualstudio.com/) recommended
+- Git installed
 
 ### 1. Clone the repository
 
@@ -45,7 +45,9 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to Supabase.
 
-If you're new to this: open VS Code, press `` Ctrl+N `` (or `` Cmd+N `` on Mac) to create a new file, then save it as `.env.local` in the project folder.
+```bash
+touch .env.local
+```
 
 Open `.env.local` in your code editor and paste the following template:
 
@@ -98,32 +100,33 @@ npx jest
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
+npx jest __tests__/dashboard/formatMetric.test.ts
+npx jest __tests__/lib/dashboard/stats.test.ts
+npx jest __tests__/lib/utils.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
-**Watch mode (re-runs on file change):**
+**Watch mode (re-runs automatically when you save a file):**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — all tests in that file passed ✅
-- `FAIL` — something broke, check the error message below for details
+**How to read Jest output:**
+- `PASS` — everything is working ✅
+- `FAIL` — something broke ❌ (Jest will show which test failed and why)
 
-**What the tests cover:**
-
-- `__tests__/auth-validators.test.ts` — Validation logic for authentication inputs
-- `__tests__/auth.test.ts` — Authentication flow and user session handling
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting in the dashboard
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — Utility functions used across the app
-- `__tests__/utils.test.ts` — General purpose utilities
+**Tests cover:**
+- Authentication validators and flow
+- Dashboard utilities and metric formatting
 
 ## 📁 Project Structure
 
-- `src/lib` — Supabase client setup and authentication utilities
-- `src/app` — Next.js App Router pages and API routes
-- `src/components` — React components (dashboard UI components)
+Only folders that contain actual files are listed below.
+
+- `src/components/dashboard/player` — Player profile dashboard component
+- `__tests__` — Jest unit tests for auth, dashboard, and utilities
 
 ## 🚀 Deploy to Vercel
 
@@ -131,17 +134,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Push your code to GitHub (if you haven't already)
-2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
-3. Click **Import Project** → select your repository
-4. Vercel auto-detects Next.js — just click **Deploy**
-5. Add your environment variables:
-   - Go to your project → **Settings** → **Environment Variables**
-   - Add `NEXT_PUBLIC_SUPABASE_URL` with your Supabase project URL
-   - Add `NEXT_PUBLIC_SUPABASE_ANON_KEY` with your anon public key
-6. Redeploy (Vercel will trigger a new deploy automatically after adding env vars)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add each variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables from your `.env.local` must be added to Vercel, otherwise your app will crash at runtime.
+> ⚠️ **Important**: Without these environment variables, your app will crash on Vercel. Make sure to add all of them before deploying.
 
 ## 📝 License
 
