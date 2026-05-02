@@ -45,41 +45,41 @@ const SERVICE_RETOUR_METRICS: MetricDefinition[] = [
     id: 'p-serve',
     name: 'P-Serve',
     plan: 'Pro',
-    shortDescription: 'Pourcentage de points gagnés sur son propre jeu de service.',
+    shortDescription: 'Probabilité de remporter un point au service.',
     expertDescription:
-      "Le P-Serve représente la proportion de points que le joueur gagne lorsqu'il sert. Un P-Serve de 0.65 signifie que le joueur gagne 65 % de ses points sur son service. Les serveurs d'élite dépassent régulièrement 0.68 sur dur. Cette métrique est spécifique à la surface — un joueur peut avoir un P-Serve excellent sur dur (0.68) mais moyen sur terre battue (0.61). Elle est calculée sur une fenêtre de 52 semaines glissantes, pondérée par l'importance du tournoi.",
+      'Calculée sur les matchs récents du joueur, pondérée par surface. Plus la valeur est proche de 100%, plus le joueur est dominant au service.',
   },
   {
     id: 'p-return',
     name: 'P-Return',
     plan: 'Pro',
-    shortDescription: 'Pourcentage de points gagnés en retour de service.',
+    shortDescription: 'Probabilité de remporter un point en retour de service.',
     expertDescription:
-      "Le P-Return mesure la proportion de points gagnés par le joueur lorsqu'il est en position de retour. Un P-Return de 0.35 signifie que le joueur gagne 35 % des points lorsqu'il retourne. Les meilleurs returners ATP (Nadal, Djokovic) dépassent 0.38 sur terre battue. La somme P-Serve + P-Return approche 1 sur les surfaces lentes (terre battue) et descend sous 0.90 sur gazon. Cette métrique est calculée sur la même fenêtre de 52 semaines que P-Serve.",
+      'Calculée sur les matchs récents. Elle reflète la capacité globale à gêner l\'adversaire sur son service. Plus la valeur est haute, plus le joueur est efficace en retour.',
   },
   {
     id: 'tsd',
     name: 'TSD',
     plan: 'Pro',
-    shortDescription: 'Différentiel de qualité du service entre le 1er et le 2e service.',
+    shortDescription: 'Score comparatif du service par rapport à la moyenne ATP sur cette surface.',
     expertDescription:
-      "Le TSD (Toss-Stability Differential) évalue la dégradation du jeu de service entre le premier et le deuxième service. Un TSD proche de 0 signifie que le joueur maintient un niveau de service constant. Un TSD négatif (ex : -0.05) indique que le deuxième service est significativement plus faible — ce qui crée une situation favorable pour l'adversaire. Un TSD positif rare signifie que le joueur joue mieux sous pression. Typiquement, les joueurs Top 10 ont un TSD entre -0.03 et +0.02.",
+      "Un score positif indique que le joueur est au-dessus de la moyenne ATP sur cette surface, négatif qu'il est en dessous. Permet de comparer des joueurs de niveaux différents sur un pied d'égalité.",
   },
   {
     id: 'bppi',
     name: 'BPPI',
     plan: 'Pro',
-    shortDescription: 'Balance Points Per Intake — indicateur de domination globale sur le service.',
+    shortDescription: 'Mesure la résistance du joueur sur les balles de break.',
     expertDescription:
-      "Le BPPI combine P-Serve et P-Return en un différentiel unique. Il est calculé comme (P-Serve − P-Return) pour chaque set, puis moyenné. Un BPPI positif signifie que le joueur domine les échanges de service (il gagne plus de points sur son service qu'il n'en concède au retour). Les serveurs purs (Isner, Opelka) ont des BPPI très positifs (>0.15). Les returners exceptionnels ont des BPPI proches de 0 ou légèrement négatifs. Une valeur proche de 0 sur terre battue est souvent signe d'un joueur complet.",
+      "Un score positif indique qu'il sauve plus de balles de break que ce que ses statistiques de service laissent attendre — signe de solidité mentale sur les moments clés.",
   },
   {
     id: 'map',
     name: 'MAP',
     plan: 'Free',
-    shortDescription: 'Probabilité victoire modélisée — probabilité estimée de victoire du joueur.',
+    shortDescription: 'Probabilité théorique de remporter le match.',
     expertDescription:
-      "Le MAP (Model Assigned Probability) est la probabilité de victoire du joueur telle que calculée par le modèle Haurus, intégrant Glicko-2, historique surface, fatigue, repos et dynamique de forme. Elle est exprimée en pourcentage (ex : 67 %). Un MAP supérieur à la probabilité implicite du bookmaker indique un edge potentiel. Le MAP est recalculé à chaque nouveau match_stats load et ne représente pas une moyenne glissante — c'est une snapshot conditionnelle au match regardé.",
+      'Calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes — reflète uniquement le niveau de jeu récent.',
   },
 ]
 
@@ -90,25 +90,25 @@ const RATING_NIVEAU_METRICS: MetricDefinition[] = [
     id: 'classement-atp',
     name: 'Classement ATP',
     plan: 'Free',
-    shortDescription: 'Position du joueur au classement officiel ATP au moment du match.',
+    shortDescription: 'Rang officiel ATP du joueur.',
     expertDescription:
-      "Le classement ATP officiel au jour du match, issu de la snapshot match_stats. Il reflète le niveau de forme récent du joueur — un classement en hausse signale une dynamique positive, une chute de plusieurs ranks sur 6 mois peut indiquer une fatigue accumulée ou un problème de confiance. Le classement ATP n'intègre pas la surface ni les conditions de jeu — un joueur rank 50 peut être favori contre un rank 20 sur une surface où il domine historiquement.",
+      "Donne une indication du niveau général mais ne reflète pas les spécificités par surface ni la forme récente.",
   },
   {
     id: 'glicko-2',
     name: 'Glicko-2',
     plan: 'Free',
-    shortDescription: 'Système de rating dynamique intégrant le niveau et la fiabilité du joueur.',
+    shortDescription: 'Système de rating calculé séparément pour chaque surface.',
     expertDescription:
-      "Le Glicko-2 est un système de rating développé par Mark Glickman, utilisé par Haurus pour évaluer le niveau global du joueur avec une incertitude (RD — Rating Deviation). Plus le RD est faible, plus le rating est fiable. Un RD élevé (ex : >200) signifie que le joueur n'a pas joué récemment et son rating peut varier fortement au prochain match. Le Glicko-2 est spécifique à la surface — un joueur peut avoir 1750 sur dur et 1680 sur terre battue. La formule d'impact combine le différentiel de rating avec la fiabilité respective des deux joueurs.",
+      'Plus précis que le classement ATP car il se met à jour après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, plus le joueur est fort sur cette surface.',
   },
   {
     id: 'delta-rank-6m',
     name: 'Δ Rank 6 mois',
     plan: 'Enterprise',
-    shortDescription: 'Variation du classement ATP sur les 6 derniers mois — dynamique longue durée.',
+    shortDescription: 'Évolution du classement ATP sur les 6 derniers mois.',
     expertDescription:
-      "La différence entre le classement ATP actuel et le classement ATP d'il y a 6 mois. Une valeur négative (ex : -12) signifie que le joueur a progressé de 12 places. Une valeur positive signifie une régression. Cette métrique est disponible uniquement sur le plan Enterprise car elle permet d'identifier des joueurs en reconstitution (hausse progressive du rank après une longue absence) ou en déclin progressif — signaux forts pour les paris à plus-value. Elle est calculée via la table player_stats.delta_rank_6m.",
+      "Une valeur négative signifie que le joueur a progressé au classement, positive qu'il a reculé. Permet de détecter les joueurs en train de monter ou de décrocher sur le moyen terme.",
   },
 ]
 
@@ -119,49 +119,49 @@ const FORME_DYNAMIQUE_METRICS: MetricDefinition[] = [
     id: 'forme',
     name: 'Forme',
     plan: 'Free',
-    shortDescription: 'Historique des 5 derniers résultats — Victoires (V) et Défaites (D).',
+    shortDescription: 'Résultats des 5 derniers matchs joués.',
     expertDescription:
-      "Représente les 5 derniers matchs du joueur avec le résultat de chacun. L'ordre est chronologique (le plus ancien à gauche, le plus récent à droite). L'encodage est V = victoire, D = défaite, N = non-joué (wildcard, bye). Une série de 4 à 5 V consécutives signale un joueur en confiance — souvent corrélé avec un momentum positif. Une série de 3+ D consécutives peut signaler un problème physique ou mental. Attention : cette métrique ne tient pas compte de la qualité de l'adversaire battu.",
+      'V = victoire, D = défaite. Les matchs sont affichés du plus ancien au plus récent. Donne une lecture immédiate de la séquence de résultats récents.',
   },
   {
     id: 'win-rate-td',
     name: 'Win Rate TD',
     plan: 'Pro',
-    shortDescription: 'Pourcentage de matchs gagnés sur les 30 derniers jours — dynamique récente.',
+    shortDescription: 'Pourcentage de victoires récentes toutes surfaces confondues.',
     expertDescription:
-      "Le Win Rate TD (Trailing Dynamic) calcule le pourcentage de victoires sur les 30 derniers jours, toutes surfaces confondues. Un WR de 0.80 signifie 80 % de victoires sur la fenêtre récente. Cette métrique lisse les résultats courts (1-2 matchs) et donne une tendance fiable. Elle est pondérée par l'importance du match (un titre WTA 1000 compte plus qu'un ITF). Comparer le Win Rate TD au Win Rate Surface TD permet d'identifier les joueurs en forme générale mais irréguliers sur une surface donnée.",
+      'Les matchs récents ont plus de poids que les anciens. Reflète la tendance générale du joueur en ce moment.',
   },
   {
     id: 'win-rate-surface-td',
     name: 'Win Rate Surface TD',
     plan: 'Pro',
-    shortDescription: 'Pourcentage de victoires sur surface identique aux 30 derniers jours.',
+    shortDescription: "Pourcentage de victoires récentes sur la surface de ce tournoi.",
     expertDescription:
-      "Le Win Rate Surface TD calcule le pourcentage de victoires sur les 30 derniers jours UNIQUEMENT sur la surface du match regardé. Un joueur avec un Win Rate TD de 0.60 mais un Win Rate Surface TD de 0.80 sur dur indique une spécialisation surface très forte — signal pertinent pour les paris sur dur (le modèle doit capturer cet edge). Cette métrique est particulièrement discriminante entre joueurs de niveau similaire : la différence entre 0.72 et 0.85 sur dur est souvent décisive.",
+      "Deux joueurs de niveau global similaire peuvent avoir des écarts importants selon la surface. Cette métrique capture directement la performance sur la surface jouée.",
   },
   {
     id: 'momentum-td',
     name: 'Momentum TD',
     plan: 'Pro',
-    shortDescription: 'Indicateur de dynamique — évolution de la forme entre les 2 dernières fenêtres.',
+    shortDescription: "Compare la forme très récente à la forme habituelle sur cette surface.",
     expertDescription:
-      "Le Momentum TD compare le Win Rate de la fenêtre la plus récente (7 derniers jours) à la fenêtre précédente (7-14 jours). Un Momentum de +0.12 signifie que le joueur a gagné 12 points de win rate de plus dans la fenêtre récente. Un Momentum positif est un signal favorable même sur un joueur à win rate global moyen. Le Momentum est particulièrement utile pour les paris sur des joueurs outsiders : un Momentum +0.15 sur un joueur rank 30 contre un rank 10 à Momentum -0.05 est un edge exploitable.",
+      "Une valeur positive signifie que le joueur surperforme par rapport à son niveau habituel en ce moment. Négative, il est en dessous. Détecte les joueurs en montée ou en descente de forme.",
   },
   {
     id: 'breaks-won-td',
     name: 'Breaks Won TD',
     plan: 'Pro',
-    shortDescription: 'Nombre moyen de breaks réalisés par match sur les 30 derniers jours.',
+    shortDescription: 'Nombre moyen de breaks réalisés par match sur cette surface.',
     expertDescription:
-      "Le Breaks Won TD mesure la capacité offensive du joueur au retour — le nombre moyen de games de service adverses breakés par match. Un Breaks Won de 3.2 signifie que le joueur break en moyenne 3.2 fois par match. Les joueurs agressifs au retour (Djokovic, Zverev) dépassent 3.5 sur dur. Cette métrique est lissée sur 30 jours et normalisée par surface. Elle complète le Win Rate Surface TD : un joueur avec un win rate élevé mais peu de breaks-won pourrait gagner ses matchs en dominant ses propres jeux de service plutôt qu'en breakant.",
+      'Mesure la capacité à concrétiser les opportunités sur le service adverse. Un joueur qui breake souvent exerce une pression constante.',
   },
   {
     id: 'breaks-lost-td',
     name: 'Breaks Lost TD',
     plan: 'Pro',
-    shortDescription: 'Nombre moyen de breaks concédés par match sur les 30 derniers jours.',
+    shortDescription: 'Nombre moyen de breaks concédés par match sur cette surface.',
     expertDescription:
-      "Le Breaks Lost TD mesure la fragilité du jeu de service — le nombre moyen de breaks concédés par match. Un Breaks Lost de 1.8 signifie que le joueur concède en moyenne 1.8 breaks par match. Une valeur basse (proche de 1.0) indique un service solide, une valeur haute (>2.5) signale des problèmes de holding. Cette métrique est particulièrement utile pour identifier les matchs à potentiel de over/under — si les deux joueurs ont un Breaks Lost élevé, la probabilité de breaks multiples est forte. Utiliser en complément du BPPI pour une vision complète du ratio service/retour.",
+      "Plus la valeur est basse, mieux le joueur tient son service sous pression. Indicateur de solidité sur les moments décisifs.",
   },
 ]
 
@@ -172,17 +172,17 @@ const CONDITION_PHYSIQUE_METRICS: MetricDefinition[] = [
     id: 'fatigue-72h',
     name: 'Fatigue 72H',
     plan: 'Free',
-    shortDescription: 'Minutes de tennis jouées dans les 72 heures précédant le match.',
+    shortDescription: 'Charge physique accumulée dans les 72 heures avant le match.',
     expertDescription:
-      "La Fatigue 72H cumule le temps de jeu (minutes) du joueur sur les 72 heures précédant le match, incluant tous les matchs et entraînements compétitifs. Une Fatigue 72H de 180 min signifie que le joueur a joué 3 heures dans les 3 derniers jours. Au-delà de 200 min, la performance diminue statistiquement de 8-12 % sur les points importants. Cette métrique est particulièrement critique en fin de Grand Slam où les joueurs enchaînent plusieurs jours sans repos. Un joueur reposé (0-30 min) face à un joueur fatigué (>150 min) est un edge significatif dans les paris sous-estimé par les bookmakers.",
+      "Cumul des minutes jouées dans ce tournoi et dans les 72 heures précédant le match. Plus cette valeur est haute, plus le joueur aborde ce match fatigué.",
   },
   {
     id: 'jours-repos',
     name: 'Jours de repos',
     plan: 'Free',
-    shortDescription: 'Nombre de jours depuis le dernier match compétitif joué.',
+    shortDescription: 'Nombre de jours depuis le dernier match joué.',
     expertDescription:
-      "Le nombre de jours depuis le dernier match compétitif du joueur. 1 jour de repos signifie que le joueur a joué hier — fatigue potentielle mais aussi rythme de match. 7+ jours de repos signifie que le joueur n'a pas joué récemment — il peut être reposé mais aussi « rouillé » (perte de timing, manque de compétition). La recherche montre une relation en U : les joueurs avec 2 à 4 jours de repos ont statistiquement les meilleurs résultats. Au-delà de 14 jours sans compétition, le risque de match référence (sans rythme) augmente significativement.",
+      "Reflète la fraîcheur physique du joueur. Ni trop peu ni trop de repos n'est objectivement meilleur — c'est un élément de contexte.",
   },
 ]
 
