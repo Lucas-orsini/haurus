@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Users } from 'lucide-react'
+import { Users, ChevronLeft } from 'lucide-react'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -292,6 +292,20 @@ export default function PlayerProfileClient() {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="relative w-[280px] shrink-0 overflow-hidden z-50"
           >
+            {/* Bouton "Mes joueurs" visible uniquement volet fermé — affiché dans le volet animé */}
+            {!panelOpen && (
+              <button
+                onClick={() => setPanelOpen(!panelOpen)}
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0 z-50"
+                aria-label="Ouvrir le panneau Mes joueurs"
+              >
+                <Users size={14} strokeWidth={1.5} className="shrink-0" />
+                <span className="whitespace-nowrap">Mes joueurs</span>
+              </button>
+            )}
+
             <TrackedPlayersList
               trackedPlayers={trackedPlayers}
               role={trackedRole}
@@ -299,6 +313,17 @@ export default function PlayerProfileClient() {
               onSelectPlayer={handleSelectTracked}
               onRemovePlayer={handleRemoveTracked}
             />
+
+            {/* Flèche de fermeture — positionnée sur le bord droit du volet, centrée verticalement */}
+            <button
+              onClick={() => setPanelOpen(false)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md
+                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                         text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors duration-150 z-50"
+              aria-label="Fermer le panneau Mes joueurs"
+            >
+              <ChevronLeft size={15} strokeWidth={1.5} className="shrink-0" />
+            </button>
           </motion.div>
         )}
 
@@ -308,16 +333,18 @@ export default function PlayerProfileClient() {
           {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
           <div className="flex items-center gap-3">
             {/* Bouton toggle — visible quand le volet est fermé */}
-            <button
-              onClick={() => setPanelOpen(!panelOpen)}
-              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                         text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-              aria-label={panelOpen ? 'Fermer le panneau Mes joueurs' : 'Ouvrir le panneau Mes joueurs'}
-            >
-              <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">Mes joueurs</span>
-            </button>
+            {!panelOpen && (
+              <button
+                onClick={() => setPanelOpen(!panelOpen)}
+                className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
+                aria-label="Ouvrir le panneau Mes joueurs"
+              >
+                <Users size={14} strokeWidth={1.5} className="shrink-0" />
+                <span className="whitespace-nowrap">Mes joueurs</span>
+              </button>
+            )}
 
             {/* Barre de recherche — prend tout l'espace restant */}
             <div className="flex-1 min-w-0">
@@ -390,9 +417,11 @@ export default function PlayerProfileClient() {
             </div>
           )}
 
-          {/* État initial — rien n'est sélectionné */}
+          {/* État initial — rien n'est sélectionné — centré quand volet fermé */}
           {!selectedPlayer && (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div
+              className={`flex flex-col items-center justify-center py-20 text-center${!selectedPlayer && !panelOpen ? ' min-h-[60vh]' : ''}`}
+            >
               <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center mb-4">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
                   <circle cx="11" cy="11" r="8" />
