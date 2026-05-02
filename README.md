@@ -4,11 +4,12 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Landing Page Sections** — Hero, Why Haurus, Metrics Showcase, Social Proof, and CTA Banner components
+- **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
 - **Authentication** — Secure user authentication powered by Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
 - **Reusable UI Components** — Modular component architecture with TypeScript
+- **Type-Safe Development** — Full TypeScript support for better code quality
 
 ## 🛠️ Tech Stack
 
@@ -89,37 +90,40 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs instantly.
+Unit tests automatically verify that individual functions and components work correctly. Think of it as a quality checker that runs every time you make changes to ensure nothing broke.
 
-**Run all tests:**
+Run all tests:
+
 ```bash
 npx jest
 ```
 
-**Run a specific test file:**
+Run a specific test file:
+
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-**Watch mode (re-runs on file change):**
+Watch mode (re-runs on file change):
+
 ```bash
 npx jest --watch
 ```
 
-**Understanding test output:**
-- `PASS` — everything works correctly
-- `FAIL` — something broke, read the error message below to see what needs fixing
+**Understanding the output:**
+- `PASS` — Everything works correctly, all assertions passed
+- `FAIL` — Something broke, check the error message below for which test failed and why
 
-**Tests cover:**
-- Authentication validators and helpers
-- Dashboard formatting and metrics utilities
-- Common utility functions (className merging, etc.)
+The test suite covers:
+- Authentication validation logic
+- Authentication integration
+- Dashboard metrics formatting
+- Dashboard statistics calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components/layout` — Navbar and Footer layout components
-- `src/components/sections` — Landing page section components (Hero, CTABanner, etc.)
-- `src/components/ui` — Reusable UI components like PricingCard
+`src/lib/metrics` — Metric definitions and data structures for the application
 
 ## 🚀 Deploy to Vercel
 
@@ -127,15 +131,15 @@ npx jest --watch
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
+1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
 3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
 4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+   - `NEXT_PUBLIC_SUPABASE_URL` — your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key
+5. Click **Deploy** — Vercel will automatically build and deploy your app
 
-Your app will be live on a `.vercel.app` URL within seconds.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying, otherwise your app may not work correctly.
 
 ## 📝 License
 
