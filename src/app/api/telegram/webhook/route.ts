@@ -150,9 +150,9 @@ export async function POST(request: Request): Promise<Response> {
   if (!textRaw.startsWith('/connect')) {
     sendTelegramMessage(
       chatId,
-      '👋 Bienvenue sur le bot Haurus.ai !\n\n' +
+      '👋 Bienvenue sur le bot Haurus.io !\n\n' +
         'Pour connecter votre compte, envoyez `/connect [VOTRE_CLÉ]`.\n' +
-        'Votre clé est disponible dans les paramètres de votre dashboard Haurus.ai.'
+        'Votre clé est disponible dans les paramètres de votre dashboard Haurus.io.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
@@ -162,7 +162,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!token) {
     sendTelegramMessage(
       chatId,
-      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.ai et réessayez.'
+      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.io et réessayez.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
@@ -196,7 +196,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!profile) {
     sendTelegramMessage(
       chatId,
-      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.ai et réessayez.'
+      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.io et réessayez.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
@@ -206,7 +206,7 @@ export async function POST(request: Request): Promise<Response> {
     sendTelegramMessage(
       chatId,
       '🔒 Votre plan actuel ne donne pas accès aux notifications Telegram. ' +
-        'Rendez-vous sur Haurus.ai pour mettre à jour votre abonnement.'
+        'Rendez-vous sur Haurus.io pour mettre à jour votre abonnement.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
@@ -215,7 +215,7 @@ export async function POST(request: Request): Promise<Response> {
   if (profile.telegram_chat_id === chatId) {
     sendTelegramMessage(
       chatId,
-      '⚠️ Ce compte Telegram est déjà connecté à votre profil Haurus.ai.'
+      '⚠️ Ce compte Telegram est déjà connecté à votre profil Haurus.io.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
@@ -237,7 +237,7 @@ export async function POST(request: Request): Promise<Response> {
   // Case 6 — success: send confirmation.
   sendTelegramMessage(
     chatId,
-    '✅ Compte Haurus.ai connecté avec succès !\n\n' +
+    '✅ Compte Haurus.io connecté avec succès !\n\n' +
       'Vous recevrez désormais une notification à chaque nouveau match ajouté sur la plateforme.'
   )
 
