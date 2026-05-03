@@ -57,20 +57,21 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL
+# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 # Supabase service role key — server-side only, bypasses RLS completely
-# Used by: /api/telegram/webhook
+# Used by: /api/telegram/webhook (webhook has no session cookie, needs service role)
 SUPABASE_SERVICE_ROLE_KEY=
 
 # Telegram Bot API token — https://core.telegram.org/bots/tutorial#creating-your-first-bot
 TELEGRAM_BOT_TOKEN=
 
-# Telegram webhook secret token — used for HMAC-SHA256 signature verification
+# Telegram webhook secret token — configured when calling setWebhook with secret parameter.
+# Used for HMAC-SHA256 signature verification on incoming webhook requests.
 TELEGRAM_BOT_SECRET=
 ```
 
@@ -91,69 +92,71 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side operations (safe with RLS) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), use `/newbot` command | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — choose a random string, e.g. `openssl rand -hex 32` | Secret token for verifying Telegram webhook requests |
+| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — message `/newbot` and follow the steps | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You choose this — must match when calling `setWebhook` with the secret parameter | Secret token for HMAC-SHA256 webhook signature verification |
 
-**How to find Supabase credentials:**
-1. Go to [app.supabase.com](https://app.supabase.com) and log in
+**To find your Supabase credentials:**
+1. Go to [app.supabase.com](https://app.supabase.com)
 2. Select your project
-3. Click **Project Settings** (gear icon) at the top
-4. Click **API** in the sidebar
-5. Copy **Project URL**, **anon/public key**, and **service_role key** from the corresponding fields
+3. Click **Project Settings** (the gear icon)
+4. Click **API**
+5. Copy the **Project URL** for `NEXT_PUBLIC_SUPABASE_URL`
+6. Copy the **anon public** key for `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+7. Copy the **service_role** secret for `SUPABASE_SERVICE_ROLE_KEY`
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that small pieces of your code (like functions) work correctly without needing the whole app running.
+Unit tests automatically check that individual pieces of your app work correctly — like making sure a function returns the right result or a button does what it should.
 
 Run all tests:
-
 ```bash
 npx jest
 ```
 
 Run a specific test file:
-
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
-
+Run tests in watch mode (re-runs automatically when you save a file):
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- **PASS** ✅ — All tests in that file passed, everything is working
-- **FAIL** ❌ — Something broke, look at the error message below for details on which test failed and why
+**How to read the output:**
+- `PASS` — All tests passed, everything is working ✅
+- `FAIL` — Something broke, check the error message below to see which test failed ❌
 
 **What the tests cover:**
-- Authentication validators and auth logic
-- Dashboard metric formatting
-- Dashboard statistics utilities
-- General utility functions
+- Authentication validators and functions
+- Dashboard utility functions (stats, formatting)
+- General utility functions and helpers
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components
-- `__tests__` — Jest unit and integration tests
+`src/components/dashboard` — Dashboard UI components including the sidebar navigation
 
 ## 🚀 Deploy to Vercel
 
+The easiest way to deploy is with Vercel — the same platform that built Next.js:
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy**
+**Step by step:**
 
-Your app will be live at a `.vercel.app` URL within seconds.
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository
+3. Add all your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add each variable from your `.env.local` file:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `TELEGRAM_BOT_TOKEN`
+     - `TELEGRAM_BOT_SECRET`
+4. Click **Deploy**
+
+Your app will be live at a URL like `your-app.vercel.app` within seconds.
 
 ## 📝 License
 
