@@ -225,7 +225,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
           </div>
 
           {/* Body */}
-          <div className="max-h-[70vh] overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             {/* ── Profil section ── */}
             {activeSection === 'profile' && (
               <form onSubmit={handleSubmit} id="profile-form">
