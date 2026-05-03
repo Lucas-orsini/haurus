@@ -5,10 +5,6 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **User Profile Management** — Modal interface for viewing and managing user profile data
-- **Authentication** — Secure authentication powered by Supabase
-- **Telegram Integration** — Webhook endpoints for connecting and disconnecting Telegram bots
-- **Role-Based Access Control** — Configurable role limits for different user tiers
-- **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Smooth Animations** — Framer Motion for polished transitions
 
@@ -20,7 +16,6 @@ The metrics bookmakers use. Now yours.
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 - **Auth & Database**: Supabase
-- **Charts**: Recharts
 - **Testing**: Jest with React Testing Library
 
 ## 🚀 Quick Start
@@ -88,14 +83,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **anon/public key** | Public key for client-side authentication, safe to expose |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **service_role key** | Server-side key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, search for [@BotFather](https://t.me/botfather), send `/newbot`, follow the prompts, copy the token | Token for your Telegram bot API |
-| `TELEGRAM_BOT_SECRET` | Yes | Any random string you choose (e.g., generate with `openssl rand -hex 32`) | Secret used to verify incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **anon/public key** | Public key for client-side auth |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **service_role key** | Server-side key for webhook handlers (bypasses RLS) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, search `@BotFather`, use `/newbot` command | Token for your Telegram bot API |
+| `TELEGRAM_BOT_SECRET` | Yes | Your custom secret string (e.g. `my-secret-webhook-token-123`) | Used for HMAC-SHA256 webhook signature verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly without needing the full app running.
+Tests automatically check that key parts of the app work correctly (like authentication logic, formatting numbers, and calculating statistics).
 
 ### Run all tests
 
@@ -109,43 +104,36 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-### Run tests in watch mode (re-runs on file change)
+### Watch mode (re-runs on file change)
 
 ```bash
 npx jest --watch
 ```
 
-### Understanding test output
-
-- **PASS** — All assertions passed, the code works as expected
-- **FAIL** — Something broke. The output shows which test failed and why (expected vs. actual value)
+**Reading test output**: `PASS` means everything worked correctly. `FAIL` means something broke — look at the error message below the failure for details on what went wrong.
 
 ### What the tests cover
 
-| Test File | What it tests |
+| Test File | What It Tests |
 |-----------|---------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and behavior |
-| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics calculations |
-| `__tests__/lib/utils.test.ts` | Utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+| `__tests__/auth-validators.test.ts` | Authentication input validation (email format, password rules) |
+| `__tests__/auth.test.ts` | Supabase authentication helpers and session handling |
+| `__tests__/dashboard/formatMetric.test.ts` | Number formatting for dashboard metrics |
+| `__tests__/lib/dashboard/stats.test.ts` | Statistical calculations for dashboard data |
+| `__tests__/lib/utils.test.ts` | General utility functions |
+| `__tests__/utils.test.ts` | Common app utilities |
 
 ## 📁 Project Structure
 
-- `src/app/api/telegram/disconnect` — Telegram disconnect webhook endpoint
-- `__tests__` — Jest unit tests
+- `src/components/dashboard` — Dashboard UI components (UserProfileModal)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository (`haraus`)
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
+2. Import your GitHub repository
+3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
 
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -153,9 +141,7 @@ npx jest --watch
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
 
-5. Click **Deploy**
-
-Your app will be live at `https://your-project.vercel.app` (you can customize the URL in Vercel settings).
+4. Deploy — Vercel auto-detects Next.js settings
 
 ## 📝 License
 
