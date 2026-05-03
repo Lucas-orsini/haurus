@@ -293,20 +293,6 @@ export default function PlayerProfileClient() {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="relative w-[280px] shrink-0 overflow-hidden z-50"
           >
-            {/* Bouton "Mes joueurs" visible uniquement volet fermé — affiché dans le volet animé */}
-            {!panelOpen && (
-              <button
-                onClick={() => setPanelOpen(!panelOpen)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0 z-50"
-                aria-label="Ouvrir le panneau Mes joueurs"
-              >
-                <Users size={14} strokeWidth={1.5} className="shrink-0" />
-                <span className="whitespace-nowrap">Mes joueurs</span>
-              </button>
-            )}
-
             <TrackedPlayersList
               trackedPlayers={trackedPlayers}
               role={trackedRole}
