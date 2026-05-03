@@ -127,8 +127,8 @@ export default function DashboardSidebar() {
                 className={cn(
                   'relative flex items-center justify-start gap-2.5 px-2 h-8 rounded-md text-sm',
                   isActive
-                    ? 'text-[var(--text-1)] font-medium pl-[6px]'
-                    : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-[6px]'
+                    ? 'text-[var(--text-1)] font-medium pl-3'
+                    : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-3'
                 )}
               >
                 <Icon size={15} strokeWidth={1.5} className="shrink-0" />
