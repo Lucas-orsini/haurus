@@ -248,12 +248,13 @@ export default function PlayerProfileClient() {
     if (!supabase) return
 
     try {
+      // Recherche bidirectionnelle : trouve la ligne où les deux joueurs apparaissent
+      // dans n'importe quel ordre (player1=A ET player2=B) OU (player1=B ET player2=A)
       const { data } = await supabase
         .from('match_stats')
         .select('*')
         .eq('date_match', date_match)
-        .eq('player1', player1)
-        .eq('player2', player2)
+        .or(`and(player1.eq.${player1},player2.eq.${player2}),and(player1.eq.${player2},player2.eq.${player1})`)
         .single()
 
       setModalMatchStats(data as MatchStats | null)
