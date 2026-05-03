@@ -353,6 +353,15 @@ export default function PlayerProfileClient() {
             </div>
           </div>
 
+          {/* Backdrop — ferme le volet au clic */}
+          {panelOpen && (
+            <div
+              className="fixed inset-0 z-40 cursor-default"
+              onClick={() => setPanelOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+
           {/* Contenu profil — apparaît après sélection */}
           {selectedPlayer && (
             <div className="space-y-5 animate-in fade-in duration-200">
