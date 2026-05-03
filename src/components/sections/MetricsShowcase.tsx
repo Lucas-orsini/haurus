@@ -428,7 +428,7 @@ export default function MetricsShowcase() {
                 <p className="text-[11px] text-[var(--text-3)]">Indice de pression sur break</p>
               </div>
             </div>
-            <div className="mt-auto flex flex-col items-center justify-center pt-4">
+            <div className="flex-1 flex flex-col items-center justify-center pt-4">
               <div className="text-4xl font-bold text-[var(--accent)] font-mono">
                 <AnimatedCounter target={847} duration={1400} />
               </div>

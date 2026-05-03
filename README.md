@@ -48,7 +48,7 @@ Create a `.env.local` file in the project root. This file stores sensitive crede
 
 **What is `.env.local`?** It's a special file where you store secrets like API keys and passwords. It lives on your computer only — never commit it to GitHub. When the app starts, Next.js reads these variables so your app can talk to Supabase and other services.
 
-To create this file, open your terminal and run:
+To create this file, open your terminal and `cd` into your project folder and run:
 
 ```bash
 touch .env.local
@@ -64,14 +64,12 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 # Supabase service role key — server-side only, bypasses RLS completely
-# Used by: /api/telegram/webhook (webhook has no session cookie, needs service role)
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Telegram Bot API token — https://core.telegram.org/bots/tutorial#creating-your-first-bot
+# Telegram Bot API token
 TELEGRAM_BOT_TOKEN=
 
-# Telegram webhook secret token — configured when calling setWebhook with secret parameter.
-# Used for HMAC-SHA256 signature verification on incoming webhook requests.
+# Telegram webhook secret token
 TELEGRAM_BOT_SECRET=
 ```
 
@@ -90,73 +88,76 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side operations (safe with RLS) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — message `/newbot` and follow the steps | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You choose this — must match when calling `setWebhook` with the secret parameter | Secret token for HMAC-SHA256 webhook signature verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Your Supabase anonymous key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Your Supabase service role key |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search @BotFather → /newbot → follow the steps → copy the token | Your Telegram bot token |
+| `TELEGRAM_BOT_SECRET` | Yes | Set this yourself when calling setWebhook with the secret parameter | A secret string you choose for webhook verification |
 
-**To find your Supabase credentials:**
+To find your Supabase credentials:
+
 1. Go to [app.supabase.com](https://app.supabase.com)
 2. Select your project
 3. Click **Project Settings** (the gear icon)
 4. Click **API**
-5. Copy the **Project URL** for `NEXT_PUBLIC_SUPABASE_URL`
-6. Copy the **anon public** key for `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-7. Copy the **service_role** secret for `SUPABASE_SERVICE_ROLE_KEY`
+5. Copy the **Project URL** into `NEXT_PUBLIC_SUPABASE_URL`
+6. Copy the **anon/public key** (under "Project API keys") into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+7. Copy the **service_role key** (under "Project API keys") into `SUPABASE_SERVICE_ROLE_KEY`
+
+> ⚠️ **Security note**: Never expose `SUPABASE_SERVICE_ROLE_KEY` client-side. It's used server-side only to bypass Row Level Security.
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of your app work correctly — like making sure a function returns the right result or a button does what it should.
+Tests check that individual pieces of code work correctly — like making sure a login function handles wrong passwords properly.
 
 Run all tests:
+
 ```bash
 npx jest
 ```
 
 Run a specific test file:
+
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
 Run tests in watch mode (re-runs automatically when you save a file):
+
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests passed, everything is working ✅
-- `FAIL` — Something broke, check the error message below to see which test failed ❌
+How to read the output:
 
-**What the tests cover:**
-- Authentication validators and functions
-- Dashboard utility functions (stats, formatting)
-- General utility functions and helpers
+- **PASS** — All tests in that file passed ✅
+- **FAIL** — Something broke ❌ (the error message will show which test failed and why)
+
+The project includes tests for authentication validators, auth helpers, metric formatting, dashboard statistics, utility functions, and more.
 
 ## 📁 Project Structure
 
-`src/components/dashboard` — Dashboard UI components including the sidebar navigation
+- `src/components/layout` — Layout components including Footer
+- `src/components/sections` — Section components including MetricsShowcase
+- `__tests__` — Jest test files for components, utilities, and business logic
 
 ## 🚀 Deploy to Vercel
 
-The easiest way to deploy is with Vercel — the same platform that built Next.js:
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all your environment variables in Vercel dashboard:
-   - Go to **Settings** → **Environment Variables**
-   - Add each variable from your `.env.local` file:
-     - `NEXT_PUBLIC_SUPABASE_URL`
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-     - `SUPABASE_SERVICE_ROLE_KEY`
-     - `TELEGRAM_BOT_TOKEN`
-     - `TELEGRAM_BOT_SECRET`
-4. Click **Deploy**
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all the variables from your `.env.local` file:
 
-Your app will be live at a URL like `your-app.vercel.app` within seconds.
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_BOT_SECRET`
+
+5. Click **Deploy**
+
+Vercel will automatically detect Next.js and run the build. Your site will be live at a `vercel.app` URL.
 
 ## 📝 License
 
