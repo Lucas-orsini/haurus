@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { X } from 'lucide-react'
 import { cn, formatMetricValue, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
@@ -18,12 +19,24 @@ export default function MatchMetricsModal({
   isOpen,
   stats,
   playerName,
-  player1,
-  player2,
   onClose,
 }: MatchMetricsModalProps) {
   // Ne rien rendre si le modal est fermé
   if (!isOpen) return null
+
+  // Détection de l'orientation : playerName est-il stocké en player1 (à gauche) en base ?
+  const isPlayerOnLeft = useMemo(
+    () => (stats ? stats.player1 === playerName : true),
+    [stats, playerName]
+  )
+
+  // Noms affichés : toujours playerName à gauche, opponent à droite
+  const leftPlayer  = isPlayerOnLeft ? stats?.player1 : stats?.player2
+  const rightPlayer = isPlayerOnLeft ? stats?.player2 : stats?.player1
+
+  // Ranks affichés selon l'orientation en base (rank_p1 pour le joueur en player1, rank_p2 pour celui en player2)
+  const leftRank  = isPlayerOnLeft ? stats?.rank_p1 : stats?.rank_p2
+  const rightRank = isPlayerOnLeft ? stats?.rank_p2 : stats?.rank_p1
 
   return (
     <div
@@ -68,43 +81,66 @@ export default function MatchMetricsModal({
           </div>
         ) : (
           <div className="px-5 py-5 max-h-[70vh] overflow-y-auto">
-            {/* En-têtes joueurs */}
+            {/* En-têtes joueurs — noms et ranks orientés */}
             <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4 pb-3 border-b border-[var(--border)]">
               <div className="flex flex-col items-center min-w-0">
                 <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                  {player1}
+                  {leftPlayer}
+                </span>
+                <span className="text-[10px] text-[var(--text-3)] font-mono mt-0.5">
+                  {leftRank !== null && leftRank !== undefined ? `#${leftRank}` : '—'}
                 </span>
               </div>
               <div />
               <div className="flex flex-col items-center min-w-0">
                 <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                  {player2}
+                  {rightPlayer}
+                </span>
+                <span className="text-[10px] text-[var(--text-3)] font-mono mt-0.5">
+                  {rightRank !== null && rightRank !== undefined ? `#${rightRank}` : '—'}
                 </span>
               </div>
             </div>
 
-            {/* Métriques — exclut 'Forme' (non demandé dans la spec) */}
+            {/* Métriques — exclut 'Forme' */}
             <div className="space-y-0">
               {METRIC_DEFS.filter((m) => m.label !== 'Forme').map((metric, idx, arr) => {
-                // Cast explicite de la clé pour permettre l'indexation sur MatchStats
                 const p1Key = metric.p1Key as keyof MatchStats
                 const p2Key = metric.p2Key as keyof MatchStats
-                const val1 = stats[p1Key] as number | null
-                const val2 = stats[p2Key] as number | null
-                const [classA, classB] = getMetricColor(
-                  val1,
-                  val2,
-                  // Le mode de METRIC_DEFS dans MatchRow.tsx est 'higher'|'lower'|'neutral'
-                  // On le passe tel quel — getMetricColor accepte ce sous-ensemble
+
+                // Valeurs brutes depuis la base
+                const rawP1 = stats[p1Key] as number | null
+                const rawP2 = stats[p2Key] as number | null
+
+                // Permutation selon orientation : les valeurs du joueur suivi passent à gauche
+                const val1 = isPlayerOnLeft ? rawP1 : rawP2  // valeur affichée à gauche
+                const val2 = isPlayerOnLeft ? rawP2 : rawP1  // valeur affichée à droite
+
+                // Couleurs — si playerName est à droite en base, on permute aussi les couleurs
+                // getMetricColor(rawP1, rawP2, ...) colore "l'avantage" sur la valeur de player1.
+                // Si playerName est en player1 → pas de permutation de couleurs.
+                // Si playerName est en player2 → permuter les couleurs pour qu'elles suivent la permutation des valeurs.
+                let [classA, classB] = getMetricColor(
+                  rawP1,
+                  rawP2,
                   metric.mode as 'higher' | 'lower' | 'neutral'
                 )
+                if (!isPlayerOnLeft) {
+                  // PlayerName est en player2 → permuter les couleurs pour qu'elles restent cohérentes
+                  // avec les valeurs permutées (val1 vient de rawP2, val2 vient de rawP1)
+                  ;[classA, classB] = [classB, classA]
+                }
 
                 const isGlickoP1 = p1Key === 'glicko_rating_p1'
                 const isGlickoP2 = p2Key === 'glicko_rating_p2'
 
-                // Extraire le RD pour Glicko
+                // RD pour Glicko — suivent l'orientation (rd_p1 pour player1 en base, rd_p2 pour player2)
                 const rdP1 = isGlickoP1 ? (stats.glicko_rd_p1 as number | null) : null
                 const rdP2 = isGlickoP2 ? (stats.glicko_rd_p2 as number | null) : null
+
+                // Valeur RD affichée à gauche selon orientation
+                const leftRd  = isPlayerOnLeft ? rdP1 : rdP2
+                const rightRd = isPlayerOnLeft ? rdP2 : rdP1
 
                 return (
                   <div
@@ -114,16 +150,16 @@ export default function MatchMetricsModal({
                       idx < arr.length - 1 && 'border-b border-[var(--border)]'
                     )}
                   >
-                    {/* Valeur P1 */}
+                    {/* Valeur à gauche (playerName si isPlayerOnLeft, opponent sinon) */}
                     <div className="flex flex-col items-center">
                       {isGlickoP1 ? (
                         <>
                           <span className={cn('text-xs font-mono tabular-nums', classA)}>
                             {val1 !== null ? Math.round(val1) : '—'}
                           </span>
-                          {rdP1 !== null && (
+                          {leftRd !== null && (
                             <span className="text-[10px] text-[var(--text-3)] mt-0.5">
-                              RD&nbsp;{Math.round(rdP1)}
+                              RD&nbsp;{Math.round(leftRd)}
                             </span>
                           )}
                         </>
@@ -148,16 +184,16 @@ export default function MatchMetricsModal({
                       </span>
                     </div>
 
-                    {/* Valeur P2 */}
+                    {/* Valeur à droite */}
                     <div className="flex flex-col items-center">
                       {isGlickoP2 ? (
                         <>
                           <span className={cn('text-xs font-mono tabular-nums', classB)}>
                             {val2 !== null ? Math.round(val2) : '—'}
                           </span>
-                          {rdP2 !== null && (
+                          {rightRd !== null && (
                             <span className="text-[10px] text-[var(--text-3)] mt-0.5">
-                              RD&nbsp;{Math.round(rdP2)}
+                              RD&nbsp;{Math.round(rightRd)}
                             </span>
                           )}
                         </>

@@ -4,13 +4,11 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Telegram Webhook Integration** — Webhook endpoints for receiving and processing Telegram bot updates with HMAC-SHA256 signature verification
-- **Secure Server-Side Operations** — Service role key usage for webhook endpoints that bypass Supabase Row Level Security
-- **Authentication** — Secure authentication powered by Supabase
-- **Role-Based Access Control** — Configurable role limits for different user tiers
-- **Metrics Dashboard** — Display and visualize key performance metrics with Recharts
+- **Player Profile Dashboard** — Display player information and performance data with interactive components
+- **Match Metrics Visualization** — Visualize and analyze match performance metrics using Recharts
+- **Secure Authentication** — Secure authentication powered by Supabase with Row Level Security
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
-- **Smooth Animations** — Framer Motion for polished transitions
+- **Smooth Animations** — Framer Motion for polished transitions and interactions
 
 ## 🛠️ Tech Stack
 
@@ -48,7 +46,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to external services.
 
-**What is `.env.local`?** It's a special file where you store secrets like API keys and passwords. It lives on your computer only — never commit it to GitHub. When the app starts, Next.js reads these variables so your app can talk to Supabase, Telegram, and other services.
+**What is `.env.local`?** It's a special file where you store secrets like API keys and passwords. It lives on your computer only — never commit it to GitHub. When the app starts, Next.js reads these variables so your app can talk to Supabase and other services.
 
 To create this file, open your terminal and run:
 
@@ -84,29 +82,29 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac), then type the command above.
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac), then type the command above.
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side authentication |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), use `/newbot` command | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this when configuring your webhook (any random string you choose) | Secret token for verifying incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side operations (safe with RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Service role key for server-side operations (bypasses RLS) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather → /newbot command | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | No | You choose this value when setting up your webhook | Secret token for HMAC-SHA256 webhook verification |
 
 To find your Supabase credentials:
 
 1. Go to [app.supabase.com](https://app.supabase.com)
 2. Select your project
 3. Click **Project Settings** (gear icon)
-4. Click **API**
-5. Copy the **Project URL**, **anon/public key**, and **service_role secret**
+4. Click **API** in the sidebar
+5. Copy the **Project URL**, **anon public key**, and **service_role secret key**
 
 ## 🧪 Running Tests
 
-Unit tests verify that individual pieces of code work correctly without needing the full app running.
+Unit tests check that individual pieces of your app work correctly — like making sure a function returns the right result or a component displays correctly.
 
 Run all tests:
 
@@ -120,46 +118,43 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+Run tests in watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-Reading Jest output:
-- **PASS** (green) = all tests in that file passed ✅
-- **FAIL** (red) = something broke, Jest will show exactly which test failed and why
+**Reading Jest output:**
+- `PASS` — All tests passed ✓
+- `FAIL` — Something broke. Check the error message below for what went wrong
 
-Test coverage:
-
-- `__tests__/auth.test.ts` — Authentication flow tests
-- `__tests__/auth-validators.test.ts` — Authentication validation logic
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting for the dashboard
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — Library utility functions
-- `__tests__/utils.test.ts` — General utility functions
+The test suite covers authentication validation, auth flows, dashboard metrics formatting, stats calculations, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the user profile modal
+- `src/components/dashboard/player` — Player dashboard components (profile display and match metrics visualization)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+### Step by step:
+
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
-3. Add all environment variables in Vercel dashboard:
-   - Go to **Settings** → **Environment Variables**
-   - Add each variable from your `.env.local` file:
-     - `NEXT_PUBLIC_SUPABASE_URL`
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-     - `SUPABASE_SERVICE_ROLE_KEY`
-     - `TELEGRAM_BOT_TOKEN`
-     - `TELEGRAM_BOT_SECRET`
+3. In the **Environment Variables** section, add all variables from your `.env.local` file:
+
+| Name | Value |
+|------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | (your Supabase URL) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (your Supabase anon key) |
+| `SUPABASE_SERVICE_ROLE_KEY` | (your Supabase service role key) |
+| `TELEGRAM_BOT_TOKEN` | (your Telegram bot token) |
+| `TELEGRAM_BOT_SECRET` | (your Telegram webhook secret) |
+
 4. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables must be added in Vercel before deploying. The app will fail to build if Supabase credentials are missing.
+Your app will be live at a Vercel URL (e.g., `your-app.vercel.app`) once the build completes.
 
 ## 📝 License
 
