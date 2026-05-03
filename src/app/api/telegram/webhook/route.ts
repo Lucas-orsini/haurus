@@ -143,11 +143,27 @@ export async function POST(request: Request): Promise<Response> {
   const chatId = message.chat.id
   const text = message.text
 
-  // ── Step 3: Extract /connect token ─────────────────────────────────────────
-  const token = extractConnectToken(text)
+  // ── Step 3: Route based on message content ─────────────────────────────────
+  const textRaw = text?.trim() ?? ''
 
-  // Acknowledge non-connect messages without responding.
+  // Case 1 — message does not start with /connect: send welcome message.
+  if (!textRaw.startsWith('/connect')) {
+    sendTelegramMessage(
+      chatId,
+      '👋 Bienvenue sur le bot Haurus.ai !\n\n' +
+        'Pour connecter votre compte, envoyez `/connect [VOTRE_CLÉ]`.\n' +
+        'Votre clé est disponible dans les paramètres de votre dashboard Haurus.ai.'
+    )
+    return Response.json({ ok: true }, { status: 200 })
+  }
+
+  // Case 2 — /connect without a token after the prefix: send error message.
+  const token = extractConnectToken(text)
   if (!token) {
+    sendTelegramMessage(
+      chatId,
+      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.ai et réessayez.'
+    )
     return Response.json({ ok: true }, { status: 200 })
   }
 
@@ -166,7 +182,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const { data: profile, error: profileError } = await adminClient
     .from('profiles')
-    .select('id, role, telegram_active')
+    .select('id, role, telegram_active, telegram_chat_id')
     .eq('telegram_token', token)
     .maybeSingle()
 
@@ -176,23 +192,35 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: true }, { status: 200 })
   }
 
+  // Case 3 — token not found in profiles: send error message.
   if (!profile) {
-    // Token not found — send error message asynchronously.
-    sendTelegramMessage(chatId, '❌ Token invalide ou expiré.')
-    return Response.json({ ok: true }, { status: 200 })
-  }
-
-  // ── Step 5: Determine response based on role eligibility ───────────────────
-  if (!ELIGIBLE_ROLES.has(profile.role)) {
-    // Role not eligible — notify user without changing DB state.
     sendTelegramMessage(
       chatId,
-      '⚠️ Votre plan actuel ne donne pas accès aux notifications Telegram.'
+      '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.ai et réessayez.'
     )
     return Response.json({ ok: true }, { status: 200 })
   }
 
-  // ── Step 6: Connect — UPDATE profile ───────────────────────────────────────
+  // Case 4 — role not eligible for Telegram notifications: send upgrade prompt.
+  if (!ELIGIBLE_ROLES.has(profile.role)) {
+    sendTelegramMessage(
+      chatId,
+      '🔒 Votre plan actuel ne donne pas accès aux notifications Telegram. ' +
+        'Rendez-vous sur Haurus.ai pour mettre à jour votre abonnement.'
+    )
+    return Response.json({ ok: true }, { status: 200 })
+  }
+
+  // Case 5 — chat_id already associated with this account: notify without updating.
+  if (profile.telegram_chat_id === chatId) {
+    sendTelegramMessage(
+      chatId,
+      '⚠️ Ce compte Telegram est déjà connecté à votre profil Haurus.ai.'
+    )
+    return Response.json({ ok: true }, { status: 200 })
+  }
+
+  // ── Step 5: Connect — UPDATE profile ───────────────────────────────────────
   const { error: updateError } = await adminClient
     .from('profiles')
     .update({
@@ -206,8 +234,12 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: true }, { status: 200 })
   }
 
-  // Send confirmation — this is non-blocking (catch swallows errors).
-  sendTelegramMessage(chatId, '✅ Connecté ! Vous recevrez vos notifications Haurus ici.')
+  // Case 6 — success: send confirmation.
+  sendTelegramMessage(
+    chatId,
+    '✅ Compte Haurus.ai connecté avec succès !\n\n' +
+      'Vous recevrez désormais une notification à chaque nouveau match ajouté sur la plateforme.'
+  )
 
   // Always return 200 to Telegram.
   return Response.json({ ok: true }, { status: 200 })
