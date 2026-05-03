@@ -148,7 +148,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // Case 1 — message does not start with /connect: send welcome message.
   if (!textRaw.startsWith('/connect')) {
-    sendTelegramMessage(
+    await sendTelegramMessage(
       chatId,
       '👋 Bienvenue sur le bot Haurus.io !\n\n' +
         'Pour connecter votre compte, envoyez `/connect [VOTRE_CLÉ]`.\n' +
@@ -160,7 +160,7 @@ export async function POST(request: Request): Promise<Response> {
   // Case 2 — /connect without a token after the prefix: send error message.
   const token = extractConnectToken(text)
   if (!token) {
-    sendTelegramMessage(
+    await sendTelegramMessage(
       chatId,
       '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.io et réessayez.'
     )
@@ -194,7 +194,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // Case 3 — token not found in profiles: send error message.
   if (!profile) {
-    sendTelegramMessage(
+    await sendTelegramMessage(
       chatId,
       '❌ Clé invalide. Vérifiez votre clé dans les paramètres de votre compte Haurus.io et réessayez.'
     )
@@ -203,7 +203,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // Case 4 — role not eligible for Telegram notifications: send upgrade prompt.
   if (!ELIGIBLE_ROLES.has(profile.role)) {
-    sendTelegramMessage(
+    await sendTelegramMessage(
       chatId,
       '🔒 Votre plan actuel ne donne pas accès aux notifications Telegram. ' +
         'Rendez-vous sur Haurus.io pour mettre à jour votre abonnement.'
@@ -213,7 +213,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // Case 5 — chat_id already associated with this account: notify without updating.
   if (profile.telegram_chat_id === chatId) {
-    sendTelegramMessage(
+    await sendTelegramMessage(
       chatId,
       '⚠️ Ce compte Telegram est déjà connecté à votre profil Haurus.io.'
     )
@@ -235,7 +235,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // Case 6 — success: send confirmation.
-  sendTelegramMessage(
+  await sendTelegramMessage(
     chatId,
     '✅ Compte Haurus.io connecté avec succès !\n\n' +
       'Vous recevrez désormais une notification à chaque nouveau match ajouté sur la plateforme.'
