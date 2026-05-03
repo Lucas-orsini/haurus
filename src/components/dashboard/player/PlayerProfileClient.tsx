@@ -315,16 +315,6 @@ export default function PlayerProfileClient() {
               onRemovePlayer={handleRemoveTracked}
             />
 
-            {/* Flèche de fermeture — positionnée sur le bord droit du volet, centrée verticalement */}
-            <button
-              onClick={() => setPanelOpen(false)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md
-                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                         text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors duration-150 z-50"
-              aria-label="Fermer le panneau Mes joueurs"
-            >
-              <ChevronLeft size={15} strokeWidth={1.5} className="shrink-0" />
-            </button>
           </motion.div>
         )}
 
