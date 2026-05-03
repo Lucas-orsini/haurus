@@ -176,7 +176,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="relative w-full max-w-md h-[600px] flex flex-col bg-[var(--surface-1)] border border-[var(--border-md)] rounded-xl shadow-2xl overflow-hidden"
+          className="relative w-full max-w-md h-[575px] flex flex-col bg-[var(--surface-1)] border border-[var(--border-md)] rounded-xl shadow-2xl overflow-hidden"
           role="dialog"
           aria-modal="true"
           aria-labelledby="profile-modal-title"
