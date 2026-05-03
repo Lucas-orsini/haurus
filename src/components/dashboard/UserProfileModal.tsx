@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { X, Copy, Check } from 'lucide-react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -11,17 +12,15 @@ import { validateName } from '@/lib/auth'
 import { updateProfile } from '@/lib/auth'
 
 interface UserProfileModalProps {
-  user: AuthUser & {
-    telegram_token?: string | null
-    telegram_chat_id?: number | null
-    telegram_active?: boolean | null
-  }
+  user: AuthUser
   onClose: () => void
   onUpdateSuccess: (updatedUser: AuthUser) => void
 }
 
 type SaveState = 'idle' | 'saving' | 'error'
-type TelegramTabState = 'not-connected' | 'connected' | 'suspended'
+type TelegramTabState = 'not-eligible' | 'not-connected' | 'connected' | 'suspended'
+
+const ELIGIBLE_ROLES = ['user', 'analyste', 'pro', 'enterprise'] as const
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -43,23 +42,28 @@ function getInitials(name: string): string {
 }
 
 export default function UserProfileModal({ user, onClose, onUpdateSuccess }: UserProfileModalProps) {
+  const router = useRouter()
   const [name, setName] = useState(user.name ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '')
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [nameError, setNameError] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState<'profile' | 'telegram'>('profile')
-  const [copyFeedback, setCopyFeedback] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [disconnectLoading, setDisconnectLoading] = useState(false)
   const [disconnectError, setDisconnectError] = useState<string | null>(null)
 
+  // ── Logique d'état Telegram ──
+  // Priorité : rôle → chatId → active
   const telegramTab: TelegramTabState =
-    user.telegram_chat_id !== null && user.telegram_chat_id !== undefined
-      ? user.telegram_active
-        ? 'connected'
-        : 'suspended'
-      : 'not-connected'
+    !ELIGIBLE_ROLES.includes(user.role as typeof ELIGIBLE_ROLES[number])
+      ? 'not-eligible'
+      : user.telegramChatId == null
+        ? 'not-connected'
+        : user.telegramActive === true
+          ? 'connected'
+          : 'suspended'
 
-  // Fermer sur Escape
+  // ── Fermer sur Escape ──
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -68,7 +72,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // Bloquer le scroll du body pendant que la modale est ouverte
+  // ── Bloquer le scroll du body ──
   useEffect(() => {
     const original = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -105,9 +109,15 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
       const res = await fetch('/api/telegram/disconnect', { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error ?? 'Erreur de déconnexion')
+        throw new Error(data.error ?? 'Erreur de deconnexion')
       }
-      onUpdateSuccess(user)
+      // Refresh local state to reflect disconnected status
+      const updatedUser: AuthUser = {
+        ...user,
+        telegramChatId: null,
+        telegramActive: false,
+      }
+      onUpdateSuccess(updatedUser)
     } catch (err) {
       setDisconnectError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
@@ -115,16 +125,17 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
     }
   }
 
-  const handleCopyToken = async () => {
-    const token = user.telegram_token ?? ''
+  const handleCopyToken = useCallback(async () => {
+    const token = user.telegramToken ?? ''
+    if (!token) return
     try {
       await navigator.clipboard.writeText(token)
-      setCopyFeedback(true)
-      setTimeout(() => setCopyFeedback(false), 2000)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch {
-      setCopyFeedback(false)
+      setCopied(false)
     }
-  }
+  }, [user.telegramToken])
 
   const isSaving = saveState === 'saving'
   const telegramBotUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? 'HaurusBot'
@@ -220,7 +231,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par défaut</p>
+                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par defaut</p>
                   </div>
 
                   {/* Photo URL */}
@@ -274,7 +285,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Erreur persistante */}
                   {saveState === 'error' && (
                     <p className="text-xs text-[var(--red)] leading-tight">
-                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez réessayer.
+                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez reessayer.
                     </p>
                   )}
                 </div>
@@ -284,22 +295,46 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
             {/* ── Telegram section ── */}
             {activeSection === 'telegram' && (
               <div className="px-5 py-5 flex flex-col gap-5">
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="text-sm font-semibold text-[var(--text-1)]">Telegram</h3>
-                  <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                    Recevez vos alertes et predictions directement sur Telegram.
-                  </p>
-                </div>
 
-                {/* État B — Connecté et actif */}
+                {/* ══ ETAT 4 — not-eligible ══ */}
+                {telegramTab === 'not-eligible' && (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
+                                       bg-[var(--text-3)]/10 text-[var(--text-3)] border border-[var(--text-3)]/20">
+                        &#128274;&nbsp;Fonctionnalite non disponible
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                      Les notifications Telegram sont disponibles a partir du plan Analyse.
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        href="/pricing"
+                      >
+                        Mettre a niveau
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ══ ETAT 2 — connected ══ */}
                 {telegramTab === 'connected' && (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
-                        ✅ Telegram connect&eacute;
+                        &#10004;&#65039;&nbsp;Telegram connecte
                       </span>
                     </div>
+
+                    <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                      Vous recevrez une notification a chaque nouveau match ajoute.
+                    </p>
 
                     <div className="flex items-center gap-2">
                       <Button
@@ -322,10 +357,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             >
                               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                             </svg>
-                            D&eacute;connexion...
+                            Deconnexion...
                           </>
                         ) : (
-                          'D&eacute;connecter'
+                          'Deconnecter'
                         )}
                       </Button>
                     </div>
@@ -336,40 +371,43 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   </div>
                 )}
 
-                {/* État C — Connecté mais suspendu */}
+                {/* ══ ETAT 3 — suspended ══ */}
                 {telegramTab === 'suspended' && (
                   <div className="flex flex-col gap-4">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
-                                     bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
-                      &#9888;&nbsp;Notifications suspendues
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
+                                       bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
+                        &#9888;&nbsp;Notifications suspendues
+                      </span>
+                    </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      Votre plan actuel ne donne pas acc&egrave;s aux notifications Telegram.
+                      Votre plan actuel ne donne pas acces aux notifications Telegram.
+                      Mettez a jour votre abonnement pour les reactiver.
                     </p>
 
-                    {user.telegram_token && (
+                    {user.telegramToken && (
                       <div className="flex flex-col gap-1.5">
                         <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
-                            {user.telegram_token}
+                            {user.telegramToken}
                           </code>
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={handleCopyToken}
-                            disabled={copyFeedback}
+                            disabled={copied}
                             iconLeft={
-                              copyFeedback ? (
+                              copied ? (
                                 <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
                               ) : (
                                 <Copy size={12} strokeWidth={1.5} />
                               )
                             }
                           >
-                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
+                            {copied ? 'Copie !' : 'Copier'}
                           </Button>
                         </div>
                       </div>
@@ -377,9 +415,16 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   </div>
                 )}
 
-                {/* État A — Non connecté */}
+                {/* ══ ETAT 1 — not-connected ══ */}
                 {telegramTab === 'not-connected' && (
                   <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <h3 className="text-sm font-semibold text-[var(--text-1)]">Connecter Telegram</h3>
+                      <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                        Recevez une notification a chaque nouveau match ajoute.
+                      </p>
+                    </div>
+
                     {user.telegramToken ? (
                       <div className="flex flex-col gap-1.5">
                         <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
@@ -392,16 +437,16 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             variant="secondary"
                             size="sm"
                             onClick={handleCopyToken}
-                            disabled={copyFeedback}
+                            disabled={copied}
                             iconLeft={
-                              copyFeedback ? (
+                              copied ? (
                                 <Check size={12} className="text-[var(--green)]" strokeWidth={2.5} />
                               ) : (
                                 <Copy size={12} strokeWidth={1.5} />
                               )
                             }
                           >
-                            {copyFeedback ? 'Copi&eacute; !' : "Copier le token"}
+                            {copied ? 'Copie !' : 'Copier'}
                           </Button>
                         </div>
                       </div>
@@ -417,8 +462,21 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       </p>
                       <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
-                        /connect {user.telegram_token ?? '[VOTRE_TOKEN]'}
+                        /connect {user.telegramToken ?? '[VOTRE_TOKEN]'}
                       </code>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://t.me/${telegramBotUsername}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-8 px-4 flex items-center justify-center gap-1.5 rounded-md
+                                   bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium
+                                   transition-colors duration-150"
+                      >
+                        Ouvrir le bot
+                      </a>
                     </div>
                   </div>
                 )}
