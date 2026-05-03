@@ -30,9 +30,14 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  // Rolling 365-day threshold — players with last_match_date older than this
+  // are excluded. last_match_date = NULL is also excluded (NULL >= anything is false in SQL).
+  const thresholdDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
+
   const { data, error } = await supabase
     .from('player_stats')
     .select('id, player_name, rank')
+    .gte('last_match_date', thresholdDate)
     .ilike('player_name', '%' + query.trim() + '%')
     .order('rank', { ascending: true, nullsFirst: false })
     .limit(MAX_RESULTS)
