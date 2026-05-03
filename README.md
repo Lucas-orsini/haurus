@@ -88,14 +88,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **anon/public key** | Public key for client-side authentication (safe to expose in browser) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **service_role key** | Server-side only key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), use `/newbot` command | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | Any secret string you choose (e.g., `my-secret-123`) | Used to verify HMAC-SHA256 signatures on incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **anon/public key** | Public key for client-side authentication, safe to expose |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → **service_role key** | Server-side key that bypasses Row Level Security |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, search for [@BotFather](https://t.me/botfather), send `/newbot`, follow the prompts, copy the token | Token for your Telegram bot API |
+| `TELEGRAM_BOT_SECRET` | Yes | Any random string you choose (e.g., generate with `openssl rand -hex 32`) | Secret used to verify incoming webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly (like math calculations, data formatting, or user login logic).
+Unit tests automatically check that specific parts of the code work correctly without needing the full app running.
 
 ### Run all tests
 
@@ -109,7 +109,7 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-### Watch mode (re-runs tests automatically when files change)
+### Run tests in watch mode (re-runs on file change)
 
 ```bash
 npx jest --watch
@@ -117,42 +117,45 @@ npx jest --watch
 
 ### Understanding test output
 
-- **PASS** — Everything works correctly, no issues found
-- **FAIL** — Something is broken. The output shows which test failed and why (expected vs. actual value)
+- **PASS** — All assertions passed, the code works as expected
+- **FAIL** — Something broke. The output shows which test failed and why (expected vs. actual value)
 
 ### What the tests cover
 
-| Test File | What It Tests |
+| Test File | What it tests |
 |-----------|---------------|
-| `__tests__/auth.test.ts` | Authentication flow and session handling |
-| `__tests__/auth-validators.test.ts` | Input validation for auth forms |
+| `__tests__/auth-validators.test.ts` | Authentication validation logic |
+| `__tests__/auth.test.ts` | Authentication flows and behavior |
+| `__tests__/dashboard/formatMetric.test.ts` | Dashboard metric formatting |
+| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics calculations |
+| `__tests__/lib/utils.test.ts` | Utility functions |
 | `__tests__/utils.test.ts` | General utility functions |
-| `__tests__/lib/utils.test.ts` | Shared library utilities |
-| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting in the dashboard |
-| `__tests__/lib/dashboard/stats.test.ts` | Statistics calculation logic |
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and layouts
-- `src/components` — Reusable React components (dashboard UI, modals)
-- `src/lib` — Utility functions, Supabase client setup, shared logic
-- `__tests__` — Jest test files mirroring the src/ structure
+- `src/app/api/telegram/disconnect` — Telegram disconnect webhook endpoint
+- `__tests__` — Jest unit tests
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+### Step by step
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
+2. Import your GitHub repository (`haraus`)
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
+
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-4. Click **Deploy**
 
-> ⚠️ Make sure all environment variables are added before deploying. Missing variables will cause the build to fail.
+5. Click **Deploy**
+
+Your app will be live at `https://your-project.vercel.app` (you can customize the URL in Vercel settings).
 
 ## 📝 License
 
