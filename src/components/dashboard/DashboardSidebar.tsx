@@ -100,7 +100,9 @@ export default function DashboardSidebar() {
       {/* Navigation */}
       <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
-          const isActive = pathname === href || pathname.startsWith(href + '/')
+          const isActive = href === '/dashboard'
+            ? pathname === href
+            : pathname === href || pathname.startsWith(href + '/')
           return (
             <motion.div
               key={href}
