@@ -59,21 +59,20 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
+# Supabase project URL
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 # Supabase service role key — server-side only, bypasses RLS completely
-# Used by: /api/telegram/webhook (webhook has no session cookie, needs service role)
+# Used by: /api/telegram/webhook
 SUPABASE_SERVICE_ROLE_KEY=
 
 # Telegram Bot API token — https://core.telegram.org/bots/tutorial#creating-your-first-bot
 TELEGRAM_BOT_TOKEN=
 
-# Telegram webhook secret token — configured when calling setWebhook with secret parameter.
-# Used for HMAC-SHA256 signature verification on incoming webhook requests.
+# Telegram webhook secret token — used for HMAC-SHA256 signature verification
 TELEGRAM_BOT_SECRET=
 ```
 
@@ -91,59 +90,57 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → Project API keys → `anon` key | Public-facing API key — safe for client-side use with Row Level Security |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://app.supabase.com) → Project Settings → API → Project API keys → `service_role` key | Server-only key that bypasses Row Level Security entirely |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), send `/newbot`, follow the prompts, copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook — make it a long random string | Secret token for verifying incoming webhook requests via HMAC-SHA256 |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side operations (safe with RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side key that bypasses RLS. Used for webhook endpoints without session cookies |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), use `/newbot` command, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — pick any random string | Secret token for HMAC-SHA256 webhook signature verification |
 
-**To find your Supabase credentials:**
-
+**Finding Supabase credentials:**
 1. Go to [app.supabase.com](https://app.supabase.com)
 2. Select your project
-3. Click **Project Settings** (gear icon in the left sidebar)
+3. Click **Project Settings** (gear icon)
 4. Click **API**
-5. Copy the **Project URL** and paste it into `NEXT_PUBLIC_SUPABASE_URL`
-6. Under **Project API keys**, copy the `anon` public key and paste it into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-7. Copy the `service_role` secret key and paste it into `SUPABASE_SERVICE_ROLE_KEY`
+5. Find **Project URL** (copy it for `NEXT_PUBLIC_SUPABASE_URL`)
+6. Find **anon public** key under "API Keys" (copy it for `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+7. Find **service_role secret** key under "API Keys" (copy it for `SUPABASE_SERVICE_ROLE_KEY`)
 
-> ⚠️ **Important**: Never share your `SUPABASE_SERVICE_ROLE_KEY` — it bypasses all security checks. Keep it server-side only.
+> ⚠️ Never share your `SUPABASE_SERVICE_ROLE_KEY` — it bypasses all security checks!
 
 ## 🧪 Running Tests
 
-Tests help ensure the app works correctly by automatically checking that specific parts of the code behave as expected.
+Unit tests automatically verify that individual parts of the code work correctly — like checking that a login function properly accepts valid passwords and rejects invalid ones.
 
 Run all tests:
-
 ```bash
 npx jest
 ```
 
 Run a specific test file:
-
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
 Watch mode (re-runs tests automatically when files change):
-
 ```bash
 npx jest --watch
 ```
 
 **How to read Jest output:**
-- `PASS` — The test passed, everything works correctly
-- `FAIL` — Something broke, check the error message below to see which test failed and why
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke ❌. Jest will show which test failed and what went wrong (expected vs. actual value)
 
-**What the tests cover:**
-- Authentication validation logic
-- Dashboard metric formatting
-- Stats calculations
-- Utility functions
+**Tests included:**
+- `__tests__/auth.test.ts` — Authentication flow tests
+- `__tests__/auth-validators.test.ts` — Authentication validation logic tests
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting tests
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics tests
+- `__tests__/lib/utils.test.ts` — Utility function tests
+- `__tests__/utils.test.ts` — General utility tests
 
 ## 📁 Project Structure
 
-- `src/app/api/telegram/webhook` — Telegram webhook API route with HMAC signature verification
+- `src/app/api/telegram/webhook/route.ts` — Telegram webhook API endpoint with HMAC-SHA256 signature verification
 
 ## 🚀 Deploy to Vercel
 
@@ -153,18 +150,17 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
+3. Add your environment variables in Vercel dashboard:
+   - Go to **Settings** → **Environment Variables**
+   - Add each variable from `.env.local`:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `TELEGRAM_BOT_TOKEN`
+     - `TELEGRAM_BOT_SECRET`
+4. Click **Deploy**
 
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-
-5. Click **Deploy**
-
-> ⚠️ **Reminder**: Make sure to add all environment variables in Vercel. If any variable is missing, the app may crash or certain features (like Telegram webhooks) won't work.
+Vercel auto-detects Next.js configuration. Your site will be live at a `vercel.app` URL once deployment completes.
 
 ## 📝 License
 
