@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Copy, Check } from 'lucide-react'
+import { X, Copy, Check, Eye, EyeOff } from 'lucide-react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Input from '@/components/ui/Input'
@@ -41,6 +41,13 @@ function getInitials(name: string): string {
   return (first + last).toUpperCase() || '?'
 }
 
+function getDisplayToken(token: string | null | undefined, revealed: boolean): string {
+  if (!token) return '—'
+  if (revealed) return token
+  const first4 = token.slice(0, 4)
+  return `${first4}••••••••••••`
+}
+
 export default function UserProfileModal({ user, onClose, onUpdateSuccess }: UserProfileModalProps) {
   const router = useRouter()
   const [name, setName] = useState(user.name ?? '')
@@ -49,8 +56,16 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
   const [nameError, setNameError] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState<'profile' | 'telegram'>('profile')
   const [copied, setCopied] = useState(false)
+  const [tokenRevealed, setTokenRevealed] = useState(false)
   const [disconnectLoading, setDisconnectLoading] = useState(false)
   const [disconnectError, setDisconnectError] = useState<string | null>(null)
+
+  // ── Reset reveal state when leaving Telegram tab ──
+  useEffect(() => {
+    if (activeSection !== 'telegram') {
+      setTokenRevealed(false)
+    }
+  }, [activeSection])
 
   // ── Logique d'état Telegram ──
   // Priorité : rôle → chatId → active
@@ -138,7 +153,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
   }, [user.telegramToken])
 
   const isSaving = saveState === 'saving'
-  const telegramBotUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? 'HaurusBot'
+  const telegramBotUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || 'Haurus_Bot'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -392,8 +407,20 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
-                            {user.telegramToken}
+                            {getDisplayToken(user.telegramToken, tokenRevealed)}
                           </code>
+                          <button
+                            onClick={() => setTokenRevealed((r: boolean) => !r)}
+                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
+                            className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
+                                       text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
+                                       transition-colors duration-150"
+                          >
+                            {tokenRevealed
+                              ? <EyeOff size={13} strokeWidth={1.5} />
+                              : <Eye size={13} strokeWidth={1.5} />
+                            }
+                          </button>
                           <Button
                             variant="secondary"
                             size="sm"
@@ -431,8 +458,20 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
-                            {user.telegramToken}
+                            {getDisplayToken(user.telegramToken, tokenRevealed)}
                           </code>
+                          <button
+                            onClick={() => setTokenRevealed((r: boolean) => !r)}
+                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
+                            className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
+                                       text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
+                                       transition-colors duration-150"
+                          >
+                            {tokenRevealed
+                              ? <EyeOff size={13} strokeWidth={1.5} />
+                              : <Eye size={13} strokeWidth={1.5} />
+                            }
+                          </button>
                           <Button
                             variant="secondary"
                             size="sm"
@@ -462,7 +501,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       </p>
                       <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
-                        /connect {user.telegramToken ?? '[VOTRE_TOKEN]'}
+                        /connect [votre_cle]
                       </code>
                     </div>
 
