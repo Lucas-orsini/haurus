@@ -462,8 +462,25 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       </p>
                       <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
-                        /connect {user.telegramToken ?? '[VOTRE_TOKEN]'}
+                        /connect votre_cle
                       </code>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText('/connect votre_cle')
+                            setCopied(true)
+                            setTimeout(() => setCopied(false), 2000)
+                          } catch {
+                            setCopied(false)
+                          }
+                        }}
+                        className="w-8 h-8 flex items-center justify-center rounded-md
+                                   text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-white/[0.05]
+                                   transition-colors duration-150"
+                        title="Copier la commande"
+                      >
+                        {copied ? <Check size={13} strokeWidth={2.5} className="text-[var(--green)]" /> : <Copy size={13} strokeWidth={1.5} />}
+                      </button>
                     </div>
 
                     <div className="flex items-center gap-2">
