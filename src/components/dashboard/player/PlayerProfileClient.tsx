@@ -333,19 +333,16 @@ export default function PlayerProfileClient() {
 
           {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
           <div className="flex items-center gap-3">
-            {/* Bouton toggle — visible quand le volet est fermé */}
-            {!panelOpen && (
-              <button
-                onClick={() => setPanelOpen(!panelOpen)}
-                className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-                aria-label="Ouvrir le panneau Mes joueurs"
-              >
-                <Users size={14} strokeWidth={1.5} className="shrink-0" />
-                <span className="whitespace-nowrap">Mes joueurs</span>
-              </button>
-            )}
+            <button
+              onClick={() => setPanelOpen(!panelOpen)}
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+                         border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
+                         text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
+              aria-label="Ouvrir ou fermer le panneau Mes joueurs"
+            >
+              <Users size={14} strokeWidth={1.5} className="shrink-0" />
+              <span className="whitespace-nowrap">Mes joueurs</span>
+            </button>
 
             {/* Barre de recherche */}
             <div>
