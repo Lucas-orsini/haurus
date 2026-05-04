@@ -23,11 +23,11 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-[var(--text-3)] max-w-xs leading-relaxed mb-6">
-              La couche analytique que les parieurs sérieux utilisent pour évaluer les cotes des matchs ATP. Axée sur les données. Sans predictions.
+              Des métriques ATP conçues pour analyser le jeu. Pas de prédictions. Pas de biais.
             </p>
             {/* Tagline */}
             <p className="text-base font-semibold tracking-tight text-[var(--accent)]">
-              Pas de tips. Des données.
+              Pas de prédiction. Des données.
             </p>
           </div>
 

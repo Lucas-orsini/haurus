@@ -32,7 +32,7 @@ export default function CTABanner() {
             <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
           </button>
           <p className="text-xs text-[var(--text-3)] italic">
-            Pas de tips. Pas de tipsters. Juste des données.
+           Pas de prédiction. Pas d'intuition. Seulement des données.
           </p>
         </motion.div>
       </div>

@@ -64,12 +64,13 @@ import { Check } from 'lucide-react'
 import Button from '@/components/ui/Button'
 
 const betaFeatures = [
-  'Toutes les métriques ATP sharp',
+  'Toutes les métriques ATP',
   'Profils joueurs avec historique',
   'Tableau comparatif des matchs',
-  'Analyse de match par IA',
+  'Tous les tournois ATP',
   'Accès à toutes les surfaces',
-  'Mises à jour 2x par jour',
+  'Accès nouvelles metriques à venir',
+  'Accès notification Telegram',
 ]
 
 export default function Pricing() {
@@ -140,7 +141,7 @@ export default function Pricing() {
               Accès Beta
             </h3>
             <p className="mt-2 text-sm text-[var(--text-2)] leading-relaxed">
-              Toutes les fonctionnalités. Gratuit pendant la beta.
+              Accès complet. Gratuit pendant la bêta.
             </p>
           </div>
 

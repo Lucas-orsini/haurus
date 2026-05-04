@@ -182,7 +182,7 @@ function Sparkline() {
   })
 
   const lastVal = (() => {
-    const points = [22, 18, 25, 15, 28, 20, 32, 24, 18, 26, 14, 22, 30, 26, 19, 23, 17, 28, 22, 20]
+    const points = [-0.42, -0.68, -0.18, -0.89, 0.05, -0.55, 0.32, -0.22, -0.68, 0.08, -0.98, -0.42, 0.22, 0.08, -0.62, -0.35, -0.75, 0.05, -0.42, 0.72]
     const idx = Math.min(displayed - 1, points.length - 1)
     return points[Math.max(0, idx)]
   })()
@@ -190,7 +190,7 @@ function Sparkline() {
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[10px] text-[var(--text-3)]">20 derniers tiebreaks</span>
+        <span className="text-[10px] text-[var(--text-3)]">+0.72 vs moyenne ATP</span>
         <span className="text-xs font-mono font-semibold text-[var(--accent)]">{lastVal}</span>
       </div>
       <canvas ref={canvasRef} width={240} height={64} className="w-full" />
@@ -286,7 +286,7 @@ function TrendLine() {
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
         <span className="text-[10px] text-[var(--text-3)]">Momentum sur 30 jours</span>
-        <span className="flex items-center gap-0.5 text-xs font-semibold text-[var(--green)]">+38 <TrendingUp size={10} /></span>
+        <span className="flex items-center gap-0.5 text-xs font-semibold text-[var(--green)]">+0.08 <TrendingUp size={10} /></span>
       </div>
       <canvas ref={canvasRef} width={240} height={56} className="w-full" />
     </div>
@@ -356,13 +356,13 @@ export default function MetricsShowcase() {
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[rgba(242,203,56,0.25)] bg-[rgba(242,203,56,0.06)] mb-6">
             <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            <span className="text-[11px] font-medium text-[var(--accent)] uppercase tracking-widest">Couche de données</span>
+            <span className="text-[11px] font-medium text-[var(--accent)] uppercase tracking-widest">Données avancées</span>
           </span>
           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-            La couche analytique
+            La structure analytique
           </h2>
           <p className="text-[var(--text-2)] max-w-xl mx-auto text-sm leading-relaxed">
-            Huit métriques. Chacune représente une dimension de la performance d'un joueur que les bookmakers intègrent dans leurs cotes. Vous les avez toutes.
+           Seize métriques. Chacune capture une dimension clé de la performance d’un joueur utilisée par les bookmakers. Toutes réunies au même endroit.
           </p>
         </motion.div>
       </div>
@@ -412,7 +412,7 @@ export default function MetricsShowcase() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">TSD</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Données de stress tiebreak · 20 derniers</p>
+                <p className="text-[11px] text-[var(--text-3)]">Indice de dominance au service</p>
               </div>
             </div>
             <Sparkline />
@@ -425,14 +425,14 @@ export default function MetricsShowcase() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">BPPI</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Indice de pression sur break</p>
+                <p className="text-[11px] text-[var(--text-3)]">Indice de performance sur balles de break</p>
               </div>
             </div>
             <div className="flex-1 flex flex-col items-center justify-center pt-4">
               <div className="text-4xl font-bold text-[var(--accent)] font-mono">
-                <AnimatedCounter target={847} duration={1400} />
+                <AnimatedCounter target={5} duration={1400} />
               </div>
-              <p className="text-[10px] text-[var(--text-3)] mt-1">score de pression · moyenne sur 20 derniers matchs</p>
+              <p className="text-[10px] text-[var(--text-3)] mt-1">indice de résistance sur balles de break au centième</p>
             </div>
           </BentoCard>
 
@@ -443,7 +443,7 @@ export default function MetricsShowcase() {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">Momentum TD</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Différentiel de tendance · Pondéré dans le temps</p>
+                <p className="text-[11px] text-[var(--text-3)]">Mesure la dynamique actuelle du joueur</p>
               </div>
             </div>
             <TrendLine />

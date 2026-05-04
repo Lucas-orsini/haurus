@@ -20,8 +20,8 @@ const points = [
     iconBg: 'bg-[rgba(242,203,56,0.08)]',
     iconBorder: 'border-[rgba(242,203,56,0.15)]',
     glowColor: '#F2CB38',
-    title: 'La même couche que les bookmakers',
-    desc: 'Les bookmakers fixent leurs cotes en utilisant Glicko-2, l\'efficacité au service/retour et les indices de pression. Haurus vous donne exactement cette couche analytique.',
+    title: 'Les données derrière les décisions du marché',
+    desc: 'Des modèles comme Glicko-2 aux métriques de performance point par point, Haurus rassemble les indicateurs essentiels en un seul endroit.',
   },
   {
     icon: Eye,
@@ -29,8 +29,8 @@ const points = [
     iconBg: 'bg-[rgba(59,130,246,0.08)]',
     iconBorder: 'border-[rgba(59,130,246,0.15)]',
     glowColor: '#3b82f6',
-    title: 'Pas de prédictions. Pas de tips.',
-    desc: 'Nous ne vous disons pas sur qui parier. Nous vous donnons les métriques brutes pour que vous puissiez vous faire votre propre avis — comme les analystes.',
+    title: 'Pas de prédictions. Pas de conseils.',
+    desc: 'Nous ne donnons pas d’avis. Nous exposons les métriques pour que vous construisiez votre propre analyse.',
   },
   {
     icon: Layers,
@@ -38,8 +38,8 @@ const points = [
     iconBg: 'bg-[rgba(168,85,247,0.08)]',
     iconBorder: 'border-[rgba(168,85,247,0.15)]',
     glowColor: '#a855f7',
-    title: 'Le contexte plutôt que le feeling',
-    desc: 'Classements ajustés par surface, signaux de fatigue et modèles de décroissance du momentum. Les chiffres plutôt que l\'intuition. Toujours.',
+    title: 'Le contexte plutôt que l’intuition',
+    desc: 'Surface, fatigue, dynamique. Haurus structure les facteurs clés pour lire un match avec des données, pas du ressenti.',
   },
 ]
 
@@ -56,13 +56,13 @@ export default function WhyHaurus() {
           className="text-center mb-16"
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border-md)] bg-[var(--surface-2)] mb-6">
-            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Pas un service de tipsters</span>
+            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Plateforme de données</span>
           </span>
           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-            Conçu pour l\'analyse, pas pour les conseils
+            Pensé pour l’analyse
           </h2>
           <p className="text-[var(--text-2)] max-w-xl mx-auto text-sm leading-relaxed">
-            Haurus est une plateforme de données. Nous exposons les chiffres. Ce que vous en faites constitue votre avantage.
+           Haurus fournit les données pour faciliter votre analyse, en transformant chaque match en informations exploitables.
           </p>
         </motion.div>
 
