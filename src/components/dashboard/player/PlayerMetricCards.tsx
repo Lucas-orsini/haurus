@@ -67,9 +67,9 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         )}
       </div>
 
-      {/* Card 3 — Momentum TD */}
+      {/* Card 3 — Momentum JJ */}
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
+        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum JJ</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
           momentum !== null ? getMomentumColor(momentum) : 'text-[var(--text-1)]'

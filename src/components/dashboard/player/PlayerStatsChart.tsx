@@ -28,7 +28,7 @@ const METRICS: Array<{ key: string; label: string }> = [
   { key: 'glicko_hard', label: 'Glicko Dur' },
   { key: 'glicko_grass', label: 'Glicko Gazon' },
   { key: 'momentum_td', label: 'Momentum' },
-  { key: 'win_rate_td', label: 'Win Rate' },
+  { key: 'win_rate_td', label: 'Taux de victoire' },
   { key: 'win_rate_clay_td', label: 'Win Rate Terre battue' },
   { key: 'win_rate_hard_td', label: 'Win Rate Dur' },
   { key: 'win_rate_grass_td', label: 'Win Rate Gazon' },
