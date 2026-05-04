@@ -65,7 +65,7 @@ export default async function DashboardPage() {
     return (
       <DashboardOverview
         matches={[]}
-        fetchError="Failed to load match data. Please try again."
+        fetchError="Échec du chargement des matchs. Veuillez réessayer."
         favoriteMatchIds={favoriteMatchIds}
         todaysStats={todaysStats}
       />

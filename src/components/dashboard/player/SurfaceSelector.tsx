@@ -9,6 +9,12 @@ interface SurfaceSelectorProps {
 
 const SURFACES = ['Hard', 'Clay', 'Grass'] as const
 
+const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
+  Hard: 'Dur',
+  Clay: 'Terre battue',
+  Grass: 'Gazon',
+}
+
 export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: SurfaceSelectorProps) {
   return (
     <div className="flex items-center gap-1">
@@ -26,7 +32,7 @@ export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: Su
                 : 'border border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
             )}
           >
-            {surface}
+            {LABEL_MAP[surface]}
           </button>
         )
       })}

@@ -11,7 +11,7 @@ export interface MetricTooltipProps {
 
 /**
  * Flèche directionnelle CSS — triangle équilatéral de 5px de côté.
- * Le border-side correspondant est omis pour simuler un triangle apuntan vers le trigger.
+ * Le border-side correspondant est omis pour simuler un triangle arent vers le trigger.
  *
  * Placements :
  *  - bottom : flèche en HAUT du tooltip (pointe vers le bas → trigger)
