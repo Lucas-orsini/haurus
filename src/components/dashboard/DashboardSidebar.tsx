@@ -11,9 +11,9 @@ import { createClient } from '@/lib/supabase/client'
 import UserProfileModal from './UserProfileModal'
 
 const NAV_ITEMS = [
-  { label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Player', icon: User, href: '/dashboard/player' },
-  { label: 'Metrics', icon: BookOpen, href: '/dashboard/metrics' },
+  { label: 'Aperçu', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Joueur', icon: User, href: '/dashboard/player' },
+  { label: 'Métriques', icon: BookOpen, href: '/dashboard/metrics' },
 ]
 
 export default function DashboardSidebar() {
@@ -162,7 +162,7 @@ export default function DashboardSidebar() {
               <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
             </div>
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs text-[var(--text-3)] truncate">Session unavailable</span>
+              <span className="text-xs text-[var(--text-3)] truncate">Session indisponible</span>
             </div>
           </div>
         )}
