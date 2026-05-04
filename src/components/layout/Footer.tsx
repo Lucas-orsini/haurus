@@ -14,13 +14,22 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
           {/* Brand column */}
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6 group">
-              <div className="w-5 h-5 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
-                <span className="text-black text-[10px] font-bold leading-none">H</span>
-              </div>
-              <span className="text-sm font-medium tracking-tight text-[var(--text-1)]">
-                Haur<span className="text-[var(--accent)]">u</span>s
-              </span>
+            <Link href="/" className="mb-6 group flex items-center justify-center shrink-0">
+              <svg
+                width="28"
+                height="25"
+                viewBox="0 0 80 72"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12 0H32V6H20V18H32V24H20V36H32V42H20V54H32V60H20V72H0V6H12V0ZM56 0H72V6H68V60H72V66H56V60H60V6H56V0Z"
+                  fill="#f2cb38"
+                />
+              </svg>
             </Link>
             <p className="text-sm text-[var(--text-3)] max-w-xs leading-relaxed mb-6">
               Des métriques ATP conçues pour analyser le jeu. Pas de prédictions. Pas de biais.
