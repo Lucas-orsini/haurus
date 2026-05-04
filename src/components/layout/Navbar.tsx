@@ -32,22 +32,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center">
         {/* Left zone: Logo */}
         <div className="flex-1 flex items-center">
-          <Link href="/" className="group flex items-center justify-center shrink-0">
-            <svg
-              width="32"
-              height="29"
-              viewBox="0 0 80 72"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="shrink-0"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12 0H32V6H20V18H32V24H20V36H32V42H20V54H32V60H20V72H0V6H12V0ZM56 0H72V6H68V60H72V66H56V60H60V6H56V0Z"
-                fill="#f2cb38"
-              />
-            </svg>
+          <Link href="/" className="flex items-center justify-center gap-2 group">
+            <div className="w-6 h-6 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
+              <span className="text-black text-xs font-bold leading-none">H</span>
+            </div>
+            <span className="text-base font-medium tracking-tight text-[var(--text-1)]">
+              Haur<span className="text-[var(--accent)]">u</span>s
+            </span>
           </Link>
         </div>
 

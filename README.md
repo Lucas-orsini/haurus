@@ -83,21 +83,33 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac), then type the command above.
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac), then type the command above.
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key | Public key safe for client-side use with RLS enabled |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key | Server-side only key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather when you create a bot | Bot API token for Telegram integration |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this when setting up your webhook | Secret token for HMAC-SHA256 webhook signature verification |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Your Supabase anonymous key (safe for client-side) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side only, bypasses Row Level Security |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Chat with [@BotFather](https://t.me/BotFather) → Send `/newbot` → Follow instructions → Copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — any random string (e.g., use `openssl rand -hex 32`) | Secret used to verify webhook requests from Telegram |
+
+### Finding Supabase credentials:
+
+1. Go to [Supabase Dashboard](https://app.supabase.com)
+2. Select your project
+3. Click **Project Settings** (gear icon)
+4. Click **API**
+5. Copy **Project URL** → paste into `NEXT_PUBLIC_SUPABASE_URL`
+6. Copy **anon/public key** (labeled as `anon key`) → paste into `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+7. Copy **service_role key** (labeled as `service_role key`) → paste into `SUPABASE_SERVICE_ROLE_KEY`
+
+> ⚠️ **Never share your `SUPABASE_SERVICE_ROLE_KEY`** — it bypasses all security rules and should only be used in server-side code.
 
 ## 🧪 Running Tests
 
-Unit tests automatically verify that your code works correctly — think of them as a robot that clicks through your app to make sure nothing is broken.
+Unit tests automatically check that individual pieces of code work correctly without needing the whole app running.
 
 Run all tests:
 
@@ -108,47 +120,51 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save changes):
+Watch mode (re-runs tests automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — everything works, you're good to go
-- `FAIL` — something broke, check the error message above for which test failed
+**Reading the output:**
+- `PASS` ✅ — All assertions in the test passed
+- `FAIL` ❌ — Something broke; the output shows which test failed and why
 
-The test suite covers:
-- Authentication validators and logic
-- Dashboard metric formatting
-- Statistics calculations
-- Utility functions (class merging, string helpers, date formatting)
+**What the tests cover:**
+- Authentication validators (email format, password strength)
+- Authentication flows (login, signup, session handling)
+- Dashboard metrics formatting (numbers, percentages, dates)
+- Dashboard statistics calculations
+- Utility functions (className merging, date helpers)
 
 ## 📁 Project Structure
 
-- `src/components/layout` — Navigation and footer layout components
+- `src/components/dashboard` — Dashboard UI components including the main overview
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
+### Step by step:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all the variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy** — Vercel will build and deploy your app
+2. Import your GitHub repository (`YOUR_USERNAME/haraus`)
+3. In the **Environment Variables** section, add each variable from your `.env.local` file:
 
-> ⚠️ **Important**: Don't skip adding the environment variables in Vercel. Without them, your app will crash because it can't connect to Supabase or Telegram.
+   | Name | Value |
+   |------|-------|
+   | `NEXT_PUBLIC_SUPABASE_URL` | (your Supabase URL) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (your anon key) |
+   | `SUPABASE_SERVICE_ROLE_KEY` | (your service role key) |
+   | `TELEGRAM_BOT_TOKEN` | (your Telegram bot token) |
+   | `TELEGRAM_BOT_SECRET` | (your webhook secret) |
+
+4. Click **Deploy**
+
+> ⚠️ **Important**: Every environment variable from your `.env.local` must be added to Vercel, otherwise your deployed app will fail to connect to Supabase and Telegram.
 
 ## 📝 License
 
