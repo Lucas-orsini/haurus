@@ -184,7 +184,9 @@ export default function DashboardOverview({
             )}
           >
             <Star size={11} strokeWidth={1.5} />
-            Favoris
+            {localFavoriteIds.length > 0
+              ? `Favoris (${localFavoriteIds.length})`
+              : 'Favoris'}
           </button>
 
           {/* Tournament filter toggles */}
