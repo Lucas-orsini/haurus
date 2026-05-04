@@ -100,10 +100,10 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-5xl md:text-7xl font-medium tracking-tighter text-[var(--text-1)] mb-6 leading-[1.1]"
           >
-            Les métriques que{' '}
-            <span className="text-[var(--accent)]">utilisent les bookmakers</span>
+            Les métriques{' '} 
+            <span className="text-[var(--accent)]">des bookmakers</span>
             <br />
-            <span className="text-[var(--text-2)]">Maintenant les vôtres.</span>
+            <span className="text-[var(--text-2)]">Enfin accessibles.</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -112,7 +112,8 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-lg text-[var(--text-2)] max-w-xl font-light mb-10 leading-relaxed"
           >
-            Accédez aux données qui servent à évaluer les cotes. Pas de tips. Juste des métriques vérifiées.
+            Accédez aux données qui structurent les cotes ATP.
+Aucun pronostic. Uniquement des métriques fiables et exploitables.
           </motion.p>
 
           {/* CTAs */}
@@ -141,7 +142,7 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-sm text-[var(--text-3)] mt-8"
           >
-            800+ parieurs · 12 métriques ATP · Mis à jour après chaque match
+            Analyse quantitative · Avantage informationnel · Données sans biais
           </motion.p>
         </motion.div>
 
