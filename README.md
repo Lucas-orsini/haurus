@@ -4,11 +4,11 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Performance Dashboard** — Interactive player statistics with metric cards and performance charts
-- **Match History Analysis** — Detailed match data with performance metrics visualization
-- **Metrics Visualization** — Interactive dashboard displaying key performance indicators and statistics using Recharts
+- **Player Profile Dashboard** — Track and view player information with search, favorites, and performance tracking
+- **Match History Analysis** — Browse detailed match history with surface-specific filtering and metrics
+- **Metrics Visualization** — Interactive dashboard displaying key performance indicators and statistics
 - **Secure Authentication** — Secure authentication powered by Supabase with Row Level Security
-- **Responsive Design** — Tailwind CSS for modern, responsive layouts with smooth animations via Framer Motion
+- **Responsive Design** — Tailwind CSS for modern, responsive layouts
 
 ## 🛠️ Tech Stack
 
@@ -90,68 +90,62 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public key for client-side authentication |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Bot API token for Telegram integration |
-| `TELEGRAM_BOT_SECRET` | No | You define this when setting up your webhook | Secret token for verifying incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side auth (safe with RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side only, bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather chat → /newbot response | Your Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | No | You choose this value when setting up your webhook | Secret for HMAC-SHA256 webhook verification |
 
-**To find Supabase credentials:**
-
+**Where to find Supabase credentials:**
 1. Go to [Supabase Dashboard](https://app.supabase.com)
 2. Select your project
-3. Click **Project Settings** (gear icon)
-4. Click **API**
-5. Find **Project URL** (copy this for `NEXT_PUBLIC_SUPABASE_URL`)
-6. Find **anon public** key (copy this for `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-7. Find **service_role secret** key (copy this for `SUPABASE_SERVICE_ROLE_KEY`)
+3. Navigate to **Project Settings** (gear icon)
+4. Click on **API**
+5. Copy the **Project URL** and **anon/public key** from the config section
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual parts of the code work correctly. When you run tests, the app verifies that functions and components behave as expected.
+Unit tests automatically check that individual pieces of code (like functions and components) work correctly without needing the full app running.
 
-Run all tests:
+### Run all tests
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+### Run a specific test file
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+### Watch mode (re-runs on file change)
 
 ```bash
 npx jest --watch
 ```
 
-**Reading test output:**
-- **PASS** (green) — All tests passed, everything works correctly
-- **FAIL** (red) — Something broke, check the error message below for details
+### Reading test output
 
-**What the tests cover:**
-- Authentication validators and authentication flow
-- Dashboard utility functions for stats calculation
-- Dashboard formatting functions for metrics display
-- General utility functions (class merging, Tailwind helpers)
+- **PASS** — All assertions passed, the code works as expected ✅
+- **FAIL** — Something broke, check the error message below for what failed and on which line 🔴
+
+The test suite covers authentication validators, auth state management, metric formatting, dashboard statistics, and utility functions.
 
 ## 📁 Project Structure
 
-- `src/lib/types` — TypeScript type definitions for match data
-- `src/components/dashboard` — Dashboard UI components for player metrics, performance charts, and match rows
+- `src/app` — Next.js App Router pages (dashboard, player, metrics)
+- `src/components/dashboard` — Dashboard layout and shared components
+- `src/components/dashboard/player` — Player tracking components (search, profiles, match history)
+- `src/components/ui` — Shared UI components (tooltips, buttons, etc.)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the **Deploy with Vercel** button above
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file:
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
@@ -159,7 +153,7 @@ npx jest --watch
    - `TELEGRAM_BOT_SECRET`
 5. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Your site will be live at a URL like `your-project.vercel.app`.
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 
