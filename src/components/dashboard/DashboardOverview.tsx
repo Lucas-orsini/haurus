@@ -28,7 +28,6 @@ export default function DashboardOverview({
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [localFavoriteIds, setLocalFavoriteIds] = useState<string[]>(favoriteMatchIds)
 
-  // Collect unique tournaments from data
   const tournaments = useMemo(() => {
     const seen = new Set<string>()
     matches.forEach((m) => {
@@ -37,38 +36,23 @@ export default function DashboardOverview({
     return Array.from(seen).sort()
   }, [matches])
 
-  // Build the full set of filter keys (today + tournaments)
-  const allFilterKeys = useMemo(
-    () => [TODAY_FILTER_KEY, ...tournaments],
-    [tournaments]
-  )
-
-  // Filter matches client-side
   const filteredMatches = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+    const todayStr = new Date().toISOString().slice(0, 10)
     const query = searchQuery.trim().toLowerCase()
 
     return matches.filter((m) => {
-      // Favorites filter
       if (favoritesOnly && !localFavoriteIds.includes(m.id)) {
         return false
       }
-
-      // Text search: player1 OR player2
       if (query) {
         const p1 = m.player1.toLowerCase()
         const p2 = m.player2.toLowerCase()
         if (!p1.includes(query) && !p2.includes(query)) return false
       }
-
-      // Active filters
       if (activeFilters.size > 0) {
-        // Today filter
         if (activeFilters.has(TODAY_FILTER_KEY) && m.date_match !== todayStr) {
           return false
         }
-
-        // Tournament filters (cumulative)
         const activeTournaments = tournaments.filter((t) =>
           activeFilters.has(t)
         )
@@ -76,7 +60,6 @@ export default function DashboardOverview({
           if (!activeTournaments.includes(m.tournoi ?? '')) return false
         }
       }
-
       return true
     })
   }, [matches, searchQuery, activeFilters, tournaments, favoritesOnly, localFavoriteIds])
@@ -128,9 +111,9 @@ export default function DashboardOverview({
         </div>
       )}
 
-      {/* Search + filter bar */}
+      {/* Search + filter bar — flex-col on mobile */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           {/* Search input */}
           <div className="relative flex-1 max-w-sm">
             <Search
@@ -159,70 +142,68 @@ export default function DashboardOverview({
             )}
           </div>
 
-          {/* Filter: Aujourd'hui */}
-          <button
-            onClick={() => toggleFilter(TODAY_FILTER_KEY)}
-            className={cn(
-              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
-              activeFilters.has(TODAY_FILTER_KEY)
-                ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
-                : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
-            )}
-          >
-            <ChevronDown size={11} strokeWidth={1.5} />
-            Aujourd&apos;hui
-          </button>
-
-          {/* Filter: Favoris */}
-          <button
-            onClick={() => setFavoritesOnly((v) => !v)}
-            className={cn(
-              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
-              favoritesOnly
-                ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
-                : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-3)] hover:bg-white/[0.06] hover:text-[var(--text-2)]'
-            )}
-          >
-            <Star size={11} strokeWidth={1.5} />
-            {localFavoriteIds.length > 0
-              ? `Favoris (${localFavoriteIds.length})`
-              : 'Favoris'}
-          </button>
-
-          {/* Tournament filter toggles */}
-          {tournaments.slice(0, 5).map((t) => (
+          {/* Filter buttons — wrap on mobile */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              key={t}
-              onClick={() => toggleFilter(t)}
+              onClick={() => toggleFilter(TODAY_FILTER_KEY)}
               className={cn(
-                'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap max-w-[160px]',
-                activeFilters.has(t)
+                'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
+                activeFilters.has(TODAY_FILTER_KEY)
                   ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
                   : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
               )}
             >
-              <span className="truncate">{t}</span>
+              <ChevronDown size={11} strokeWidth={1.5} />
+              Aujourd&apos;hui
             </button>
-          ))}
 
-          {/* Clear all */}
-          {hasActiveFilters && (
             <button
-              onClick={clearFilters}
-              className="h-8 px-2.5 flex items-center justify-center gap-1 rounded-md text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors"
+              onClick={() => setFavoritesOnly((v) => !v)}
+              className={cn(
+                'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
+                favoritesOnly
+                  ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
+                  : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-3)] hover:bg-white/[0.06] hover:text-[var(--text-2)]'
+              )}
             >
-              <X size={11} />
-              Effacer
+              <Star size={11} strokeWidth={1.5} />
+              {localFavoriteIds.length > 0
+                ? `Favoris (${localFavoriteIds.length})`
+                : 'Favoris'}
             </button>
-          )}
 
-          {/* Count */}
-          <p className="text-xs text-[var(--text-3)] shrink-0 ml-auto">
-            <span className="text-[var(--text-2)] font-medium tabular-nums">
-              {filteredMatches.length}
-            </span>
-            {' '}match{filteredMatches.length !== 1 ? 's' : ''}
-          </p>
+            {tournaments.slice(0, 5).map((t) => (
+              <button
+                key={t}
+                onClick={() => toggleFilter(t)}
+                className={cn(
+                  'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap max-w-[160px]',
+                  activeFilters.has(t)
+                    ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
+                    : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
+                )}
+              >
+                <span className="truncate">{t}</span>
+              </button>
+            ))}
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="h-8 px-2.5 flex items-center justify-center gap-1 rounded-md text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors"
+              >
+                <X size={11} />
+                Effacer
+              </button>
+            )}
+
+            <p className="text-xs text-[var(--text-3)] shrink-0 ml-auto">
+              <span className="text-[var(--text-2)] font-medium tabular-nums">
+                {filteredMatches.length}
+              </span>
+              {' '}match{filteredMatches.length !== 1 ? 's' : ''}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -232,10 +213,10 @@ export default function DashboardOverview({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--border)]">
-                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
                   Date
                 </th>
-                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
                   Tournoi
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">

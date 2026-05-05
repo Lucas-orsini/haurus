@@ -13,10 +13,6 @@ interface MatchRowProps {
   onToggleFavorite: (matchId: string, favorited: boolean) => void
 }
 
-/**
- * Metric definition for the accordion panel.
- * This local interface mirrors the MetricDef shape expected by METRIC_DEFS.
- */
 interface MetricDef {
   label: string
   p1Key: keyof MatchStats
@@ -24,10 +20,6 @@ interface MetricDef {
   mode: 'higher' | 'lower' | 'neutral'
 }
 
-/**
- * Ordered list of all 16 pre-match metrics displayed in the accordion panel.
- * Exported so MatchMetricsModal can import the same definitions.
- */
 export const METRIC_DEFS: MetricDef[] = [
   { label: 'Classement ATP',         p1Key: 'rank_p1',              p2Key: 'rank_p2',              mode: 'lower'   },
   { label: 'Évolution rank 6 mois', p1Key: 'delta_rank_6m_p1',     p2Key: 'delta_rank_6m_p2',     mode: 'lower'   },
@@ -47,10 +39,6 @@ export const METRIC_DEFS: MetricDef[] = [
   { label: 'Forme',                p1Key: 'form_p1',                p2Key: 'form_p2',                mode: 'neutral' },
 ]
 
-/**
- * Tooltip text for each metric label.
- * Exported so other components can reuse the same definitions.
- */
 export const METRIC_TOOLTIPS: Record<string, string> = {
   'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
   'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
@@ -59,7 +47,7 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
   'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
   'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
-  'MAP': 'Probabilité théorique de remporter le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
+  'MAP': 'Probabilité théorique de remporté le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
   'Win Rate TD': 'Pourcentage de victoires du joueur sur la période récente, toutes surfaces confondues. Les matchs récents ont plus de poids que les anciens.',
   'Win Rate Surface TD': 'Pourcentage de victoires du joueur sur la surface de ce tournoi, calculé sur la période récente. Capture la spécialisation sur cette surface.',
   'Momentum TD': 'Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu\'il surperforme en ce moment, négative qu\'il est en dessous de son niveau habituel.',
@@ -84,15 +72,15 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
           'hover:bg-white/[0.02]'
         )}
       >
-        {/* Date */}
-        <td className="px-4 py-3.5 whitespace-nowrap">
+        {/* Date — hidden on mobile */}
+        <td className="px-4 py-3.5 whitespace-nowrap hidden md:table-cell">
           <span className="text-xs font-mono text-[var(--text-3)] tabular-nums">
             {match.date_match}
           </span>
         </td>
 
-        {/* Tournoi */}
-        <td className="px-4 py-3.5 max-w-[180px]">
+        {/* Tournoi — hidden on mobile */}
+        <td className="px-4 py-3.5 max-w-[180px] hidden md:table-cell">
           <span className="truncate block text-sm text-[var(--text-2)]">
             {match.tournoi ?? '—'}
           </span>
@@ -114,8 +102,8 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
           </span>
         </td>
 
-        {/* Favoris */}
-        <td className="px-4 py-3.5">
+        {/* Favoris — touch target 44px */}
+        <td className="px-4 py-3.5 min-h-[44px] flex items-center">
           <FavoriteButton
             matchId={match.id}
             isFavorite={isFavorite}
@@ -133,20 +121,16 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
               open ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
             )}
           >
-            <div className="px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
-              {/* Player headers — aligned with the 3-column metrics grid below */}
-              <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4">
-                {/* Col 1: player 1 name, centered */}
+            <div className="px-4 md:px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
+
+              {/* Desktop: player headers in 3-column grid */}
+              <div className="hidden md:grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4">
                 <div className="flex flex-col items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player1}
                   </span>
                 </div>
-
-                {/* Col 2: empty — metric labels occupy this space below */}
                 <div />
-
-                {/* Col 3: player 2 name, centered */}
                 <div className="flex flex-col items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player2}
@@ -154,89 +138,168 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                 </div>
               </div>
 
-              {/* Metrics grid — comparative, 3-column per row */}
+              {/* Mobile: player names stacked */}
+              <div className="flex md:hidden mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-[var(--text-1)]">{match.player1}</span>
+                  <span className="text-[10px] text-[var(--text-3)]">vs</span>
+                  <span className="text-xs font-medium text-[var(--text-1)]">{match.player2}</span>
+                </div>
+              </div>
+
+              {/* Metrics grid */}
               <div>
                 <div className="space-y-0">
                   {METRIC_DEFS.map(({ label, p1Key, p2Key, mode }, idx) => {
                     const val1 = match[p1Key] as number | null
                     const val2 = match[p2Key] as number | null
                     const [classA, classB] = getMetricColor(val1, val2, mode)
-
                     const isGlickoP1 = p1Key === 'glicko_rating_p1'
                     const isGlickoP2 = p2Key === 'glicko_rating_p2'
 
                     return (
-                      <div
-                        key={label}
-                        className={cn(
-                          'grid grid-cols-[1fr_2fr_1fr] gap-3 py-2.5',
-                          idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
-                        )}
-                      >
-                        {/* Valeur P1 — centered */}
-                        <div className="flex items-center justify-center">
-                          <span
-                            className={cn(
-                              'text-xs font-mono tabular-nums',
-                              val1 === null || val1 === undefined
-                                ? 'text-[var(--text-3)]'
-                                : isGlickoP1
-                                  ? ''
-                                  : classA
-                            )}
-                          >
-                            {isGlickoP1 ? (
-                              <span className={cn(classA)}>
-                                {val1 !== null ? Math.round(val1) : '—'}
-                              </span>
-                            ) : p1Key === 'form_p1' ? (
-                              <FormeCell value={match.form_p1} />
-                            ) : p1Key === 'delta_rank_6m_p1' ? (
-                              <span className={cn(getDeltaColor(val1))}>
-                                {formatMetricValue(val1, p1Key as string)}
-                              </span>
-                            ) : (
-                              <span>{formatMetricValue(val1, p1Key as string)}</span>
-                            )}
-                          </span>
+                      <>
+                        {/* Desktop row */}
+                        <div
+                          key={`desktop-${label}`}
+                          className={cn(
+                            'hidden md:grid grid-cols-[1fr_2fr_1fr] gap-3 py-2.5',
+                            idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
+                          )}
+                        >
+                          <div className="flex items-center justify-center">
+                            <span
+                              className={cn(
+                                'text-xs font-mono tabular-nums',
+                                val1 === null || val1 === undefined
+                                  ? 'text-[var(--text-3)]'
+                                  : isGlickoP1
+                                    ? ''
+                                    : classA
+                              )}
+                            >
+                              {isGlickoP1 ? (
+                                <span className={cn(classA)}>
+                                  {val1 !== null ? Math.round(val1) : '—'}
+                                </span>
+                              ) : p1Key === 'form_p1' ? (
+                                <FormeCell value={match.form_p1} />
+                              ) : p1Key === 'delta_rank_6m_p1' ? (
+                                <span className={cn(getDeltaColor(val1))}>
+                                  {formatMetricValue(val1, p1Key as string)}
+                                </span>
+                              ) : (
+                                <span>{formatMetricValue(val1, p1Key as string)}</span>
+                              )}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-center">
+                            <MetricTooltip
+                              label={label}
+                              tooltip={METRIC_TOOLTIPS[label] ?? ''}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-center">
+                            <span
+                              className={cn(
+                                'text-xs font-mono tabular-nums',
+                                val2 === null || val2 === undefined
+                                  ? 'text-[var(--text-3)]'
+                                  : isGlickoP2
+                                    ? ''
+                                    : classB
+                              )}
+                            >
+                              {isGlickoP2 ? (
+                                <span className={cn(classB)}>
+                                  {val2 !== null ? Math.round(val2) : '—'}
+                                </span>
+                              ) : p2Key === 'form_p2' ? (
+                                <FormeCell value={match.form_p2} />
+                              ) : p2Key === 'delta_rank_6m_p2' ? (
+                                <span className={cn(getDeltaColor(val2))}>
+                                  {formatMetricValue(val2, p2Key as string)}
+                                </span>
+                              ) : (
+                                <span>{formatMetricValue(val2, p2Key as string)}</span>
+                              )}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Label — centered with tooltip */}
-                        <div className="flex items-center justify-center">
-                          <MetricTooltip
-                            label={label}
-                            tooltip={METRIC_TOOLTIPS[label] ?? ''}
-                          />
+                        {/* Mobile vertical layout */}
+                        <div
+                          key={`mobile-${label}`}
+                          className={cn(
+                            'flex md:hidden flex-col gap-1.5 py-3 px-1',
+                            idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
+                          )}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-[var(--text-3)]">{label}</span>
+                            <MetricTooltip
+                              label=""
+                              tooltip={METRIC_TOOLTIPS[label] ?? ''}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-[var(--text-3)]">{match.player1}</span>
+                            <span
+                              className={cn(
+                                'text-sm font-mono tabular-nums font-medium',
+                                val1 === null || val1 === undefined
+                                  ? 'text-[var(--text-3)]'
+                                  : isGlickoP1
+                                    ? 'text-[var(--text-1)]'
+                                    : classA
+                              )}
+                            >
+                              {isGlickoP1 ? (
+                                <span className={cn(classA)}>
+                                  {val1 !== null ? Math.round(val1) : '—'}
+                                </span>
+                              ) : p1Key === 'form_p1' ? (
+                                <FormeCell value={match.form_p1} />
+                              ) : p1Key === 'delta_rank_6m_p1' ? (
+                                <span className={cn(getDeltaColor(val1))}>
+                                  {formatMetricValue(val1, p1Key as string)}
+                                </span>
+                              ) : (
+                                <span>{formatMetricValue(val1, p1Key as string)}</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-[var(--text-3)]">{match.player2}</span>
+                            <span
+                              className={cn(
+                                'text-sm font-mono tabular-nums font-medium',
+                                val2 === null || val2 === undefined
+                                  ? 'text-[var(--text-3)]'
+                                  : isGlickoP2
+                                    ? 'text-[var(--text-1)]'
+                                    : classB
+                              )}
+                            >
+                              {isGlickoP2 ? (
+                                <span className={cn(classB)}>
+                                  {val2 !== null ? Math.round(val2) : '—'}
+                                </span>
+                              ) : p2Key === 'form_p2' ? (
+                                <FormeCell value={match.form_p2} />
+                              ) : p2Key === 'delta_rank_6m_p2' ? (
+                                <span className={cn(getDeltaColor(val2))}>
+                                  {formatMetricValue(val2, p2Key as string)}
+                                </span>
+                              ) : (
+                                <span>{formatMetricValue(val2, p2Key as string)}</span>
+                              )}
+                            </span>
+                          </div>
                         </div>
-
-                        {/* Valeur P2 — centered */}
-                        <div className="flex items-center justify-center">
-                          <span
-                            className={cn(
-                              'text-xs font-mono tabular-nums',
-                              val2 === null || val2 === undefined
-                                ? 'text-[var(--text-3)]'
-                                : isGlickoP2
-                                  ? ''
-                                  : classB
-                            )}
-                          >
-                            {isGlickoP2 ? (
-                              <span className={cn(classB)}>
-                                {val2 !== null ? Math.round(val2) : '—'}
-                              </span>
-                            ) : p2Key === 'form_p2' ? (
-                              <FormeCell value={match.form_p2} />
-                            ) : p2Key === 'delta_rank_6m_p2' ? (
-                              <span className={cn(getDeltaColor(val2))}>
-                                {formatMetricValue(val2, p2Key as string)}
-                              </span>
-                            ) : (
-                              <span>{formatMetricValue(val2, p2Key as string)}</span>
-                            )}
-                          </span>
-                        </div>
-                      </div>
+                      </>
                     )
                   })}
                 </div>
@@ -249,12 +312,6 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
   )
 }
 
-// ─── Sous-composants pour les cas spéciaux ───────────────────────────────────
-
-/**
- * Affiche la forme (V/D/N) avec couleurs : V=vert, D=rouge, N=neutre.
- * Séparé par des espaces.
- */
 function FormeCell({ value }: { value: string | null }) {
   const segments = formatForme(value)
 

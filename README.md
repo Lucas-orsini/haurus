@@ -88,68 +88,61 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key | Public key for client-side authentication |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key | Server-side key that bypasses RLS (never expose client-side) |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open a chat with [@BotFather](https://t.me/botfather) on Telegram → send `/newbot` → follow the steps → copy the token | Authenticates your bot with the Telegram API |
-| `TELEGRAM_BOT_SECRET` | Yes | Create a random secret string (e.g., use a password generator) | Secret token for HMAC-SHA256 webhook signature verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key | Public key for client-side authentication, safe to expose in browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key | Secret key for server-side operations, bypasses Row Level Security |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), use `/newbot` command | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook | A secret string you choose for verifying webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly without running the entire app.
+Unit tests automatically check that your code works correctly — think of them as tiny robots that verify each piece of your app does what it's supposed to do.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
+**Watch mode — re-runs tests automatically when files change:**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests passed, everything works correctly
-- `FAIL` — Something broke, check the error message below to see which test failed
+**Understanding the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke ❌, you'll see which test failed and why
 
-**Tests included:**
-- Authentication validators and flows (`__tests__/auth.test.ts`, `__tests__/auth-validators.test.ts`)
-- Dashboard metric formatting (`__tests__/dashboard/formatMetric.test.ts`)
-- Dashboard statistics utilities (`__tests__/lib/dashboard/stats.test.ts`)
-- General utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+The test suite covers authentication validators, auth utilities, dashboard formatting helpers, dashboard stats utilities, and general utility functions.
 
 ## 📁 Project Structure
 
 - `src/app` — Next.js App Router pages and layouts
-- `src/components` — React components including dashboard elements
+- `src/components/dashboard` — Dashboard-specific UI components
+- `__tests__` — Jest test files for auth, dashboard, and utilities
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the "Deploy with Vercel" button above
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-
+4. Add all the variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
+5. Click **Deploy**
 
-5. Click **Deploy** — Vercel will automatically build and deploy your app
-
-> ⚠️ **Important**: Every environment variable from `.env.local` must be added to Vercel, otherwise your app will crash or behave unexpectedly after deployment.
+> ⚠️ **Important**: Every environment variable from your `.env.local` must be added to Vercel, otherwise your app will break in production.
 
 ## 📝 License
 
