@@ -21,8 +21,8 @@ export default function DashboardLayout({
         {/* Page header — fixed, never scrolls */}
         <header className="shrink-0 flex items-center justify-between h-14 px-6 border-b border-[var(--border)] bg-[var(--bg)]">
           <div className="min-w-0">
-            <h1 className="text-sm font-semibold text-[var(--text-1)] truncate">Overview</h1>
-            <p className="text-xs text-[var(--text-3)] truncate">ATP match statistics</p>
+            <h1 className="text-sm font-semibold text-[var(--text-1)] truncate">Aperçu</h1>
+            <p className="text-xs text-[var(--text-3)] truncate">Statistiques des matchs ATP</p>
           </div>
         </header>
 
