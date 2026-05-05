@@ -17,7 +17,7 @@ const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
 
 export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: SurfaceSelectorProps) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="w-full md:w-auto flex items-center gap-1">
       {SURFACES.map((surface) => {
         const active = selectedSurface === surface
         return (
@@ -25,7 +25,7 @@ export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: Su
             key={surface}
             onClick={() => onSurfaceChange(surface)}
             className={cn(
-              'h-7 px-3 flex items-center justify-center rounded-md text-xs font-medium',
+              'flex-1 h-7 px-1 md:px-3 flex items-center justify-center rounded-md text-[10px] md:text-xs font-medium',
               'transition-all duration-150 whitespace-nowrap',
               active
                 ? 'border border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent-hi)]'

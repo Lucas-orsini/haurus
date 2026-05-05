@@ -50,11 +50,11 @@ export default function MatchHistoryTable({
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-md)]">
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Date</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Date</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Adversaire</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Tournoi</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Surface</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Score</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Tournoi</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Surface</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Score</th>
               <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Résultat</th>
               <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide w-24">Métriques</th>
             </tr>
@@ -70,19 +70,19 @@ export default function MatchHistoryTable({
                   key={match.id}
                   className="border-b border-[var(--border)] last:border-0 hover:bg-white/[0.02] transition-colors duration-150"
                 >
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)] font-mono">
+                  <td className="hidden md:table-cell px-4 py-3 text-sm text-[var(--text-2)] font-mono">
                     {formatDate(match.date_match)}
                   </td>
                   <td className="px-4 py-3 text-sm text-[var(--text-1)]">
                     {match.adversaire}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)]">
+                  <td className="hidden md:table-cell px-4 py-3 text-sm text-[var(--text-2)]">
                     {match.tournoi ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)]">
+                  <td className="hidden md:table-cell px-4 py-3 text-sm text-[var(--text-2)]">
                     {match.surface ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--text-2)] font-mono">
+                  <td className="hidden md:table-cell px-4 py-3 text-sm text-[var(--text-2)] font-mono">
                     {match.score ?? '—'}
                   </td>
                   <td className="px-4 py-3 text-center">

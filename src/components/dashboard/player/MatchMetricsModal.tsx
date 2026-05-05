@@ -47,7 +47,7 @@ export default function MatchMetricsModal({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal content */}
-      <div className="relative w-full max-w-lg bg-[var(--surface-1)] border border-[var(--border-md)] rounded-xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-none md:max-w-lg bg-[var(--surface-1)] border border-[var(--border-md)] rounded-xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
@@ -81,8 +81,8 @@ export default function MatchMetricsModal({
           </div>
         ) : (
           <div className="px-5 py-5 max-h-[70vh] overflow-y-auto">
-            {/* En-têtes joueurs — noms et ranks orientés */}
-            <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4 pb-3 border-b border-[var(--border)]">
+            {/* En-têtes joueurs — noms et ranks orientés — stack mobile, grid desktop */}
+            <div className="flex flex-col md:grid md:grid-cols-[1fr_2fr_1fr] gap-3 mb-4 pb-3 border-b border-[var(--border)]">
               <div className="flex flex-col items-center min-w-0">
                 <span className="text-xs font-medium text-[var(--text-1)] truncate">
                   {leftPlayer}
@@ -91,7 +91,7 @@ export default function MatchMetricsModal({
                   {leftRank !== null && leftRank !== undefined ? `#${leftRank}` : '—'}
                 </span>
               </div>
-              <div />
+              <div className="hidden md:block" />
               <div className="flex flex-col items-center min-w-0">
                 <span className="text-xs font-medium text-[var(--text-1)] truncate">
                   {rightPlayer}
@@ -108,37 +108,27 @@ export default function MatchMetricsModal({
                 const p1Key = metric.p1Key as keyof MatchStats
                 const p2Key = metric.p2Key as keyof MatchStats
 
-                // Valeurs brutes depuis la base
                 const rawP1 = stats[p1Key] as number | null
                 const rawP2 = stats[p2Key] as number | null
 
-                // Permutation selon orientation : les valeurs du joueur suivi passent à gauche
-                const val1 = isPlayerOnLeft ? rawP1 : rawP2  // valeur affichée à gauche
-                const val2 = isPlayerOnLeft ? rawP2 : rawP1  // valeur affichée à droite
+                const val1 = isPlayerOnLeft ? rawP1 : rawP2
+                const val2 = isPlayerOnLeft ? rawP2 : rawP1
 
-                // Couleurs — si playerName est à droite en base, on permute aussi les couleurs
-                // getMetricColor(rawP1, rawP2, ...) colore "l'avantage" sur la valeur de player1.
-                // Si playerName est en player1 → pas de permutation de couleurs.
-                // Si playerName est en player2 → permuter les couleurs pour qu'elles suivent la permutation des valeurs.
                 let [classA, classB] = getMetricColor(
                   rawP1,
                   rawP2,
                   metric.mode as 'higher' | 'lower' | 'neutral'
                 )
                 if (!isPlayerOnLeft) {
-                  // PlayerName est en player2 → permuter les couleurs pour qu'elles restent cohérentes
-                  // avec les valeurs permutées (val1 vient de rawP2, val2 vient de rawP1)
                   ;[classA, classB] = [classB, classA]
                 }
 
                 const isGlickoP1 = p1Key === 'glicko_rating_p1'
                 const isGlickoP2 = p2Key === 'glicko_rating_p2'
 
-                // RD pour Glicko — suivent l'orientation (rd_p1 pour player1 en base, rd_p2 pour player2)
                 const rdP1 = isGlickoP1 ? (stats.glicko_rd_p1 as number | null) : null
                 const rdP2 = isGlickoP2 ? (stats.glicko_rd_p2 as number | null) : null
 
-                // Valeur RD affichée à gauche selon orientation
                 const leftRd  = isPlayerOnLeft ? rdP1 : rdP2
                 const rightRd = isPlayerOnLeft ? rdP2 : rdP1
 
@@ -150,7 +140,7 @@ export default function MatchMetricsModal({
                       idx < arr.length - 1 && 'border-b border-[var(--border)]'
                     )}
                   >
-                    {/* Valeur à gauche (playerName si isPlayerOnLeft, opponent sinon) */}
+                    {/* Valeur à gauche */}
                     <div className="flex flex-col items-center">
                       {isGlickoP1 ? (
                         <>
@@ -215,7 +205,7 @@ export default function MatchMetricsModal({
               })}
             </div>
 
-            {/* Legende */}
+            {/* Légende */}
             <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-[var(--border)]">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--green)]" />

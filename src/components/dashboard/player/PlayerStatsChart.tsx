@@ -11,11 +11,6 @@ import type { StatsHistoryPoint } from '@/lib/types/player'
 
 type Json = Database['public']['Tables']['player_stats']['Row']['stats_history'] extends infer T ? T : never
 
-/**
- * 16 métriques disponibles dans stats_history.
- * Chaque clé correspond à la propriété stockée dans le JSON,
- * la valeur est le label affiché dans le dropdown.
- */
 const METRICS: Array<{ key: string; label: string }> = [
   { key: 'bppi', label: 'BPPI' },
   { key: 'rank', label: 'Classement' },
@@ -41,41 +36,18 @@ interface PlayerStatsChartProps {
   statsHistory: Json | null
 }
 
-/**
- * Retourne le label lisible d'une clé de métrique.
- */
 export function formatMetricLabel(key: string): string {
   return METRICS.find((m) => m.key === key)?.label ?? key
 }
 
-/**
- * Parse le JSON stats_history et extrait les points pour une métrique donnée.
- *
- * Format réel attendu :
- * {
- *   "glicko_clay": [["2024-01-01", 1800.5], ["2024-01-08", 1810.2], ...],
- *   "win_rate_td": [["2024-01-01", 0.72], ...],
- *   ...
- * }
- *
- * Chaque valeur est un tableau [date, valeur] avec date au format ISO (YYYY-MM-DD).
- *
- * @param raw   — le JSON brut (objet ou null)
- * @param metricKey — la clé de métrique à extraire (ex: 'glicko_clay')
- * @returns     — tableau de StatsHistoryPoint trié par date, limité aux 60 derniers
- */
 function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoint[] {
-  // Validation défensive
   if (raw === null || typeof raw !== 'object') return []
 
   const obj = raw as Record<string, unknown>
-
-  // Vérifie que la clé existe et que la valeur est un tableau
   const metricData = obj[metricKey]
   if (!metricData) return []
   if (!Array.isArray(metricData)) return []
 
-  // Chaque élément est un couple [date, valeur]
   const points: StatsHistoryPoint[] = []
 
   for (const item of metricData) {
@@ -90,26 +62,25 @@ function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoi
     })
   }
 
-  // Trié par date, garder les 60 derniers
   return points
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(-60)
 }
 
-function MetricChart({ data, color }: { data: StatsHistoryPoint[]; color: string }) {
+function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number }) {
   const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
 
   if (validData.length < 3) {
     return (
-      <div className="h-[200px] flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
       </div>
     )
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={validData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
+      <AreaChart data={validData} margin={{ top: 4, right: 16, bottom: 0, left: -20 }}>
         <defs>
           <linearGradient id="grad-chart" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor={color} stopOpacity={0.15} />
@@ -169,8 +140,8 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
 
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-      {/* Sélecteur de métrique — dropdown natif */}
-      <div className="flex items-center gap-2 mb-4">
+      {/* Sélecteur de métrique — column mobile, row desktop */}
+      <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
         <label
           htmlFor="metric-select"
           className="text-xs font-medium text-[var(--text-2)] shrink-0"
@@ -178,7 +149,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
           Métrique
         </label>
 
-        <div className="relative flex-1 max-w-[220px]">
+        <div className="relative flex-1 max-w-full md:max-w-[220px]">
           <select
             id="metric-select"
             value={selectedMetric}
@@ -197,7 +168,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
             ))}
           </select>
 
-          {/* Chevron absolute — pointer-events-none pour que le clic passe au select */}
+          {/* Chevron */}
           <svg
             width="14"
             height="14"
@@ -213,22 +184,33 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
           </svg>
         </div>
 
-        {/* Label actif — информация */}
+        {/* Label actif */}
         {parsedData.length > 0 && (
-          <span className="text-xs text-[var(--text-3)] font-mono tabular-nums ml-auto">
+          <span className="text-xs text-[var(--text-3)] font-mono tabular-nums md:ml-auto">
             {parsedData.length} pts
           </span>
         )}
       </div>
 
-      {/* Chart ou fallback */}
-      {parsedData.length === 0 ? (
-        <div className="h-[200px] flex items-center justify-center">
-          <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
-        </div>
-      ) : (
-        <MetricChart data={parsedData} color="var(--accent)" />
-      )}
+      {/* Chart — 250px mobile, 200px desktop */}
+      <div className="h-[250px] md:h-[200px]">
+        {parsedData.length === 0 ? (
+          <div className="h-full flex items-center justify-center">
+            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop chart — hidden on mobile */}
+            <div className="hidden md:block h-full">
+              <MetricChart data={parsedData} color="var(--accent)" chartHeight={200} />
+            </div>
+            {/* Mobile chart — hidden on desktop */}
+            <div className="md:hidden h-full">
+              <MetricChart data={parsedData} color="var(--accent)" chartHeight={250} />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
