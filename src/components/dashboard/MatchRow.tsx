@@ -233,7 +233,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                         <div
                           key={`mobile-${label}`}
                           className={cn(
-                            'flex md:hidden flex-col gap-1.5 py-3 px-1',
+                            'flex md:hidden flex-col gap-0.5 md:gap-1.5 py-3 px-1',
                             idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                           )}
                         >
