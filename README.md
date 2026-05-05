@@ -82,69 +82,62 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac), then type the command above.
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac), then type the command above.
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key | Safe to expose in client-side code |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key | Server-side only, bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — [Create a bot](https://core.telegram.org/bots/tutorial#creating-your-first-bot) | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this when setting up your webhook | Secret string used for HMAC-SHA256 signature verification |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side queries |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → message [@BotFather](https://t.me/BotFather) → send `/newbot` → follow prompts → copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Choose any random string (e.g. `my-secret-webhook-key-123`) | Secret used to verify HMAC-SHA256 signatures on incoming webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly — think of them as automated quality checks that run in seconds.
+Unit tests automatically check that small pieces of your code work correctly — like checking that a login function handles invalid emails properly.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode — re-runs tests automatically when you save a file:
+**Watch mode (re-runs automatically when you change a file):**
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — Everything works ✅
-- `FAIL` — Something is broken. Look at the error message — it shows which test failed and why.
+**How to read the output:**
+- `PASS` — All checks passed, your code works correctly
+- `FAIL` — Something broke, see the error message below for details
 
 **What the tests cover:**
-
-| Test File | What it tests |
-|-----------|---------------|
-| `__tests__/auth.test.ts` | Authentication logic and flows |
-| `__tests__/auth-validators.test.ts` | Input validation for auth (email, password rules) |
-| `__tests__/utils.test.ts` | General utility functions |
-| `__tests__/lib/utils.test.ts` | Library-level utilities |
-| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting in the dashboard |
-| `__tests__/lib/dashboard/stats.test.ts` | Statistics calculation logic |
+- Auth validation logic (email format, password strength)
+- Auth flow (login, logout, session handling)
+- Dashboard metrics formatting and calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (MatchRow and related)
+- `src/components/dashboard` — Dashboard UI components including match rows
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add ALL the environment variables from your `.env.local` file:
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all the variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
@@ -152,7 +145,7 @@ npx jest --watch
    - `TELEGRAM_BOT_SECRET`
 5. Click **Deploy**
 
-> ⚠️ **Important**: Every environment variable from `.env.local` must be added to Vercel, or your app will crash on startup.
+Vercel will automatically build and deploy your app. Every time you push to your `main` branch, Vercel will rebuild and redeploy.
 
 ## 📝 License
 
