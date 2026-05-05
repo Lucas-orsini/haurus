@@ -130,10 +130,9 @@ export default function DashboardOverview({
 
       {/* Search + filter bar */}
       <div className="flex flex-col gap-3">
-        {/* Horizontal scrollable filter row */}
-        <div className="overflow-x-auto flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2">
           {/* Search input */}
-          <div className="relative shrink-0 w-48">
+          <div className="relative flex-1 max-w-sm">
             <Search
               size={14}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] pointer-events-none"
@@ -164,7 +163,7 @@ export default function DashboardOverview({
           <button
             onClick={() => toggleFilter(TODAY_FILTER_KEY)}
             className={cn(
-              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0',
+              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
               activeFilters.has(TODAY_FILTER_KEY)
                 ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
                 : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
@@ -178,7 +177,7 @@ export default function DashboardOverview({
           <button
             onClick={() => setFavoritesOnly((v) => !v)}
             className={cn(
-              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0',
+              'h-8 px-3 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap',
               favoritesOnly
                 ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
                 : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-3)] hover:bg-white/[0.06] hover:text-[var(--text-2)]'
@@ -196,7 +195,7 @@ export default function DashboardOverview({
               key={t}
               onClick={() => toggleFilter(t)}
               className={cn(
-                'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0 max-w-[160px]',
+                'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap max-w-[160px]',
                 activeFilters.has(t)
                   ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
                   : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
@@ -210,7 +209,7 @@ export default function DashboardOverview({
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="h-8 px-2.5 flex items-center justify-center gap-1 rounded-md text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors shrink-0"
+              className="h-8 px-2.5 flex items-center justify-center gap-1 rounded-md text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors"
             >
               <X size={11} />
               Effacer
@@ -218,7 +217,7 @@ export default function DashboardOverview({
           )}
 
           {/* Count */}
-          <p className="text-xs text-[var(--text-3)] shrink-0 ml-auto whitespace-nowrap">
+          <p className="text-xs text-[var(--text-3)] shrink-0 ml-auto">
             <span className="text-[var(--text-2)] font-medium tabular-nums">
               {filteredMatches.length}
             </span>
