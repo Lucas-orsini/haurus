@@ -16,7 +16,12 @@ const NAV_ITEMS = [
   { label: 'Métriques', icon: BookOpen, href: '/dashboard/metrics' },
 ]
 
-export default function DashboardSidebar() {
+interface DashboardSidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -85,186 +90,292 @@ export default function DashboardSidebar() {
   }
 
   return (
-    <aside className="w-[220px] shrink-0 h-screen flex flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
+    <>
+      {/* Mobile overlay sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="fixed inset-y-0 left-0 z-50 w-[220px] flex flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4 md:hidden"
+          >
+            {/* Logo */}
+            <div className="flex items-center justify-between px-2 mb-6 shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
+                  <span className="text-black text-xs font-bold">H</span>
+                </div>
+                <span className="text-sm font-semibold text-[var(--text-1)] tracking-tight truncate">
+                  Haurus
+                </span>
+              </div>
+              <button
+                onClick={onClose}
+                aria-label="Fermer le menu"
+                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/[0.05] transition-colors"
+              >
+                <span className="text-[var(--text-2)] text-lg leading-none">×</span>
+              </button>
+            </div>
 
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-2 mb-6 shrink-0">
-        <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
-          <span className="text-black text-xs font-bold">H</span>
-        </div>
-        <span className="text-sm font-semibold text-[var(--text-1)] tracking-tight truncate">
-          Haurus
-        </span>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
-          const isActive = href === '/dashboard'
-            ? pathname === href
-            : pathname === href || pathname.startsWith(href + '/')
-          return (
-            <motion.div
-              key={href}
-              className="relative"
-              initial={false}
-            >
-              {/* Sliding active indicator */}
-              <AnimatePresence initial={false} mode="wait">
-                {isActive && (
+            {/* Navigation */}
+            <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
+              {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+                const isActive = href === '/dashboard'
+                  ? pathname === href
+                  : pathname === href || pathname.startsWith(href + '/')
+                return (
                   <motion.div
-                    layoutId="active-nav-indicator"
-                    className="absolute inset-0 bg-white/[0.07] rounded-md"
-                    style={{ borderLeft: '2px solid var(--accent)' }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    key={href}
+                    className="relative"
+                    initial={false}
+                  >
+                    <AnimatePresence initial={false} mode="wait">
+                      {isActive && (
+                        <motion.div
+                          layoutId="active-nav-indicator-mobile"
+                          className="absolute inset-0 bg-white/[0.07] rounded-md"
+                          style={{ borderLeft: '2px solid var(--accent)' }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15, ease: 'easeOut' }}
+                        />
+                      )}
+                    </AnimatePresence>
+                    <Link
+                      href={href}
+                      onClick={onClose}
+                      className={cn(
+                        'relative flex items-center justify-start gap-2.5 px-2 h-8 rounded-md text-sm',
+                        isActive
+                          ? 'text-[var(--text-1)] font-medium pl-3'
+                          : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-3'
+                      )}
+                    >
+                      <Icon size={15} strokeWidth={1.5} className="shrink-0" />
+                      <span className="truncate">{label}</span>
+                    </Link>
+                  </motion.div>
+                )
+              })}
+            </nav>
+
+            {/* User footer */}
+            <div className="shrink-0 border-t border-[var(--border)] pt-3 mt-2">
+              {sessionState === 'loading' && (
+                <div className="flex items-center gap-2 px-2 py-2 animate-pulse">
+                  <div className="w-6 h-6 rounded-full bg-white/[0.06] shrink-0" />
+                  <div className="flex flex-col min-w-0 flex-1 gap-1">
+                    <div className="h-2.5 bg-white/[0.06] rounded w-24" />
+                    <div className="h-2 bg-white/[0.04] rounded w-32" />
+                  </div>
+                </div>
+              )}
+              {sessionState === 'error' && (
+                <div className="flex items-center gap-2 px-2 py-2">
+                  <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
+                    <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-xs text-[var(--text-3)]">Session indisponible</span>
+                </div>
+              )}
+              {sessionState === 'success' && user && (
+                <div className="flex items-center gap-2 px-2 py-2">
+                  <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0 overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[10px] font-medium text-[var(--text-2)]">
+                        {getInitials(user.name ?? '')}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-medium text-[var(--text-1)] truncate block">
+                      {user.name ?? 'User'}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-3)] truncate block">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop sidebar — always visible, ignores isOpen/onClose */}
+      <aside className="hidden md:flex w-[220px] shrink-0 h-screen flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
+
+        {/* Logo */}
+        <div className="flex items-center gap-2 px-2 mb-6 shrink-0">
+          <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
+            <span className="text-black text-xs font-bold">H</span>
+          </div>
+          <span className="text-sm font-semibold text-[var(--text-1)] tracking-tight truncate">
+            Haurus
+          </span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
+          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+            const isActive = href === '/dashboard'
+              ? pathname === href
+              : pathname === href || pathname.startsWith(href + '/')
+            return (
+              <motion.div
+                key={href}
+                className="relative"
+                initial={false}
+              >
+                <AnimatePresence initial={false} mode="wait">
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-nav-indicator"
+                      className="absolute inset-0 bg-white/[0.07] rounded-md"
+                      style={{ borderLeft: '2px solid var(--accent)' }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                    />
+                  )}
+                </AnimatePresence>
+                <Link
+                  href={href}
+                  className={cn(
+                    'relative flex items-center justify-start gap-2.5 px-2 h-8 rounded-md text-sm',
+                    isActive
+                      ? 'text-[var(--text-1)] font-medium pl-3'
+                      : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-3'
+                  )}
+                >
+                  <Icon size={15} strokeWidth={1.5} className="shrink-0" />
+                  <span className="truncate">{label}</span>
+                </Link>
+              </motion.div>
+            )
+          })}
+        </nav>
+
+        {/* User footer — bloc profil */}
+        <div className="shrink-0 border-t border-[var(--border)] pt-3 mt-2">
+          {sessionState === 'loading' && (
+            <div className="flex items-center gap-2 px-2 py-2 animate-pulse">
+              <div className="w-6 h-6 rounded-full bg-white/[0.06] shrink-0" />
+              <div className="flex flex-col min-w-0 flex-1 gap-1">
+                <div className="h-2.5 bg-white/[0.06] rounded w-24" />
+                <div className="h-2 bg-white/[0.04] rounded w-32" />
+              </div>
+            </div>
+          )}
+          {sessionState === 'error' && (
+            <div className="flex items-center gap-2 px-2 py-2">
+              <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
+                <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs text-[var(--text-3)] truncate">Session indisponible</span>
+              </div>
+            </div>
+          )}
+          {sessionState === 'success' && user && (
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setIsDropdownOpen((prev: boolean) => !prev)}
+                className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer transition-colors w-full"
+              >
+                <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0 overflow-hidden">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[10px] font-medium text-[var(--text-2)]">
+                      {getInitials(user.name ?? '')}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col min-w-0 flex-1 text-left">
+                  <span className="text-xs font-medium text-[var(--text-1)] truncate">
+                    {user.name ?? 'User'}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-3)] truncate">
+                    {user.email}
+                  </span>
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
-                  />
+                    className="absolute bottom-full left-0 right-0 mb-1.5 z-50
+                               bg-[var(--surface-2)] border border-[var(--border-md)]
+                               rounded-lg shadow-xl overflow-hidden py-1"
+                  >
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(true)
+                        setIsDropdownOpen(false)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                                 text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)]
+                                 transition-colors duration-100 whitespace-nowrap"
+                    >
+                      <User size={13} strokeWidth={1.5} className="shrink-0" />
+                      Profil
+                    </button>
+
+                    <button
+                      disabled
+                      className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                                 text-[var(--text-3)] opacity-50 cursor-default pointer-events-none
+                                 transition-colors duration-100 whitespace-nowrap"
+                    >
+                      <Settings size={13} strokeWidth={1.5} className="shrink-0" />
+                      Réglage
+                    </button>
+
+                    <div className="h-px bg-[var(--border)] my-1" />
+
+                    <button
+                      onClick={() => {
+                        handleSignOut()
+                        setIsDropdownOpen(false)
+                      }}
+                      disabled={signingOut}
+                      className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
+                                 text-[var(--red)] hover:bg-[var(--red)]/10
+                                 transition-colors duration-100 whitespace-nowrap
+                                 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
+                      {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                    </button>
+                  </motion.div>
                 )}
               </AnimatePresence>
-
-              <Link
-                href={href}
-                className={cn(
-                  'relative flex items-center justify-start gap-2.5 px-2 h-8 rounded-md text-sm',
-                  isActive
-                    ? 'text-[var(--text-1)] font-medium pl-3'
-                    : 'text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.03] pl-3'
-                )}
-              >
-                <Icon size={15} strokeWidth={1.5} className="shrink-0" />
-                <span className="truncate">{label}</span>
-              </Link>
-            </motion.div>
-          )
-        })}
-      </nav>
-
-      {/* User footer — bloc profil */}
-      <div className="shrink-0 border-t border-[var(--border)] pt-3 mt-2">
-
-        {/* Skeleton loading */}
-        {sessionState === 'loading' && (
-          <div className="flex items-center gap-2 px-2 py-2 animate-pulse">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] shrink-0" />
-            <div className="flex flex-col min-w-0 flex-1 gap-1">
-              <div className="h-2.5 bg-white/[0.06] rounded w-24" />
-              <div className="h-2 bg-white/[0.04] rounded w-32" />
             </div>
-          </div>
-        )}
-
-        {/* Error state */}
-        {sessionState === 'error' && (
-          <div className="flex items-center gap-2 px-2 py-2">
-            <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
-              <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
-            </div>
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs text-[var(--text-3)] truncate">Session indisponible</span>
-            </div>
-          </div>
-        )}
-
-        {/* Success — bloc profil cliquable avec dropdown */}
-        {sessionState === 'success' && user && (
-          <div ref={dropdownRef} className="relative">
-            <button
-              onClick={() => setIsDropdownOpen((prev: boolean) => !prev)}
-              className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/[0.04] cursor-pointer transition-colors w-full"
-            >
-              {/* Avatar initiales ou image */}
-              <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0 overflow-hidden">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-[10px] font-medium text-[var(--text-2)]">
-                    {getInitials(user.name ?? '')}
-                  </span>
-                )}
-              </div>
-
-              {/* Nom + email */}
-              <div className="flex flex-col min-w-0 flex-1 text-left">
-                <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                  {user.name ?? 'User'}
-                </span>
-                <span className="text-[10px] text-[var(--text-3)] truncate">
-                  {user.email}
-                </span>
-              </div>
-            </button>
-
-            {/* Dropdown menu */}
-            <AnimatePresence>
-              {isDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 4 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute bottom-full left-0 right-0 mb-1.5 z-50
-                             bg-[var(--surface-2)] border border-[var(--border-md)]
-                             rounded-lg shadow-xl overflow-hidden py-1"
-                >
-                  <button
-                    onClick={() => {
-                      setIsProfileModalOpen(true)
-                      setIsDropdownOpen(false)
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
-                               text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)]
-                               transition-colors duration-100 whitespace-nowrap"
-                  >
-                    <User size={13} strokeWidth={1.5} className="shrink-0" />
-                    Profil
-                  </button>
-
-                  <button
-                    disabled
-                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
-                               text-[var(--text-3)] opacity-50 cursor-default pointer-events-none
-                               transition-colors duration-100 whitespace-nowrap"
-                  >
-                    <Settings size={13} strokeWidth={1.5} className="shrink-0" />
-                    Réglage
-                  </button>
-
-                  <div className="h-px bg-[var(--border)] my-1" />
-
-                  <button
-                    onClick={() => {
-                      handleSignOut()
-                      setIsDropdownOpen(false)
-                    }}
-                    disabled={signingOut}
-                    className="w-full flex items-center gap-2.5 px-3 h-8 text-sm
-                               text-[var(--red)] hover:bg-[var(--red)]/10
-                               transition-colors duration-100 whitespace-nowrap
-                               disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-                    {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Modale profil */}
-        {sessionState === 'success' && user && isProfileModalOpen && (
-          <UserProfileModal
-            user={user}
-            onClose={() => setIsProfileModalOpen(false)}
-            onUpdateSuccess={(updated: AuthUser) => {
-              setUser(updated)
-              setIsProfileModalOpen(false)
-            }}
-          />
-        )}
-      </div>
-    </aside>
+          )}
+          {sessionState === 'success' && user && isProfileModalOpen && (
+            <UserProfileModal
+              user={user}
+              onClose={() => setIsProfileModalOpen(false)}
+              onUpdateSuccess={(updated: AuthUser) => {
+                setUser(updated)
+                setIsProfileModalOpen(false)
+              }}
+            />
+          )}
+        </div>
+      </aside>
+    </>
   )
 }
