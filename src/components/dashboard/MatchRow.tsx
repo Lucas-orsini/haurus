@@ -96,7 +96,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
         </td>
 
         {/* Surface */}
-        <td className="px-4 py-3.5 whitespace-nowrap">
+        <td className="px-4 py-3.5 whitespace-nowrap hidden md:table-cell">
           <span className="text-xs text-[var(--text-3)]">
             {match.surface ?? '—'}
           </span>
