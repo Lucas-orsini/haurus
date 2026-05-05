@@ -271,7 +271,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                               )}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-start gap-2">
                             <span className="text-xs text-[var(--text-3)]">{match.player2}</span>
                             <span
                               className={cn(

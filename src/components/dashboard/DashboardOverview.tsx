@@ -222,7 +222,7 @@ export default function DashboardOverview({
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
                   Joueurs
                 </th>
-                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
                   Surface
                 </th>
                 <th className="px-4 py-2.5 w-10" />
