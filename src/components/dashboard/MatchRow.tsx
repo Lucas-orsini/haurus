@@ -43,7 +43,7 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
   'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
   'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
-  'P-Return': 'Probabilité de remporter un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
+  'P-Return': 'Probabilité de remporté un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
   'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
   'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
   'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
@@ -87,10 +87,10 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
         </td>
 
         {/* Joueurs */}
-        <td className="px-4 py-3.5 min-w-0">
-          <span className="text-sm text-[var(--text-1)] whitespace-nowrap">
+        <td className="px-2 md:px-4 py-3.5 min-w-0">
+          <span className="text-xs md:text-sm text-[var(--text-1)] whitespace-normal md:whitespace-nowrap">
             {match.player1}{' '}
-            <span className="text-[var(--text-3)] text-xs mx-1">vs</span>{' '}
+            <span className="text-[var(--text-3)] text-[10px] md:text-xs mx-1">vs</span>{' '}
             {match.player2}
           </span>
         </td>
@@ -103,7 +103,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
         </td>
 
         {/* Favoris — touch target 44px */}
-        <td className="px-4 py-3.5 min-h-[44px] flex items-center">
+        <td className="px-2 md:px-4 py-3.5 min-h-[44px] flex items-center">
           <FavoriteButton
             matchId={match.id}
             isFavorite={isFavorite}

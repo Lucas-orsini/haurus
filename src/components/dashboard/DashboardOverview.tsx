@@ -209,7 +209,7 @@ export default function DashboardOverview({
 
       {/* Table */}
       <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="md:overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--border)]">
@@ -219,13 +219,13 @@ export default function DashboardOverview({
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
                   Tournoi
                 </th>
-                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-2 md:px-4 py-2.5 text-left text-[10px] md:text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
                   Joueurs
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
                   Surface
                 </th>
-                <th className="px-4 py-2.5 w-10" />
+                <th className="px-2 md:px-4 py-2.5 w-10" />
               </tr>
             </thead>
             <tbody>
