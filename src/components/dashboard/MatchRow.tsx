@@ -118,7 +118,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
           <div
             className={cn(
               'overflow-hidden transition-all duration-200',
-              open ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+              open ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
             )}
           >
             <div className="px-4 md:px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
@@ -229,74 +229,80 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                           </div>
                         </div>
 
-                        {/* Mobile vertical layout */}
+                        {/* Mobile: 2-column grid, each cell is a compact metric card */}
                         <div
                           key={`mobile-${label}`}
                           className={cn(
-                            'flex md:hidden flex-col gap-1.5 py-3 px-1',
+                            'grid md:hidden grid-cols-2 gap-x-4 gap-y-0 py-2 px-0',
                             idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                           )}
                         >
-                          <div className="flex items-center justify-start gap-2">
-                            <span className="text-[11px] text-[var(--text-3)]">{label}</span>
-                            <MetricTooltip
-                              label=""
-                              tooltip={METRIC_TOOLTIPS[label] ?? ''}
-                            />
-                          </div>
-                          <div className="flex items-center justify-start gap-2">
-                            <span className="text-xs text-[var(--text-3)]">{match.player1}</span>
-                            <span
-                              className={cn(
-                                'text-sm font-mono tabular-nums font-medium',
-                                val1 === null || val1 === undefined
-                                  ? 'text-[var(--text-3)]'
-                                  : isGlickoP1
-                                    ? 'text-[var(--text-1)]'
-                                    : classA
-                              )}
-                            >
-                              {isGlickoP1 ? (
-                                <span className={cn(classA)}>
-                                  {val1 !== null ? Math.round(val1) : '—'}
-                                </span>
-                              ) : p1Key === 'form_p1' ? (
-                                <FormeCell value={match.form_p1} />
-                              ) : p1Key === 'delta_rank_6m_p1' ? (
-                                <span className={cn(getDeltaColor(val1))}>
-                                  {formatMetricValue(val1, p1Key as string)}
-                                </span>
-                              ) : (
-                                <span>{formatMetricValue(val1, p1Key as string)}</span>
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-start gap-2">
-                            <span className="text-xs text-[var(--text-3)]">{match.player2}</span>
-                            <span
-                              className={cn(
-                                'text-sm font-mono tabular-nums font-medium',
-                                val2 === null || val2 === undefined
-                                  ? 'text-[var(--text-3)]'
-                                  : isGlickoP2
-                                    ? 'text-[var(--text-1)]'
-                                    : classB
-                              )}
-                            >
-                              {isGlickoP2 ? (
-                                <span className={cn(classB)}>
-                                  {val2 !== null ? Math.round(val2) : '—'}
-                                </span>
-                              ) : p2Key === 'form_p2' ? (
-                                <FormeCell value={match.form_p2} />
-                              ) : p2Key === 'delta_rank_6m_p2' ? (
-                                <span className={cn(getDeltaColor(val2))}>
-                                  {formatMetricValue(val2, p2Key as string)}
-                                </span>
-                              ) : (
-                                <span>{formatMetricValue(val2, p2Key as string)}</span>
-                              )}
-                            </span>
+                          {/* Cell content: 3 compact rows */}
+                          <div className="flex flex-col gap-px">
+                            {/* Row 1: label */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-[var(--text-3)] leading-tight">{label}</span>
+                              <MetricTooltip
+                                label=""
+                                tooltip={METRIC_TOOLTIPS[label] ?? ''}
+                              />
+                            </div>
+                            {/* Row 2: player1 name + value */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-[var(--text-3)] leading-tight truncate max-w-[90px]">{match.player1}</span>
+                              <span
+                                className={cn(
+                                  'text-xs font-mono tabular-nums font-medium leading-tight shrink-0',
+                                  val1 === null || val1 === undefined
+                                    ? 'text-[var(--text-3)]'
+                                    : isGlickoP1
+                                      ? 'text-[var(--text-1)]'
+                                      : classA
+                                )}
+                              >
+                                {isGlickoP1 ? (
+                                  <span className={cn(classA)}>
+                                    {val1 !== null ? Math.round(val1) : '—'}
+                                  </span>
+                                ) : p1Key === 'form_p1' ? (
+                                  <FormeCell value={match.form_p1} small />
+                                ) : p1Key === 'delta_rank_6m_p1' ? (
+                                  <span className={cn(getDeltaColor(val1))}>
+                                    {formatMetricValue(val1, p1Key as string)}
+                                  </span>
+                                ) : (
+                                  <span>{formatMetricValue(val1, p1Key as string)}</span>
+                                )}
+                              </span>
+                            </div>
+                            {/* Row 3: player2 name + value */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-[var(--text-3)] leading-tight truncate max-w-[90px]">{match.player2}</span>
+                              <span
+                                className={cn(
+                                  'text-xs font-mono tabular-nums font-medium leading-tight shrink-0',
+                                  val2 === null || val2 === undefined
+                                    ? 'text-[var(--text-3)]'
+                                    : isGlickoP2
+                                      ? 'text-[var(--text-1)]'
+                                      : classB
+                                )}
+                              >
+                                {isGlickoP2 ? (
+                                  <span className={cn(classB)}>
+                                    {val2 !== null ? Math.round(val2) : '—'}
+                                  </span>
+                                ) : p2Key === 'form_p2' ? (
+                                  <FormeCell value={match.form_p2} small />
+                                ) : p2Key === 'delta_rank_6m_p2' ? (
+                                  <span className={cn(getDeltaColor(val2))}>
+                                    {formatMetricValue(val2, p2Key as string)}
+                                  </span>
+                                ) : (
+                                  <span>{formatMetricValue(val2, p2Key as string)}</span>
+                                )}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </>
@@ -312,7 +318,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
   )
 }
 
-function FormeCell({ value }: { value: string | null }) {
+function FormeCell({ value, small }: { value: string | null; small?: boolean }) {
   const segments = formatForme(value)
 
   if (!segments) {
@@ -327,7 +333,9 @@ function FormeCell({ value }: { value: string | null }) {
           className={cn(
             seg.color === 'green'  && 'text-[var(--green)]',
             seg.color === 'red'    && 'text-[var(--red)]',
-            seg.color === 'neutral' && 'text-[var(--text-3)]'
+            seg.color === 'neutral' && 'text-[var(--text-3)]',
+            small && 'text-[10px]',
+            !small && 'text-xs'
           )}
         >
           {seg.char}
