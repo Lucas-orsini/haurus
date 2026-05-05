@@ -237,14 +237,14 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                             idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                           )}
                         >
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-start gap-2">
                             <span className="text-[11px] text-[var(--text-3)]">{label}</span>
                             <MetricTooltip
                               label=""
                               tooltip={METRIC_TOOLTIPS[label] ?? ''}
                             />
                           </div>
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-start gap-2">
                             <span className="text-xs text-[var(--text-3)]">{match.player1}</span>
                             <span
                               className={cn(
