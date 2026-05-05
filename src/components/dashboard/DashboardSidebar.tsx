@@ -85,7 +85,7 @@ export default function DashboardSidebar() {
   }
 
   return (
-    <aside className="w-[220px] shrink-0 h-screen flex flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
+    <aside className="hidden md:flex w-[220px] shrink-0 h-screen flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
 
       {/* Logo */}
       <div className="flex items-center gap-2 px-2 mb-6 shrink-0">

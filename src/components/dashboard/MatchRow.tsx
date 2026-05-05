@@ -56,17 +56,17 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
   'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
   'P-Return': 'Probabilité de remporter un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
-  'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
+  'Glicko Rating': "Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.",
   'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
-  'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
+  'BPPI': "Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu'il sauve plus de balles de break que ce que ses statistiques laissent attendre.",
   'MAP': 'Probabilité théorique de remporter le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
   'Win Rate TD': 'Pourcentage de victoires du joueur sur la période récente, toutes surfaces confondues. Les matchs récents ont plus de poids que les anciens.',
   'Win Rate Surface TD': 'Pourcentage de victoires du joueur sur la surface de ce tournoi, calculé sur la période récente. Capture la spécialisation sur cette surface.',
-  'Momentum TD': 'Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu\'il surperforme en ce moment, négative qu\'il est en dessous de son niveau habituel.',
+  'Momentum TD': "Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu'il surperforme en ce moment, négative qu'il est en dessous de son niveau habituel.",
   'Breaks Won TD': 'Nombre moyen de breaks de service réalisés par match sur cette surface récemment. Mesure la capacité à concrétiser les opportunités sur le service adverse.',
   'Breaks Lost TD': 'Nombre moyen de breaks concédés par match sur cette surface récemment. Plus la valeur est basse, mieux le joueur tient son service sous pression.',
   'Fatigue 72H': 'Cumul des minutes jouées dans ce tournoi et dans les 72 heures précédant le match. Plus cette valeur est haute, plus le joueur aborde ce match avec une charge physique importante.',
-  'Jours de repos': 'Nombre de jours depuis le dernier match joué. Reflète la fraîcheur physique du joueur à l\'approche du match.',
+  'Jours de repos': "Nombre de jours depuis le dernier match joué. Reflète la fraîcheur physique du joueur à l'approche du match.",
   'Forme': "Résultats des 5 derniers matchs joués. V = victoire, D = défaite. Le match le plus récent est affiché en dernier.",
 }
 
@@ -133,28 +133,33 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
               open ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
             )}
           >
-            <div className="px-6 py-5 bg-[var(--surface-2)] border-t border-[var(--border)]">
-              {/* Player headers — aligned with the 3-column metrics grid below */}
-              <div className="grid grid-cols-[1fr_2fr_1fr] gap-3 mb-4">
-                {/* Col 1: player 1 name, centered */}
-                <div className="flex flex-col items-center min-w-0">
+            <div className="px-4 py-5 md:px-6 bg-[var(--surface-2)] border-t border-[var(--border)]">
+
+              {/* Player headers — responsive: vertical stack on mobile, 3-col grid on desktop */}
+              <div className="flex flex-col md:grid md:grid-cols-[1fr_2fr_1fr] md:gap-3 mb-4 gap-2">
+                {/* Mobile: player 1 label | Desktop: col 1 */}
+                <div className="flex md:flex-col items-center md:items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player1}
                   </span>
+                  {/* Desktop spacer */}
+                  <div className="hidden md:block" />
                 </div>
 
-                {/* Col 2: empty — metric labels occupy this space below */}
-                <div />
+                {/* Mobile: divider + label | Desktop: empty */}
+                <div className="hidden md:block" />
 
-                {/* Col 3: player 2 name, centered */}
-                <div className="flex flex-col items-center min-w-0">
+                {/* Mobile: player 2 label | Desktop: col 3 */}
+                <div className="flex md:flex-col items-center md:items-center min-w-0">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
                     {match.player2}
                   </span>
+                  {/* Desktop spacer */}
+                  <div className="hidden md:block" />
                 </div>
               </div>
 
-              {/* Metrics grid — comparative, 3-column per row */}
+              {/* Metrics grid — responsive: vertical on mobile, 3-col grid on desktop */}
               <div>
                 <div className="space-y-0">
                   {METRIC_DEFS.map(({ label, p1Key, p2Key, mode }, idx) => {
@@ -169,11 +174,12 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                       <div
                         key={label}
                         className={cn(
-                          'grid grid-cols-[1fr_2fr_1fr] gap-3 py-2.5',
+                          // Mobile: vertical stack | Desktop: horizontal 3-column grid
+                          'flex flex-col md:grid md:grid-cols-[1fr_2fr_1fr] md:gap-3 gap-2 py-3 md:py-2.5',
                           idx < METRIC_DEFS.length - 1 && 'border-b border-[var(--border)]'
                         )}
                       >
-                        {/* Valeur P1 — centered */}
+                        {/* Valeur P1 — centered on both mobile and desktop */}
                         <div className="flex items-center justify-center">
                           <span
                             className={cn(
