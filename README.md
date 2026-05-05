@@ -4,8 +4,6 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Profile Dashboard** — Track and view player information with search, favorites, and performance tracking
-- **Match History Analysis** — Browse detailed match history with surface-specific filtering and metrics
 - **Metrics Visualization** — Interactive dashboard displaying key performance indicators and statistics
 - **Secure Authentication** — Secure authentication powered by Supabase with Row Level Security
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
@@ -32,8 +30,8 @@ The metrics bookmakers use. Now yours.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/haraus.git
-cd haurus
+git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+cd REPO_NAME
 ```
 
 ### 2. Install dependencies
@@ -89,71 +87,69 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Anonymous key for client-side auth (safe with RLS) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side only, bypasses RLS (keep secret!) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather chat → /newbot response | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | You choose this value when setting up your webhook | Secret for HMAC-SHA256 webhook verification |
-
-**Where to find Supabase credentials:**
-1. Go to [Supabase Dashboard](https://app.supabase.com)
-2. Select your project
-3. Navigate to **Project Settings** (gear icon)
-4. Click on **API**
-5. Copy the **Project URL** and **anon/public key** from the config section
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key | Public key for client-side authentication |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key | Server-side key that bypasses RLS (never expose client-side) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open a chat with [@BotFather](https://t.me/botfather) on Telegram → send `/newbot` → follow the steps → copy the token | Authenticates your bot with the Telegram API |
+| `TELEGRAM_BOT_SECRET` | Yes | Create a random secret string (e.g., use a password generator) | Secret token for HMAC-SHA256 webhook signature verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code (like functions and components) work correctly without needing the full app running.
+Unit tests automatically check that specific parts of your code work correctly without running the entire app.
 
-### Run all tests
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-### Run a specific test file
+Run a specific test file:
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+Run tests in watch mode (re-runs automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-### Reading test output
+**How to read the output:**
+- `PASS` — All tests passed, everything works correctly
+- `FAIL` — Something broke, check the error message below to see which test failed
 
-- **PASS** — All assertions passed, the code works as expected ✅
-- **FAIL** — Something broke, check the error message below for what failed and on which line 🔴
-
-The test suite covers authentication validators, auth state management, metric formatting, dashboard statistics, and utility functions.
+**Tests included:**
+- Authentication validators and flows (`__tests__/auth.test.ts`, `__tests__/auth-validators.test.ts`)
+- Dashboard metric formatting (`__tests__/dashboard/formatMetric.test.ts`)
+- Dashboard statistics utilities (`__tests__/lib/dashboard/stats.test.ts`)
+- General utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages (dashboard, player, metrics)
-- `src/components/dashboard` — Dashboard layout and shared components
-- `src/components/dashboard/player` — Player tracking components (search, profiles, match history)
-- `src/components/ui` — Shared UI components (tooltips, buttons, etc.)
+- `src/app` — Next.js App Router pages and layouts
+- `src/components` — React components including dashboard elements
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the **Deploy with Vercel** button above
+**Step by step:**
+
+1. Click the "Deploy with Vercel" button above
 2. Import your GitHub repository
 3. In the Vercel dashboard, go to **Settings → Environment Variables**
 4. Add all variables from your `.env.local` file:
+
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy**
 
-Your app will be live at `https://your-project.vercel.app` within seconds.
+5. Click **Deploy** — Vercel will automatically build and deploy your app
+
+> ⚠️ **Important**: Every environment variable from `.env.local` must be added to Vercel, otherwise your app will crash or behave unexpectedly after deployment.
 
 ## 📝 License
 
