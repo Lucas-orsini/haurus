@@ -29,7 +29,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Debounced search — fetch vers le Route Handler avec AnnulerController
+  // Debounced search
   useEffect(() => {
     if (query.length < MIN_CHARS) {
       setResults([])
@@ -68,7 +68,6 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         setActiveIdx(-1)
         setSearchState(rows.length > 0 ? 'success' : 'empty')
       } catch (err) {
-        // Annulation via AbortController — ignorer silencieusement
         if (err instanceof Error && err.name === 'AbortError') return
 
         setSearchState('error')
@@ -127,7 +126,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   }
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-md mx-auto">
+    <div ref={containerRef} className="relative w-full px-4 md:px-0 md:max-w-md md:mx-auto">
       {/* Input */}
       <div className="relative">
         <Search
@@ -165,12 +164,12 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         </div>
       </div>
 
-      {/* Dropdown */}
+      {/* Dropdown — full width on mobile, constrained on desktop */}
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 z-50
+        <div className="fixed left-0 right-0 z-[60] mt-1.5 mx-4 md:mx-0 md:left-auto md:right-auto md:relative
                         bg-[var(--surface-2)] border border-[var(--border-md)]
-                        rounded-lg shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto">
-          {/* Error state — visible message */}
+                        rounded-lg shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto w-auto md:w-full">
+          {/* Error state */}
           {searchState === 'error' && (
             <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[var(--border-md)]">
               <AlertCircle size={13} className="text-[var(--red)] shrink-0" strokeWidth={1.5} />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Trash2, Lock, AlertCircle } from 'lucide-react'
+import { Loader2, Trash2, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /** Type TrackedPlayer — aligné avec la réponse GET /api/tracked-players */
@@ -60,8 +60,8 @@ export default function TrackedPlayersList({
   if (trackedPlayers.length === 0) {
     return (
       <div className="flex flex-col gap-3">
-        {/* Counter */}
-        <div className="flex items-center justify-between px-1">
+        {/* Counter — sticky top mobile */}
+        <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
           <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
             Suivis
           </span>
@@ -91,8 +91,8 @@ export default function TrackedPlayersList({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Counter */}
-      <div className="flex items-center justify-between px-1">
+      {/* Counter — sticky top mobile */}
+      <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
         <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
           Suivis
         </span>
@@ -110,7 +110,7 @@ export default function TrackedPlayersList({
           return (
             <div
               key={player.id}
-              className="group flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer"
+              className="group flex items-center gap-2 px-3 py-2.5 min-h-11 rounded-md hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer"
               onClick={() => onSelectPlayer(player.player_name, player.player_id)}
             >
               {/* Name */}
@@ -118,7 +118,7 @@ export default function TrackedPlayersList({
                 <p className="text-sm text-[var(--text-1)] truncate leading-tight">
                   {player.player_name}
                 </p>
-                {/* Lock info — only for roles with lockDays */}
+                {/* Lock info */}
                 {lockDays && locked && (
                   <p className="text-[11px] text-[var(--text-3)] flex items-center gap-1 mt-0.5">
                     <Lock size={9} strokeWidth={1.5} className="shrink-0" />
@@ -136,7 +136,7 @@ export default function TrackedPlayersList({
               <button
                 onClick={(e) => handleRemove(e, player.player_name)}
                 disabled={locked || removing}
-                title={locked ? `Jouer verrouillé jusqu'au ${formatLockDate(player.locked_until)}` : 'Retirer des suivis'}
+                title={locked ? `Joueur verrouillé jusqu'au ${formatLockDate(player.locked_until)}` : 'Retirer des suivis'}
                 className={cn(
                   'w-6 h-6 shrink-0 rounded flex items-center justify-center transition-all duration-150',
                   locked

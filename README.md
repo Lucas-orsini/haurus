@@ -4,9 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Metrics Visualization** — Interactive dashboard displaying key performance indicators and statistics
-- **Dashboard Components** — Reusable React components for displaying matches and metrics
-- **Secure Authentication** — Secure authentication powered by Supabase with Row Level Security
+- **Player Metrics Dashboard** — Track and visualize tennis player performance with interactive charts
+- **Match History** — Browse detailed match results with surface and tournament filtering
+- **Player Tracking** — Add players to your watchlist for quick access to their statistics
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 
 ## 🛠️ Tech Stack
@@ -89,63 +89,57 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side queries |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → message [@BotFather](https://t.me/BotFather) → send `/newbot` → follow prompts → copy the token | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | Choose any random string (e.g. `my-secret-webhook-key-123`) | Secret used to verify HMAC-SHA256 signatures on incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Public key for client-side Supabase access |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses Row Level Security |
+| `TELEGRAM_BOT_TOKEN` | No | Open Telegram, search for [@BotFather](https://t.me/botfather), send `/newbot`, follow instructions, copy the token | Your Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Create any random string (e.g., use a password generator) | Secret token for verifying Telegram webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that small pieces of your code work correctly — like checking that a login function handles invalid emails properly.
-
-**Run all tests:**
+Unit tests automatically check that small pieces of your code work correctly — like making sure a math function returns the right answer.
 
 ```bash
+# Run all tests
 npx jest
-```
 
-**Run a specific test file:**
+# Run a specific test file
+npx jest __tests__/auth.test.ts
 
-```bash
-npx jest __tests__/auth-validators.test.ts
-```
-
-**Watch mode (re-runs automatically when you change a file):**
-
-```bash
+# Run tests in watch mode (re-runs when you save a file)
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All checks passed, your code works correctly
-- `FAIL` — Something broke, see the error message below for details
+**Reading the output:**
+- `PASS` — All tests passed, everything works ✅
+- `FAIL` — Something broke, check the error message below for which test failed and why
 
 **What the tests cover:**
-- Auth validation logic (email format, password strength)
-- Auth flow (login, logout, session handling)
-- Dashboard metrics formatting and calculations
-- Utility functions
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows and session handling
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
+- `__tests__/lib/dashboard/stats.test.ts` — Statistics calculation functions
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Shared utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including match rows
+- `src/components/dashboard/player` — Player dashboard components including metrics display, match history, player tracking, and statistics charts
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all the variables from your `.env.local` file:
+1. Click "Add New..." → "Project" → import your GitHub repository
+2. In the Vercel project settings, go to **Environment Variables**
+3. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy**
+   - `TELEGRAM_BOT_TOKEN` (if used)
+   - `TELEGRAM_BOT_SECRET` (if used)
+4. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Every time you push to your `main` branch, Vercel will rebuild and redeploy.
+> ⚠️ **Important**: Make sure to add all environment variables in Vercel before deploying. The app will fail to build if Supabase keys are missing.
 
 ## 📝 License
 

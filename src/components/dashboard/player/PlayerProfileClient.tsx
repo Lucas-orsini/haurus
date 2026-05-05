@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Users, ChevronLeft } from 'lucide-react'
+import { Users } from 'lucide-react'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -217,7 +217,6 @@ export default function PlayerProfileClient() {
         setSelectedPlayer(pendingPlayer)
         await loadPlayerProfile(pendingPlayer, selectedSurface)
       } else if (res.status === 409) {
-        // Déjà suivi entre-temps — charger directement
         setSelectedPlayer(pendingPlayer)
         await loadPlayerProfile(pendingPlayer, selectedSurface)
       }
@@ -248,8 +247,6 @@ export default function PlayerProfileClient() {
     if (!supabase) return
 
     try {
-      // Recherche bidirectionnelle : trouve la ligne où les deux joueurs apparaissent
-      // dans n'importe quel ordre (player1=A ET player2=B) OU (player1=B ET player2=A)
       const { data } = await supabase
         .from('match_stats')
         .select('*')
@@ -281,32 +278,18 @@ export default function PlayerProfileClient() {
         onCancel={() => setPendingPlayer(null)}
       />
 
-      {/* Layout flex avec volet coulissant conditionnel */}
-      <div className="flex gap-5">
+      {/* Layout flex — column mobile, row desktop */}
+      <div className="flex flex-col md:flex-row gap-5">
 
-        {/* Volet "Mes joueurs" — animé, sort de la gauche */}
+        {/* Volet "Mes joueurs" — overlay fixed mobile, slide desktop */}
         {panelOpen && (
           <motion.div
-            initial={{ x: -280 }}
-            animate={{ x: 0 }}
-            exit={{ x: -280 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="relative w-[280px] shrink-0 overflow-hidden z-50"
+            className="fixed inset-0 z-50 w-full h-full md:relative md:inset-auto md:w-[280px] md:shrink-0 md:overflow-hidden md:opacity-100 bg-[var(--bg)] md:bg-transparent"
           >
-            {/* Bouton "Mes joueurs" visible uniquement volet fermé — affiché dans le volet animé */}
-            {!panelOpen && (
-              <button
-                onClick={() => setPanelOpen(!panelOpen)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-9 px-3 flex items-center justify-center gap-2 rounded-md
-                           border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
-                           text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0 z-50"
-                aria-label="Ouvrir le panneau Mes joueurs"
-              >
-                <Users size={14} strokeWidth={1.5} className="shrink-0" />
-                <span className="whitespace-nowrap">Mes joueurs</span>
-              </button>
-            )}
-
             <TrackedPlayersList
               trackedPlayers={trackedPlayers}
               role={trackedRole}
@@ -314,18 +297,17 @@ export default function PlayerProfileClient() {
               onSelectPlayer={handleSelectTracked}
               onRemovePlayer={handleRemoveTracked}
             />
-
           </motion.div>
         )}
 
         {/* Colonne droite — recherche + profil (flexible) */}
         <div className="flex-1 min-w-0 space-y-5">
 
-          {/* Bouton toggle "Mes joueurs" + barre de recherche sur la même ligne */}
-          <div className="flex items-center gap-3">
+          {/* Bouton toggle "Mes joueurs" + barre de recherche — stack mobile, row desktop */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <button
               onClick={() => setPanelOpen(!panelOpen)}
-              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto
                          border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
                          text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
               aria-label="Ouvrir ou fermer le panneau Mes joueurs"
@@ -334,16 +316,16 @@ export default function PlayerProfileClient() {
               <span className="whitespace-nowrap">Mes joueurs</span>
             </button>
 
-            {/* Barre de recherche */}
-            <div>
+            {/* Barre de recherche — pleine largeur mobile */}
+            <div className="w-full md:w-auto md:flex-1">
               <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
             </div>
           </div>
 
-          {/* Backdrop — ferme le volet au clic */}
+          {/* Backdrop — ferme le volet au clic sur mobile */}
           {panelOpen && (
             <div
-              className="fixed inset-0 z-40 cursor-default"
+              className="fixed inset-0 z-40 cursor-default md:hidden"
               onClick={() => setPanelOpen(false)}
               aria-hidden="true"
             />
@@ -352,8 +334,8 @@ export default function PlayerProfileClient() {
           {/* Contenu profil — apparaît après sélection */}
           {selectedPlayer && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              {/* Header nom joueur + SurfaceSelector */}
-              <div className="flex items-center justify-between">
+              {/* Header nom joueur + SurfaceSelector — stack mobile, row desktop */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div>
                     <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
@@ -372,7 +354,7 @@ export default function PlayerProfileClient() {
 
               {/* Loading state */}
               {loadingProfile ? (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {[0, 1, 2].map((i) => (
                     <div key={i} className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg p-4 animate-pulse">
                       <div className="h-2.5 bg-white/[0.06] rounded w-20 mb-3" />
@@ -405,7 +387,7 @@ export default function PlayerProfileClient() {
             </div>
           )}
 
-          {/* État initial — rien n'est sélectionné — centré quand volet fermé */}
+          {/* État initial — rien n'est sélectionné */}
           {!selectedPlayer && (
             <div
               className={`flex flex-col items-center justify-center py-20 text-center${!selectedPlayer && !panelOpen ? ' min-h-[60vh]' : ''}`}

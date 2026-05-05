@@ -39,7 +39,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
   const pServeDelta = pServe !== null && atpPServe !== null ? pServe - atpPServe : null
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Card 1 — Glicko-2 */}
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
         <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Glicko-2</p>

@@ -62,16 +62,16 @@ export default function TrackPlayerModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)]">
+        <div className="flex flex-col md:flex-row items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)]">
           <button
             onClick={onCancel}
-            className="h-8 px-4 flex items-center justify-center rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors duration-150"
+            className="h-8 w-full md:w-auto px-4 flex items-center justify-center rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors duration-150"
           >
             Annuler
           </button>
           <button
             onClick={onConfirm}
-            className="h-8 px-4 flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium transition-colors duration-150"
+            className="h-8 w-full md:w-auto px-4 flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium transition-colors duration-150"
           >
             Suivre et consulter
           </button>
