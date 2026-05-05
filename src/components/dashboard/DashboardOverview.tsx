@@ -218,7 +218,7 @@ export default function DashboardOverview({
           )}
 
           {/* Count */}
-          <p className="hidden sm:inline text-xs text-[var(--text-3)] shrink-0 ml-auto whitespace-nowrap">
+          <p className="text-xs text-[var(--text-3)] shrink-0 ml-auto whitespace-nowrap">
             <span className="text-[var(--text-2)] font-medium tabular-nums">
               {filteredMatches.length}
             </span>

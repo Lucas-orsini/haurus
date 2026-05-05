@@ -133,7 +133,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
               open ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
             )}
           >
-            <div className="px-4 py-4 sm:py-5 md:px-6 bg-[var(--surface-2)] border-t border-[var(--border)]">
+            <div className="px-4 py-5 md:px-6 bg-[var(--surface-2)] border-t border-[var(--border)]">
 
               {/* Player headers — responsive: vertical stack on mobile, 3-col grid on desktop */}
               <div className="flex flex-col md:grid md:grid-cols-[1fr_2fr_1fr] md:gap-3 mb-4 gap-2">
