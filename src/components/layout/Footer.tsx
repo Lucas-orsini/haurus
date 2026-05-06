@@ -15,8 +15,11 @@ export default function Footer() {
           {/* Brand column */}
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-6 group">
-              <div className="w-5 h-5 rounded bg-[var(--accent)] flex items-center justify-center shrink-0">
-                <span className="text-black text-[10px] font-bold leading-none">H</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-200 shrink-0">
+                <svg width="122" height="110" viewBox="0 0 122 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M49.0005 107.999L29.0001 61.9992L41.0001 37.9992L61.0005 83.9992L49.0005 107.999Z" fill="#f2cb38"/>
+                  <path d="M49.0005 0L29.0001 45.9998L41.0001 69.9998L61.0005 23.9998L49.0005 0Z" fill="#f2cb38"/>
+                </svg>
               </div>
               <span className="text-sm font-medium tracking-tight text-[var(--text-1)]">
                 Haur<span className="text-[var(--accent)]">u</span>s

@@ -89,46 +89,38 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | No | Open Telegram, chat with [@BotFather](https://t.me/botfather), send `/newbot`, follow instructions, copy the token | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | Any random string you choose (e.g. `openssl rand -hex 32`) | Secret for webhook signature verification |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search for **@BotFather** → Send `/newbot` → Follow prompts → Copy the token | Your Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You choose this string yourself (e.g. `my-super-secret-webhook-key`) | Secret used to verify webhook requests via HMAC-SHA256 |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly — like making sure a calculation returns the right number or a button does what it should.
-
-Run all tests:
+Unit tests automatically check that specific parts of your code work correctly — like verifying that a function returns the right output for a given input.
 
 ```bash
+# Run all tests
 npx jest
-```
 
-Run a specific test file:
+# Run a specific test file
+npx jest __tests__/auth-validators.test.ts
 
-```bash
-npx jest __tests__/auth.test.ts
-```
-
-Watch mode (re-runs automatically when you save changes):
-
-```bash
+# Watch mode — re-runs tests automatically when files change
 npx jest --watch
 ```
 
-**How to read the output:**
-- **PASS** — All tests passed, everything is working
-- **FAIL** — Something broke. Look for the red text below to see which test failed and why
+**Reading the output:**
+- **PASS** — All checks in that test file passed ✅
+- **FAIL** — Something broke ❌, you'll see which test failed and why
 
-**Tests included:**
-
-- Auth validators and authentication logic
+The test suite covers:
+- Authentication validation logic
 - Dashboard metric formatting
-- Stats calculations
-- Utility functions
+- Stats calculations and utilities
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (overview, match rows)
+- `src/components/layout` — Layout components (Navbar, Footer)
 
 ## 🚀 Deploy to Vercel
 
@@ -136,12 +128,15 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add each variable from `.env.example` with its value
+3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_BOT_SECRET`
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables listed above in Vercel, otherwise your app won't connect to Supabase.
+> ⚠️ Make sure all environment variables are added — the app won't work without them.
 
 ## 📝 License
 
