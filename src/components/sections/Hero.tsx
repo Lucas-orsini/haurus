@@ -34,9 +34,10 @@ function AnimatedBarChart() {
         />
       ))}
       {/* Peak label — positioned over heights[5] (88%, the max of the heights array).
-          Index 5 on 7 bars → left position = (5/6) * 100 ≈ 83.3%.
-          If heights values or order change, recalculate: (peakIndex / (heights.length - 1)) * 100 */}
-      <div className="absolute top-8 left-[83.3%] -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
+          With 7 bars in a flex container (gap-2, px-4), the centre of bar index 5 falls at ~74%
+          of the container width — not at (5/6)*100 ≈ 83.3%, which places the label beyond the bar.
+          If the number of bars changes, recalculate manually by visually centering the label. */}
+      <div className="absolute top-8 left-[74%] -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
         Pic
       </div>
       {/* Fade overlay */}
