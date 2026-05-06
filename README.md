@@ -89,13 +89,13 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key, bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → search for **@BotFather** → send `/newbot` → follow instructions → copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook | Secret string used to verify incoming webhook requests |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key, bypasses RLS |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, message **@BotFather**, follow the bot creation steps, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook — it's your chosen secret string | Secret for verifying webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly without needing to run the whole app.
+Tests automatically check that the app works correctly — no manual clicking needed.
 
 ### Run all tests
 
@@ -109,31 +109,28 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-### Watch mode (re-runs tests automatically when you save a file)
+### Watch mode (re-runs tests automatically when files change)
 
 ```bash
 npx jest --watch
 ```
 
-### How to read the output
-
-- **PASS** — All tests in that file passed ✓
-- **FAIL** — Something broke. Read the error message below to see which test failed and why
+**Reading the output:**
+- `PASS` — Everything works ✅
+- `FAIL` — Something is broken. Look at the error message below for details on what failed.
 
 ### What the tests cover
 
-| Test File | What It Tests |
-|-----------|---------------|
-| `__tests__/auth-validators.test.ts` | Authentication validation logic |
-| `__tests__/auth.test.ts` | Authentication flows and behavior |
-| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting in the dashboard |
-| `__tests__/lib/dashboard/stats.test.ts` | Statistics calculations |
-| `__tests__/lib/utils.test.ts` | Utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+- `auth.test.ts` — Authentication flow and user session handling
+- `auth-validators.test.ts` — Input validation for auth forms
+- `dashboard/formatMetric.test.ts` — Number and metric formatting logic
+- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `lib/utils.test.ts` — Shared utility functions
+- `utils.test.ts` — General helper functions
 
 ## 📁 Project Structure
 
-- `src/components/layout/` — Layout components including the navigation bar
+- `src/components/layout/` — Layout components including Footer
 
 ## 🚀 Deploy to Vercel
 
@@ -141,30 +138,20 @@ npx jest --watch
 
 ### Step by step
 
-1. **Push your code to GitHub** — If you haven't already, create a new repo on GitHub and push your project:
+1. Click the **Deploy with Vercel** button above (or go to [vercel.com/new](https://vercel.com/new))
+2. Import your GitHub repository
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all variables from your `.env.local` file:
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
-git push -u origin main
-```
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_BOT_SECRET`
 
-2. **Import to Vercel** — Go to [vercel.com/new](https://vercel.com/new) and import your GitHub repository.
+5. Click **Deploy** — Vercel will build and deploy your app automatically
 
-3. **Add environment variables** — In the Vercel dashboard, go to **Settings → Environment Variables** and add each variable from your `.env.local` file:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_BOT_SECRET`
-
-4. **Deploy** — Click **Deploy**. Vercel will build and deploy your app automatically.
-
-> 💡 **Important**: Make sure all environment variables are added in Vercel before deploying. If you deploy without them, the app will crash.
+> ⚠️ **Important**: Missing environment variables will cause the deployment to fail or the app to malfunction. Make sure all five variables are added in Vercel.
 
 ## 📝 License
 
