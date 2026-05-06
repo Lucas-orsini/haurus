@@ -33,8 +33,10 @@ function AnimatedBarChart() {
           }}
         />
       ))}
-      {/* Peak label */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
+      {/* Peak label — positioned over heights[5] (88%, the max of the heights array).
+          Index 5 on 7 bars → left position = (5/6) * 100 ≈ 83.3%.
+          If heights values or order change, recalculate: (peakIndex / (heights.length - 1)) * 100 */}
+      <div className="absolute top-8 left-[83.3%] -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
         Pic
       </div>
       {/* Fade overlay */}
@@ -100,7 +102,7 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-5xl md:text-7xl font-medium tracking-tighter text-[var(--text-1)] mb-6 leading-[1.1]"
           >
-            Les métriques{' '} 
+            Les métriques{' '}
             <span className="text-[var(--accent)]">des bookmakers</span>
             <br />
             <span className="text-[var(--text-2)]">Enfin accessibles.</span>
@@ -113,7 +115,7 @@ export default function Hero() {
             className="text-lg text-[var(--text-2)] max-w-xl font-light mb-10 leading-relaxed"
           >
             Accédez aux données qui structurent les cotes ATP.
-Aucun pronostic. Uniquement des métriques fiables et exploitables.
+            Aucun pronostic. Uniquement des métriques fiables et exploitables.
           </motion.p>
 
           {/* CTAs */}
