@@ -7,6 +7,7 @@ The metrics bookmakers use. Now yours.
 - **Authentication** — Secure login and signup with Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Animations** — Smooth transitions with Framer Motion
+- **Telegram Integration** — Bot notifications for real-time updates
 
 ## 🛠️ Tech Stack
 
@@ -89,66 +90,57 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key, bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, message [@BotFather](https://t.me/botfather), send `/newbot`, follow instructions, copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | Generate any random string (e.g., `openssl rand -hex 32`) | Secret for HMAC-SHA256 webhook verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase authentication |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses RLS (used by Telegram webhook) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/botfather), send `/newbot`, follow prompts, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Any random string you choose (e.g., generate with `openssl rand -hex 32`) | Secret token for verifying webhook requests |
 
 ## 🧪 Running Tests
 
-Tests verify that specific parts of your code work correctly. When a test **PASS**es, that feature is working. When it **FAIL**s, something is broken — the error message shows exactly which part.
-
-### Run all tests
+Unit tests automatically check that specific parts of your code work correctly.
 
 ```bash
+# Run all tests
 npx jest
-```
 
-### Run a specific test file
-
-```bash
+# Run a specific test file
 npx jest __tests__/auth.test.ts
-```
 
-### Run tests in watch mode (re-runs on file change)
-
-```bash
+# Watch mode — re-runs tests automatically when files change
 npx jest --watch
 ```
 
-### What the tests cover
+**Reading the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke, you'll see which test failed and why ❌
 
-- **auth-validators.test.ts** — Authentication validation logic
-- **auth.test.ts** — Authentication flows and behavior
-- **formatMetric.test.ts** — Metric formatting in dashboard
-- **stats.test.ts** — Dashboard statistics calculations
-- **utils.test.ts** — General utility functions
+**Tests included:**
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Common utilities
 
 ## 📁 Project Structure
 
-- `src/components/layout` — Layout components including the Navbar
+- `src/components/sections` — Reusable section components for pages
 
 ## 🚀 Deploy to Vercel
 
-The easiest way to deploy your Next.js app is to use [Vercel](https://vercel.com/new).
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
-
-1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Vercel will auto-detect Next.js — click **Deploy**
-4. Once deployed, go to your project → **Settings** → **Environment Variables**
-5. Add all variables from `.env.local`:
+3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-6. Click **Save** and **Redeploy**
+4. Click **Deploy**
 
-> ⚠️ **Important**: Without these environment variables, your app will crash or show errors on Vercel. Make sure every variable from `.env.local` is added.
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 
