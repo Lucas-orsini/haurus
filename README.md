@@ -90,54 +90,69 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram [@BotFather](https://t.me/botfather) → `/newbot` → copy the token | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up the webhook | Secret token for webhook signature verification |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), send `/newbot`, follow the steps, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — it's the secret you pass when calling Telegram's `setWebhook` API | A secret string you choose for webhook verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly without needing to run the whole app.
+Unit tests automatically check that individual pieces of your app work correctly without needing the whole app running.
+
+### Run all tests
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
+### Run a specific test file
+
+```bash
 npx jest __tests__/auth.test.ts
+```
 
-# Run tests in watch mode (re-runs automatically when files change)
+### Watch mode (re-runs tests automatically when files change)
+
+```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌ — Jest will show exactly which test failed and why
+### Reading test output
 
-**Tests included:**
-- `auth-validators.test.ts` — Authentication validation logic
-- `auth.test.ts` — Authentication flow tests
-- `dashboard/formatMetric.test.ts` — Metric formatting for dashboard
-- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `lib/utils.test.ts` — Utility function tests
-- `utils.test.ts` — General utility tests
+- **PASS** — All tests in that file passed ✅
+- **FAIL** — Something broke. The output shows which test failed and why (expected vs. actual value)
+
+### What the tests cover
+
+| Test File | What it Tests |
+|-----------|---------------|
+| `__tests__/auth.test.ts` | Authentication flow |
+| `__tests__/auth-validators.test.ts` | Auth input validation rules |
+| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting for dashboard |
+| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics calculations |
+| `__tests__/lib/utils.test.ts` | Utility functions |
+| `__tests__/utils.test.ts` | General utility functions |
 
 ## 📁 Project Structure
 
-- `src/app/(auth)/` — Authentication pages (login, signup)
+- `src/components/layout` — Layout components including the main navigation bar
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+### Step by step
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In Vercel dashboard → **Settings** → **Environment Variables**, add all variables from `.env.local`:
+3. In the **Environment Variables** section, add each variable from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
 4. Click **Deploy**
+
+> ⚠️ **Important**: Don't forget to add `SUPABASE_SERVICE_ROLE_KEY` — it's required for the Telegram webhook endpoint which runs server-side and needs elevated permissions.
 
 ## 📝 License
 
