@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Menu, X, LogOut, User, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { getSession, signOut, type AuthUser } from '@/lib/auth'
+import UserProfileModal from '@/components/dashboard/UserProfileModal'
 
 const navLinks = [
   { label: 'Métriques', href: '#metrics' },
@@ -15,6 +16,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   useEffect(() => {
     getSession().then(setUser).catch(() => setUser(null))
@@ -97,14 +99,16 @@ export default function Navbar() {
                     <div className="px-3 py-2 border-b border-[var(--border)]">
                       <p className="text-xs text-[var(--text-3)] truncate">{user.email}</p>
                     </div>
-                    <Link
-                      href="/settings"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(true)
+                        setUserMenuOpen(false)
+                      }}
+                      className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
                     >
                       <User size={13} strokeWidth={1.5} className="shrink-0" />
-                      Profil
-                    </Link>
+                      Mon profil
+                    </button>
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--red)] hover:bg-[var(--red)]/10 transition-colors whitespace-nowrap"
@@ -191,6 +195,18 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Profile modal */}
+      {isProfileModalOpen && user && (
+        <UserProfileModal
+          user={user}
+          onClose={() => setIsProfileModalOpen(false)}
+          onUpdateSuccess={(updatedUser) => {
+            setUser(updatedUser)
+            setIsProfileModalOpen(false)
+          }}
+        />
+      )}
     </header>
   )
 }
