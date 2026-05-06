@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { Menu, X, LogOut, User, ChevronDown } from 'lucide-react'
+import { Menu, X, LogOut, User, ChevronDown, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { getSession, signOut, type AuthUser } from '@/lib/auth'
 import UserProfileModal from '@/components/dashboard/UserProfileModal'
@@ -99,6 +99,14 @@ export default function Navbar() {
                     <div className="px-3 py-2 border-b border-[var(--border)]">
                       <p className="text-xs text-[var(--text-3)] truncate">{user.email}</p>
                     </div>
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
+                    >
+                      <LayoutDashboard size={13} strokeWidth={1.5} className="shrink-0" />
+                      Dashboard
+                    </Link>
                     <button
                       onClick={() => {
                         setIsProfileModalOpen(true)
@@ -168,13 +176,23 @@ export default function Navbar() {
           ))}
           <div className="h-px bg-[var(--border)] my-1" />
           {user ? (
-            <button
-              onClick={() => { handleSignOut(); setMobileOpen(false) }}
-              className="mt-2 h-9 px-4 flex items-center justify-center gap-2 rounded-lg text-sm font-medium border border-[var(--red)]/25 bg-[var(--red)]/[0.06] hover:bg-[var(--red)]/10 text-[var(--red)] transition-colors"
-            >
-              <LogOut size={14} strokeWidth={1.5} />
-              Se déconnecter
-            </button>
+            <>
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 h-9 px-4 flex items-center justify-center gap-2 rounded-lg text-sm font-medium border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] transition-colors"
+              >
+                <LayoutDashboard size={14} strokeWidth={1.5} />
+                Dashboard
+              </Link>
+              <button
+                onClick={() => { handleSignOut(); setMobileOpen(false) }}
+                className="h-9 px-4 flex items-center justify-center gap-2 rounded-lg text-sm font-medium border border-[var(--red)]/25 bg-[var(--red)]/[0.06] hover:bg-[var(--red)]/10 text-[var(--red)] transition-colors"
+              >
+                <LogOut size={14} strokeWidth={1.5} />
+                Se déconnecter
+              </button>
+            </>
           ) : (
             <>
               <Link
