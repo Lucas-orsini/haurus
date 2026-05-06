@@ -90,13 +90,13 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), send `/newbot`, follow the steps, copy the token | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — it's the secret you pass when calling Telegram's `setWebhook` API | A secret string you choose for webhook verification |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key, bypasses RLS |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, message [@BotFather](https://t.me/botfather), send `/newbot`, follow instructions, copy the token | Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Generate any random string (e.g., `openssl rand -hex 32`) | Secret for HMAC-SHA256 webhook verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of your app work correctly without needing the whole app running.
+Tests verify that specific parts of your code work correctly. When a test **PASS**es, that feature is working. When it **FAIL**s, something is broken — the error message shows exactly which part.
 
 ### Run all tests
 
@@ -110,49 +110,45 @@ npx jest
 npx jest __tests__/auth.test.ts
 ```
 
-### Watch mode (re-runs tests automatically when files change)
+### Run tests in watch mode (re-runs on file change)
 
 ```bash
 npx jest --watch
 ```
 
-### Reading test output
-
-- **PASS** — All tests in that file passed ✅
-- **FAIL** — Something broke. The output shows which test failed and why (expected vs. actual value)
-
 ### What the tests cover
 
-| Test File | What it Tests |
-|-----------|---------------|
-| `__tests__/auth.test.ts` | Authentication flow |
-| `__tests__/auth-validators.test.ts` | Auth input validation rules |
-| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting for dashboard |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics calculations |
-| `__tests__/lib/utils.test.ts` | Utility functions |
-| `__tests__/utils.test.ts` | General utility functions |
+- **auth-validators.test.ts** — Authentication validation logic
+- **auth.test.ts** — Authentication flows and behavior
+- **formatMetric.test.ts** — Metric formatting in dashboard
+- **stats.test.ts** — Dashboard statistics calculations
+- **utils.test.ts** — General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/layout` — Layout components including the main navigation bar
+- `src/components/layout` — Layout components including the Navbar
 
 ## 🚀 Deploy to Vercel
+
+The easiest way to deploy your Next.js app is to use [Vercel](https://vercel.com/new).
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ### Step by step
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
 2. Import your GitHub repository
-3. In the **Environment Variables** section, add each variable from your `.env.local` file:
+3. Vercel will auto-detect Next.js — click **Deploy**
+4. Once deployed, go to your project → **Settings** → **Environment Variables**
+5. Add all variables from `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-4. Click **Deploy**
+6. Click **Save** and **Redeploy**
 
-> ⚠️ **Important**: Don't forget to add `SUPABASE_SERVICE_ROLE_KEY` — it's required for the Telegram webhook endpoint which runs server-side and needs elevated permissions.
+> ⚠️ **Important**: Without these environment variables, your app will crash or show errors on Vercel. Make sure every variable from `.env.local` is added.
 
 ## 📝 License
 
