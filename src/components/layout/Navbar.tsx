@@ -35,8 +35,8 @@ export default function Navbar() {
           <Link href="/" className="flex items-center justify-center gap-2 group">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-200">
           <svg 
-    width="122" 
-    height="110" 
+    width="100%" 
+    height="100%" 
     viewBox="0 0 122 110" 
     fill="none" 
     xmlns="http://www.w3.org/2000/svg"

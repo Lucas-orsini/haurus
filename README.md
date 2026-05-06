@@ -89,54 +89,70 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search for **@BotFather** → Send `/newbot` → Follow prompts → Copy the token | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You choose this string yourself (e.g. `my-super-secret-webhook-key`) | Secret used to verify webhook requests via HMAC-SHA256 |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (never expose this to the client) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search for **@BotFather** → Send `/newbot` → Follow prompts → Copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | This is a secret you define yourself — choose any random string, e.g. `openssl rand -hex 32` | Secret used to verify webhook requests from Telegram |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly — like verifying that a function returns the right output for a given input.
+Unit tests automatically check that specific parts of your code work correctly — like verifying that a function returns the right result when given certain inputs.
+
+Run all tests:
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
-npx jest __tests__/auth-validators.test.ts
+Run a specific test file:
 
-# Watch mode — re-runs tests automatically when files change
+```bash
+npx jest __tests__/auth.test.ts
+```
+
+Run tests in watch mode (re-runs automatically when you save a file):
+
+```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- **PASS** — All checks in that test file passed ✅
-- **FAIL** — Something broke ❌, you'll see which test failed and why
+**How to read the output:**
+- `PASS` — All tests passed ✅
+- `FAIL` — Something broke ❌ — the error message shows which test failed and why
 
-The test suite covers:
-- Authentication validation logic
-- Dashboard metric formatting
-- Stats calculations and utilities
-- General utility functions
+**What the tests cover:**
+- `auth-validators.test.ts` — Authentication validation logic
+- `auth.test.ts` — Authentication flows and components
+- `dashboard/formatMetric.test.ts` — Metric formatting utilities
+- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `lib/utils.test.ts` — General utility functions
+- `utils.test.ts` — Common utility functions
 
 ## 📁 Project Structure
 
-- `src/components/layout` — Layout components (Navbar, Footer)
+- `src/components/layout/` — Layout components including the main navigation bar
+- `__tests__/` — Jest test files for components, utilities, and application logic
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+**Step by step:**
+
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
+3. In the **Environment Variables** section, add all the variables from your `.env.local` file:
+
+| Name | Value |
+|------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | your Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | your Supabase service role key |
+| `TELEGRAM_BOT_TOKEN` | your Telegram bot token |
+| `TELEGRAM_BOT_SECRET` | your Telegram webhook secret |
+
 4. Click **Deploy**
 
-> ⚠️ Make sure all environment variables are added — the app won't work without them.
+> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. If you deploy without them, the app will crash.
 
 ## 📝 License
 
