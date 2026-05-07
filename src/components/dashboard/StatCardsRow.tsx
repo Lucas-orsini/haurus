@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -146,15 +146,24 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
   )
 }
 
+/** Palette hex pour la jauge — indexée par PaceColor */
+const PACE_COLOR_HEX: Record<string, string> = {
+  blue:   '#3b82f6',   // bg-blue-500
+  yellow: '#facc15',  // bg-yellow-400
+  red:    '#f87171',  // bg-red-500
+}
+
 function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
   const paceIndex = entry.paceIndex
   const displayValue = paceIndex !== null ? paceIndex.toFixed(2) : '—'
+  const paceColor   = paceIndex !== null ? getPaceColor(paceIndex) : 'blue'
+  const paceCategory = getPaceCategory(paceIndex)
+  const colorHex = PACE_COLOR_HEX[paceColor]
 
-  // Clamp the cursor position so the badge never overflows the container edges
-  // min: 5px  (avoids clipping at left = 0%)
-  // max: calc(100% - 5px)  (avoids clipping at right = 100%)
-  const clampedPace = Math.min(Math.max(paceIndex ?? 0, 0), 1)
-  const cursorLeft = `calc(${clampedPace * 100}% - 5px)`
+  // CONSTRAINT 1 — Normalisation curseur sur échelle 0–2 :
+  // paceIndex 0 → 0%, 0.80 → 40%, 1.10 → 55%, 2.0 → 100%
+  const normalizedPace = Math.min(Math.max(paceIndex ?? 0, 0), 2) / 2
+  const cursorLeft = `calc(${normalizedPace * 100}% - 5px)`
 
   return (
     <div className="flex flex-col gap-1">
@@ -165,12 +174,22 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
         {entry.surface}
       </p>
 
-      {/* Valeur numérique — AU-DESSUS de la barre */}
-      <p className="text-sm font-semibold text-[var(--text-1)] tabular-nums tracking-tight">
-        {displayValue}
-      </p>
+      {/* Valeur + catégorie — AU-DESSUS de la barre */}
+      <div className="flex items-baseline gap-2">
+        <p className="text-sm font-semibold text-[var(--text-1)] tabular-nums tracking-tight">
+          {displayValue}
+        </p>
+        {paceIndex !== null && (
+          <span
+            className="text-[10px] font-medium px-1.5 py-px rounded"
+            style={{ color: colorHex, backgroundColor: `${colorHex}18` }}
+          >
+            {paceCategory}
+          </span>
+        )}
+      </div>
 
-      {/* Zone curseur + barre — overflow-hidden empêche le badge de déborder */}
+      {/* Zone curseur + barre */}
       <div className="relative h-[44px] flex flex-col justify-end gap-0 overflow-hidden">
         {/* Curseur triangulaire — AU-DESSUS de la barre */}
         <div className="relative h-7 flex items-end">
@@ -183,8 +202,8 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
             >
               {/* Badge inline au-dessus de la flèche */}
               <span
-                className="text-[9px] font-mono font-semibold text-white whitespace-nowrap px-1 py-px rounded"
-                style={{ backgroundColor: 'var(--accent)' }}
+                className="text-[9px] font-mono font-semibold whitespace-nowrap px-1 py-px rounded"
+                style={{ color: colorHex, backgroundColor: `${colorHex}22` }}
               >
                 {displayValue}
               </span>
@@ -193,19 +212,34 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
                 className="w-[10px] h-[14px] -mt-px"
                 style={{
                   clipPath: 'polygon(50% 100%, 0 0, 100% 0)',
-                  backgroundColor: 'var(--accent)',
-                  boxShadow: '0 0 6px 1px var(--accent)',
+                  backgroundColor: colorHex,
+                  boxShadow: `0 0 6px 1px ${colorHex}80`,
                 }}
               />
             </motion.div>
           ) : null}
         </div>
 
-        {/* Barre 3 segments */}
-        <div className="relative h-[10px] rounded-full overflow-hidden flex">
-          <div className="w-[40%] h-full bg-[var(--red)]" />
-          <div className="w-[20%] h-full bg-[var(--yellow)]" />
-          <div className="w-[40%] h-full bg-[var(--green)]" />
+        {/* Barre unie + marqueurs de seuil */}
+        {/* CONSTRAINT 2 & 3 — barre dynamique + seuils visuels */}
+        <div className="relative h-[10px] rounded-full overflow-hidden bg-[var(--surface-3)]">
+          {/* Barre de couleur dynamique */}
+          <div
+            className="h-full rounded-full"
+            style={{ backgroundColor: colorHex, opacity: 0.85 }}
+          />
+
+          {/* Marqueur seuil 0.80 → 40% */}
+          <div
+            className="absolute top-0 bottom-0 w-[1px] bg-white opacity-25"
+            style={{ left: '40%' }}
+          />
+
+          {/* Marqueur seuil 1.10 → 55% */}
+          <div
+            className="absolute top-0 bottom-0 w-[1px] bg-white opacity-25"
+            style={{ left: '55%' }}
+          />
         </div>
       </div>
     </div>

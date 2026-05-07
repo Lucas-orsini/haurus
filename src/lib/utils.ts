@@ -35,6 +35,32 @@ export function getMomentumColor(value: number | null): string {
 }
 
 /**
+ * Détermine la catégorie de couleur pour la vitesse de surface (paceIndex).
+ * Logique : lent (< 0.80) → bleu, moyen (0.80–1.10) → jaune, rapide (> 1.10) → rouge.
+ *
+ * @param paceIndex - Indice de vitesse (peut être null)
+ * @returns Catégorie de couleur : 'blue' | 'yellow' | 'red'
+ */
+export function getPaceColor(paceIndex: number | null): 'blue' | 'yellow' | 'red' {
+  if (paceIndex === null || paceIndex < 0.80) return 'blue'
+  if (paceIndex <= 1.10) return 'yellow'
+  return 'red'
+}
+
+/**
+ * Retourne le label texte de la catégorie de vitesse de surface.
+ * Logique : lent (< 0.80) → 'Lent', moyen (0.80–1.10) → 'Moyen', rapide (> 1.10) → 'Rapide'.
+ *
+ * @param paceIndex - Indice de vitesse (peut être null)
+ * @returns Label de catégorie : 'Lent' | 'Moyen' | 'Rapide'
+ */
+export function getPaceCategory(paceIndex: number | null): 'Lent' | 'Moyen' | 'Rapide' {
+  if (paceIndex === null || paceIndex < 0.80) return 'Lent'
+  if (paceIndex <= 1.10) return 'Moyen'
+  return 'Rapide'
+}
+
+/**
  * Mode de coloration pour getMetricColor — étendue pour couvrir tous les modes
  * utilisés par les composants dashboard (MatchRow, MatchMetricsModal).
  */
