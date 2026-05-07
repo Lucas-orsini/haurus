@@ -126,7 +126,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   }
 
   return (
-    <div ref={containerRef} className="relative w-full px-4 md:px-0 md:max-w-md md:mx-auto">
+    <div ref={containerRef} className="relative w-full px-4 md:px-0">
       {/* Input */}
       <div className="relative">
         <Search
