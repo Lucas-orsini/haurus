@@ -148,6 +148,13 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
 
 function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
   const paceIndex = entry.paceIndex
+  const displayValue = paceIndex !== null ? paceIndex.toFixed(2) : '—'
+
+  // Clamp the cursor position so the badge never overflows the container edges
+  // min: 5px  (avoids clipping at left = 0%)
+  // max: calc(100% - 5px)  (avoids clipping at right = 100%)
+  const clampedPace = Math.min(Math.max(paceIndex ?? 0, 0), 1)
+  const cursorLeft = `calc(${clampedPace * 100}% - 5px)`
 
   return (
     <div className="flex flex-col gap-1">
@@ -158,24 +165,39 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
         {entry.surface}
       </p>
 
-      {/* Zone curseur + barre */}
-      <div className="relative h-[72px] flex flex-col justify-end gap-1">
-        {/* Curseur triangulaire — au-dessus de la barre */}
-        <div className="relative h-4 flex items-end">
+      {/* Valeur numérique — AU-DESSUS de la barre */}
+      <p className="text-sm font-semibold text-[var(--text-1)] tabular-nums tracking-tight">
+        {displayValue}
+      </p>
+
+      {/* Zone curseur + barre — overflow-hidden empêche le badge de déborder */}
+      <div className="relative h-[44px] flex flex-col justify-end gap-0 overflow-hidden">
+        {/* Curseur triangulaire — AU-DESSUS de la barre */}
+        <div className="relative h-7 flex items-end">
           {paceIndex !== null ? (
             <motion.div
               initial={{ left: '0%' }}
-              animate={{
-                left: `calc(${Math.min(Math.max(paceIndex, 0), 1) * 100}% - 5px)`,
-              }}
+              animate={{ left: cursorLeft }}
               transition={{ duration: 0.7, delay: index * 0.06, ease: 'easeOut' }}
-              className="absolute top-0 w-[10px] h-4"
-              style={{
-                clipPath: 'polygon(50% 100%, 0 0, 100% 0)',
-                backgroundColor: 'var(--accent)',
-                boxShadow: '0 0 8px 2px var(--accent)',
-              }}
-            />
+              className="absolute top-0 w-[10px] h-7 flex flex-col items-center"
+            >
+              {/* Badge inline au-dessus de la flèche */}
+              <span
+                className="text-[9px] font-mono font-semibold text-white whitespace-nowrap px-1 py-px rounded"
+                style={{ backgroundColor: 'var(--accent)' }}
+              >
+                {displayValue}
+              </span>
+              {/* Flèche triangulaire pointant vers le bas */}
+              <div
+                className="w-[10px] h-[14px] -mt-px"
+                style={{
+                  clipPath: 'polygon(50% 100%, 0 0, 100% 0)',
+                  backgroundColor: 'var(--accent)',
+                  boxShadow: '0 0 6px 1px var(--accent)',
+                }}
+              />
+            </motion.div>
           ) : null}
         </div>
 
@@ -185,11 +207,6 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
           <div className="w-[20%] h-full bg-[var(--yellow)]" />
           <div className="w-[40%] h-full bg-[var(--green)]" />
         </div>
-
-        {/* Valeur numérique */}
-        <p className="text-[11px] font-mono text-[var(--text-2)]">
-          {paceIndex !== null ? paceIndex.toFixed(3) : '—'}
-        </p>
       </div>
     </div>
   )

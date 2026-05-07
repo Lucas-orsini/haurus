@@ -80,7 +80,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac), then type the command above.
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac), then type the command above.
 
 ## 🔑 Environment Variables
 
@@ -88,13 +88,13 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose in browser, Row Level Security controls access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS — never expose to client |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), use `/newbot` command | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | Set this when calling `setWebhook` with the `secret` parameter | Secret token for verifying incoming webhook requests |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS completely |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), send `/newbot`, follow instructions, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook | A secret string you choose for HMAC signature verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code work correctly without needing the whole app running.
+Unit tests automatically check that individual pieces of your app work correctly without needing the full app running.
 
 Run all tests:
 
@@ -105,28 +105,30 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save changes):
+Watch mode — re-runs tests automatically when you save changes:
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- **PASS** ✅ — All assertions in the test passed
-- **FAIL** ❌ — Something broke; the output shows which test failed and why
+**How to read the output:**
+- **PASS** — All tests passed, everything works correctly
+- **FAIL** — Something broke, check the error message below to see which test failed and why
 
-The test suite covers:
-- Authentication validation logic
-- Dashboard formatting utilities
-- Dashboard statistics calculations
-- General utility functions
+**What the tests cover:**
+- `auth-validators` — Authentication validation logic
+- `auth` — Authentication flows
+- `dashboard/formatMetric` — Metric formatting utilities
+- `lib/dashboard/stats` — Dashboard statistics calculations
+- `lib/utils` — General utility functions
+- `utils` — Common utilities
 
 ## 📁 Project Structure
 
-- `src/lib/dashboard` — Dashboard statistics and formatting utilities
+- `src/components/dashboard` — Dashboard UI components including stat cards
 
 ## 🚀 Deploy to Vercel
 
@@ -134,15 +136,16 @@ The test suite covers:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In **Environment Variables**, add all variables from your `.env.local`:
+3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
+4. Add all variables from your `.env.local` file:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-4. Click **Deploy**
+5. Click **Deploy**
 
-Your app will be live at a URL like `your-app.vercel.app`.
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 
