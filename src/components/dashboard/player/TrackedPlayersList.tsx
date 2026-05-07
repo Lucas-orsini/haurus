@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Trash2, Lock } from 'lucide-react'
+import { Loader2, Trash2, Lock, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /** Type TrackedPlayer — aligné avec la réponse GET /api/tracked-players */
@@ -19,6 +19,7 @@ interface TrackedPlayersListProps {
   limit: number | null
   onSelectPlayer: (playerName: string, playerId: string) => void
   onRemovePlayer: (playerName: string) => Promise<void>
+  onClose?: () => void
 }
 
 function isLocked(lockedUntil: string): boolean {
@@ -39,6 +40,7 @@ export default function TrackedPlayersList({
   limit,
   onSelectPlayer,
   onRemovePlayer,
+  onClose,
 }: TrackedPlayersListProps) {
   const [removingName, setRemovingName] = useState<string | null>(null)
 
@@ -65,9 +67,20 @@ export default function TrackedPlayersList({
           <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
             Suivis
           </span>
-          <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
-            {countLabel}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
+              {countLabel}
+            </span>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="md:hidden w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors duration-150"
+                aria-label="Fermer le panneau"
+              >
+                <X size={15} strokeWidth={1.5} className="shrink-0" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Empty state */}
@@ -96,9 +109,20 @@ export default function TrackedPlayersList({
         <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
           Suivis
         </span>
-        <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
-          {countLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
+            {countLabel}
+          </span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="md:hidden w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors duration-150"
+              aria-label="Fermer le panneau"
+            >
+              <X size={15} strokeWidth={1.5} className="shrink-0" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* List */}

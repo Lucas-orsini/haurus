@@ -296,6 +296,7 @@ export default function PlayerProfileClient() {
               limit={trackedLimit}
               onSelectPlayer={handleSelectTracked}
               onRemovePlayer={handleRemoveTracked}
+              onClose={() => setPanelOpen(false)}
             />
           </motion.div>
         )}
