@@ -305,10 +305,10 @@ export default function PlayerProfileClient() {
         <div className="flex-1 min-w-0 space-y-5">
 
           {/* Bouton toggle "Mes joueurs" + barre de recherche — stack mobile, row desktop */}
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <button
               onClick={() => setPanelOpen(!panelOpen)}
-              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto my-auto
+              className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto
                          border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
                          text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
               aria-label="Ouvrir ou fermer le panneau Mes joueurs"
