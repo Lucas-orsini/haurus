@@ -201,14 +201,11 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
           ) : null}
         </div>
 
-        {/* Barre 3 segments — seuils sur échelle 0–2 :
-             Lent   0.00–0.80 → 40%  (0.80/2)
-             Moyen  0.80–1.10 → 15%  (0.30/2)
-             Rapide 1.10–2.00 → 45%  (0.90/2) */}
+        {/* Barre 3 segments */}
         <div className="relative h-[10px] rounded-full overflow-hidden flex">
           <div className="w-[40%] h-full bg-[var(--red)]" />
-          <div className="w-[15%] h-full bg-[var(--yellow)]" />
-          <div className="w-[45%] h-full bg-[var(--green)]" />
+          <div className="w-[20%] h-full bg-[var(--yellow)]" />
+          <div className="w-[40%] h-full bg-[var(--green)]" />
         </div>
       </div>
     </div>
