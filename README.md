@@ -4,10 +4,9 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard** — Analytics dashboard displaying statistics with visual stat cards
-- **Authentication** — Secure login and signup with Supabase
-- **Responsive Design** — Tailwind CSS for modern, responsive layouts
-- **Animations** — Smooth transitions with Framer Motion
+- **Dashboard** — Analytics dashboard with visual stat cards displaying key metrics
+- **Authentication** — Secure login and signup powered by Supabase
+- **Utility Functions** — Shared utilities for styling and common operations
 
 ## 🛠️ Tech Stack
 
@@ -89,14 +88,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose in browser, Row Level Security controls access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS — never expose to client |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search @BotFather → `/newbot` → follow prompts → copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up the webhook | Secret string for HMAC-SHA256 signature verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose client-side, RLS protects your data |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), send `/newbot`, follow steps, copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Any random string you choose (e.g., generate with `openssl rand -hex 32`) | Secret used to verify webhook requests from Telegram |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual parts of your code work correctly without needing to run the whole app.
+Unit tests automatically check that specific parts of your code work correctly — like verifying that a function returns the right output.
 
 Run all tests:
 
@@ -110,26 +109,27 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save changes):
+Watch mode (re-runs tests automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, check the error message below for what went wrong
+**Understanding the output:**
+- **PASS** — All tests passed, your code works correctly
+- **FAIL** — Something broke, check the error message below for what went wrong
 
 The test suite covers:
 - Authentication validators and auth flow
-- Dashboard formatting utilities
-- Stats calculation logic
-- General utility functions
+- Dashboard metrics formatting
+- Statistics calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/lib/dashboard/` — Dashboard statistics and data processing
-- `__tests__/` — Jest test files
+- `src/lib` — Utility functions for styling (clsx, tailwind-merge) and common operations
+- `src/components/dashboard` — Dashboard UI components (stat cards, visualizations)
+- `__tests__` — Jest test files for components, utilities, and business logic
 
 ## 🚀 Deploy to Vercel
 
@@ -137,17 +137,15 @@ The test suite covers:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in **Vercel Dashboard → Settings → Environment Variables**:
-
+3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-
 4. Click **Deploy**
 
-Your app will be live at `https://your-project.vercel.app`.
+> ⚠️ **Important**: Make sure all environment variables are added before deploying. The app won't work correctly without them.
 
 ## 📝 License
 
