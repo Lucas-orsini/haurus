@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp } from 'lucide-react'
-import SpeedGauge from '@/components/ui/SpeedGauge'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
@@ -135,16 +134,40 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
           Vitesse de surface
         </p>
       </div>
-      <div className="flex flex-col gap-3">
-        {card3.map((entry, i) => (
-          <SpeedGauge
-            key={i}
-            paceIndex={entry.paceIndex}
-            name={entry.name}
-            surface={entry.surface}
-          />
-        ))}
+      <div className="flex flex-col gap-1">
+        {card3.map((entry, i) => {
+          const { textClass, suffix } = getPaceColor(entry.paceIndex)
+          return (
+            <p key={i} className={cn('text-[11px]', textClass)}>
+              {entry.name}
+              <span className="mx-1 text-[var(--text-3)]">·</span>
+              {entry.surface}
+              <span className="mx-1 text-[var(--text-3)]">·</span>
+              {suffix}
+            </p>
+          )
+        })}
       </div>
     </div>
   )
+}
+
+/**
+ * Retourne les classes de couleur et le texte formaté pour un paceIndex.
+ * - paceIndex === null → —(lent) en couleur atténuée
+ * - paceIndex < 0.80  → couleur atténuée + (lent)
+ * - 0.80 ≤ paceIndex ≤ 1.20 → couleur normale + (moyen)
+ * - paceIndex > 1.20  → couleur accentuée + (rapide)
+ */
+function getPaceColor(paceIndex: number | null): { textClass: string; suffix: string } {
+  if (paceIndex === null) {
+    return { textClass: 'text-[var(--text-2)]', suffix: '— (lent)' }
+  }
+  if (paceIndex < 0.80) {
+    return { textClass: 'text-[var(--text-2)]', suffix: `${paceIndex.toFixed(3)} (lent)` }
+  }
+  if (paceIndex > 1.20) {
+    return { textClass: 'text-[var(--accent-hi)]', suffix: `${paceIndex.toFixed(3)} (rapide)` }
+  }
+  return { textClass: 'text-[var(--text-1)]', suffix: `${paceIndex.toFixed(3)} (moyen)` }
 }
