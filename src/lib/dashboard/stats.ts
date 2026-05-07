@@ -90,6 +90,35 @@ function findSurfaceSpecialist(
 }
 
 /**
+ * Normalizes a tournament name for matching purposes.
+ *
+ * Applies: trim, lowercase, removal of common tour-level prefixes (ATP, WTA,
+ * Challenger, ITF), removal of punctuation (commas, periods, apostrophes,
+ * dashes), and collapse of multiple whitespace.
+ *
+ * Examples:
+ *   "ATP Rome Masters"  → "rome masters"
+ *   "Rome Masters"      → "rome masters"
+ *   "Monte Carlo, Monaco" → "monte carlo monaco"
+ *   "Monte-Carlo"      → "monte carlo"
+ *   "Rome"             → "rome"
+ */
+function normalizeTournamentName(name: string): string {
+  return (
+    name
+      .trim()
+      .toLowerCase()
+      // Remove common prefixes at the start of the string
+      .replace(/^(?:atp|wta|challenger|itf)\s+/i, '')
+      // Remove punctuation: commas, periods, apostrophes, dashes
+      .replace(/[,.'\-–—]/g, ' ')
+      // Collapse multiple spaces into one
+      .replace(/\s+/g, ' ')
+      .trim()
+  )
+}
+
+/**
  * Card 3: surface speed from tournament_pace for each active tournament.
  *
  * @param tournaments — unique { name, surface } from match_stats
@@ -103,13 +132,18 @@ function buildCard3(
   // Query failed — signal to the UI to show "Données indisponibles"
   if (paceRows === null) return null
 
-  // Build the ordered list: one entry per tournament, paceIndex resolved via lowercase matching
+  // Build the ordered list: one entry per tournament, paceIndex resolved via
+  // bidirectional contains-matching on normalized names + surface equality
   const card3 = tournaments.map(({ name, surface }) => {
+    const normalizedName = normalizeTournamentName(name)
+
     const match = paceRows.find(
       (p) =>
-        p.tourney_name.toLowerCase() === name.toLowerCase() &&
+        (normalizeTournamentName(p.tourney_name).includes(normalizedName) ||
+          normalizedName.includes(normalizeTournamentName(p.tourney_name))) &&
         p.surface.toLowerCase() === surface.toLowerCase()
     )
+
     return {
       name,
       surface,
@@ -170,7 +204,7 @@ export async function computeTodaysStats(
 
   const tournaments = extractTournaments(todaysMatches)
 
-  // Fetch tournament_pace rows — lowercase matching is done in-memory (see buildCard3)
+  // Fetch tournament_pace rows — normalized matching is done in-memory (see buildCard3)
   const { data: paceData, error: paceError } = await supabase
     .from('tournament_pace')
     .select('tourney_name, surface, pace_index')
