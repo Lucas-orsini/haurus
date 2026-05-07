@@ -175,6 +175,15 @@ export async function computeTodaysStats(
     .from('tournament_pace')
     .select('tourney_name, surface, pace_index')
 
+  console.log('[computeTodaysStats] tournament_pace response:', {
+    rowCount: paceData?.length ?? null,
+    surfacesAndNames: paceData?.map((p) => ({
+      tourney_name: p.tourney_name,
+      surface: p.surface,
+    })),
+    paceError,
+  })
+
   const paceRows: PaceRow[] | null =
     paceError || !paceData ? null : paceData
 

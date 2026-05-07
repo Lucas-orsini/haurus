@@ -88,13 +88,13 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose in browser, Row Level Security controls access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses all security — never expose to browser |
-| `TELEGRAM_BOT_TOKEN` | No | Open Telegram → search for **@BotFather** → send `/newbot` → follow prompts → copy the token | Used to send notifications via Telegram bot |
-| `TELEGRAM_BOT_SECRET` | No | Any random string you choose (e.g. `my-secret-123`) | Used to verify that incoming webhook requests are really from Telegram |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS — never expose to client |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, chat with [@BotFather](https://t.me/BotFather), use `/newbot` command | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Set this when calling `setWebhook` with the `secret` parameter | Secret token for verifying incoming webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your app work correctly — like verifying that a calculation returns the right number or that a login form behaves as expected.
+Unit tests automatically check that individual pieces of code work correctly without needing the whole app running.
 
 Run all tests:
 
@@ -105,7 +105,7 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
 Run tests in watch mode (re-runs automatically when you save changes):
@@ -114,41 +114,35 @@ Run tests in watch mode (re-runs automatically when you save changes):
 npx jest --watch
 ```
 
-**How to read the output:**
-- **PASS** (green) = all tests in that file passed ✅
-- **FAIL** (red) = something broke, check the error message below for which test failed and why
+**Reading the output:**
+- **PASS** ✅ — All assertions in the test passed
+- **FAIL** ❌ — Something broke; the output shows which test failed and why
 
-**Tests included:**
-- `__tests__/auth.test.ts` — Authentication flow tests
-- `__tests__/auth-validators.test.ts` — Form validation tests
-- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting tests
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics tests
-- `__tests__/lib/utils.test.ts` — Utility function tests
-- `__tests__/utils.test.ts` — General utility tests
+The test suite covers:
+- Authentication validation logic
+- Dashboard formatting utilities
+- Dashboard statistics calculations
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including stat cards
+- `src/lib/dashboard` — Dashboard statistics and formatting utilities
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Push your code to GitHub if you haven't already
-2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
-3. Click **"Add New Project"**
-4. Import your repository
-5. In **"Environment Variables"**, add every variable from your `.env.local` file:
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In **Environment Variables**, add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-6. Click **"Deploy"**
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add ALL environment variables in Vercel. If you miss one, the app will crash when it tries to use that missing variable.
+Your app will be live at a URL like `your-app.vercel.app`.
 
 ## 📝 License
 
