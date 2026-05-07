@@ -89,60 +89,65 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side safe key for Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search for **@BotFather** → send `/newbot` → follow prompts → copy the token | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You choose this string yourself when setting up the webhook | Secret string used to verify incoming webhook requests |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose client-side, RLS protects your data |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS |
+| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — [t.me/BotFather](https://t.me/BotFather) → create bot and copy token | Telegram bot authentication |
+| `TELEGRAM_BOT_SECRET` | No | You define this yourself when configuring the webhook | Used for HMAC-SHA256 signature verification |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual parts of the code work correctly without needing the whole app running.
+Tests help verify that the app works correctly — they automatically check key parts of the code for you.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs automatically when you save a file):
+**Watch mode (re-runs automatically when files change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, check the error message below to see which test failed
+**Understanding the output:**
+- `PASS` — All tests passed, everything works ✅
+- `FAIL` — Something broke, check the error message below to see which test failed ❌
 
-The test suite covers authentication validation, auth configuration, dashboard formatting, statistics utilities, and general utility functions.
+**What gets tested:**
+- Authentication validators and logic
+- Dashboard formatting utilities
+- Stats calculation functions
+- Utility helpers (styling, class merging, etc.)
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player dashboard UI components
+- `src/components/dashboard/player` — Player tracking dashboard components (profile display, tracked players list)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In **Environment Variables**, add each variable from your `.env.local` file:
+**Step by step:**
 
+1. Push your code to GitHub if you haven't already
+2. Go to [vercel.com/new](https://vercel.com/new)
+3. Click **"Import Git Repository"** and select your repo
+4. In the **Environment Variables** section, add all variables from your `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
+5. Click **"Deploy"** — Vercel will build and deploy your app automatically
 
-4. Click **Deploy**
-
-Your app will be live at a URL like `your-app.vercel.app` within seconds.
+> ⚠️ **Important**: Make sure to add all environment variables in Vercel before deploying. Without them, your app won't be able to connect to Supabase or Telegram.
 
 ## 📝 License
 
