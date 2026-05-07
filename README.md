@@ -89,46 +89,48 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose client-side, RLS protects your data |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — [t.me/BotFather](https://t.me/BotFather) → create bot and copy token | Telegram bot authentication |
-| `TELEGRAM_BOT_SECRET` | No | You define this yourself when configuring the webhook | Used for HMAC-SHA256 signature verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-side key, safe with Row Level Security |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS completely |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → search **@BotFather** → send `/newbot` → follow prompts → copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | Custom secret you choose when setting up your webhook | Used to verify HMAC-SHA256 signatures on incoming webhook requests |
 
 ## 🧪 Running Tests
 
-Tests help verify that the app works correctly — they automatically check key parts of the code for you.
+Unit tests check that individual pieces of code (like utility functions and components) work correctly without needing the whole app running.
 
-**Run all tests:**
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-**Run a specific test file:**
+Run a specific test file:
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs automatically when files change):**
+Run tests in watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — All tests passed, everything works ✅
-- `FAIL` — Something broke, check the error message below to see which test failed ❌
+**How to read Jest output:**
+- `PASS` — all tests in that file passed ✅
+- `FAIL` — something broke, see the error message below for which test failed and why
 
-**What gets tested:**
-- Authentication validators and logic
-- Dashboard formatting utilities
-- Stats calculation functions
-- Utility helpers (styling, class merging, etc.)
+**What the tests cover:**
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flow and behavior
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting in the dashboard
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics utilities
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Common utilities
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player tracking dashboard components (profile display, tracked players list)
+- `src/components/dashboard/player` — Player dashboard components (search bar, player profile)
 
 ## 🚀 Deploy to Vercel
 
@@ -136,18 +138,20 @@ npx jest --watch
 
 **Step by step:**
 
-1. Push your code to GitHub if you haven't already
-2. Go to [vercel.com/new](https://vercel.com/new)
-3. Click **"Import Git Repository"** and select your repo
-4. In the **Environment Variables** section, add all variables from your `.env.local`:
+1. Push your code to GitHub (if you haven't already)
+2. Go to [vercel.com](https://vercel.com) and click **Add New Project**
+3. Import your GitHub repository
+4. In **Environment Variables**, add every variable from your `.env.local` file:
+
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-5. Click **"Deploy"** — Vercel will build and deploy your app automatically
 
-> ⚠️ **Important**: Make sure to add all environment variables in Vercel before deploying. Without them, your app won't be able to connect to Supabase or Telegram.
+5. Click **Deploy**
+
+Your app will be live on a Vercel URL (e.g., `your-app.vercel.app`).
 
 ## 📝 License
 
