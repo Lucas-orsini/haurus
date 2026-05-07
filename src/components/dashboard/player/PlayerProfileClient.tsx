@@ -318,7 +318,7 @@ export default function PlayerProfileClient() {
             </button>
 
             {/* Barre de recherche — pleine largeur mobile */}
-            <div className="w-full md:w-auto md:flex-1">
+            <div className="w-full md:w-auto md:flex-1 md:self-center">
               <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
             </div>
           </div>
