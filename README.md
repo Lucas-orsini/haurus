@@ -4,7 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Player Dashboard** — Track and manage player profiles with dedicated dashboard components
+- **Player Dashboard** — Track and manage player profiles with a dedicated search component
 - **Visual Analytics** — Display key metrics with chart visualizations using Recharts
 - **Authentication** — Secure login and signup powered by Supabase
 - **Animations** — Smooth transitions and interactions using Framer Motion
@@ -14,11 +14,11 @@ The metrics bookmakers use. Now yours.
 - **Framework**: Next.js (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
+- **Database & Auth**: Supabase
 - **Charts**: Recharts
 - **Icons**: Lucide React
+- **Animations**: Framer Motion
 - **Testing**: Jest with React Testing Library
-- **Auth & Database**: Supabase
 
 ## 🚀 Quick Start
 
@@ -56,21 +56,19 @@ touch .env.local
 Open `.env.local` in your code editor and paste the following template:
 
 ```bash
-# Supabase project URL — https://app.supabase.com/project/<project>/settings/api
+# Supabase project URL
 NEXT_PUBLIC_SUPABASE_URL=
 
 # Supabase anonymous (public) key — exposed client-side, safe with RLS
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 # Supabase service role key — server-side only, bypasses RLS completely
-# Used by: /api/telegram/webhook (webhook has no session cookie, needs service role)
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Telegram Bot API token — https://core.telegram.org/bots/tutorial#creating-your-first-bot
+# Telegram Bot API token
 TELEGRAM_BOT_TOKEN=
 
-# Telegram webhook secret token — configured when calling setWebhook with secret parameter.
-# Used for HMAC-SHA256 signature verification on incoming webhook requests.
+# Telegram webhook secret token
 TELEGRAM_BOT_SECRET=
 ```
 
@@ -89,65 +87,59 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Safe to expose client-side, RLS protects your data |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only, bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram BotFather — [t.me/BotFather](https://t.me/BotFather) → create bot and copy token | Telegram bot authentication |
-| `TELEGRAM_BOT_SECRET` | No | You define this yourself when configuring the webhook | Used for HMAC-SHA256 signature verification |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Anonymous key for client-side Supabase access |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Service role key for server-side operations that bypass RLS |
+| `TELEGRAM_BOT_TOKEN` | No | Open Telegram, chat with [@BotFather](https://t.me/BotFather), use `/newbot` command | Telegram bot token for webhook integration |
+| `TELEGRAM_BOT_SECRET` | No | Set this when configuring your webhook URL with the secret parameter | Secret token for webhook request verification |
 
 ## 🧪 Running Tests
 
-Tests help verify that the app works correctly — they automatically check key parts of the code for you.
+Unit tests automatically check that individual parts of the code work correctly — like a quality check for small pieces of your app.
 
-**Run all tests:**
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-**Run a specific test file:**
+Run a specific test file:
 
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-**Watch mode (re-runs automatically when files change):**
+Watch mode (re-runs automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — All tests passed, everything works ✅
-- `FAIL` — Something broke, check the error message below to see which test failed ❌
+**Reading the output**: `PASS` means all tests passed — everything works. `FAIL` means something broke — you'll see which test failed and why.
 
-**What gets tested:**
-- Authentication validators and logic
-- Dashboard formatting utilities
-- Stats calculation functions
-- Utility helpers (styling, class merging, etc.)
+The test suite covers:
+- Authentication validators and flows
+- Dashboard utility functions and metric formatting
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard/player` — Player tracking dashboard components (profile display, tracked players list)
+- `src/components/dashboard/player` — Player dashboard components including the search bar
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Push your code to GitHub if you haven't already
-2. Go to [vercel.com/new](https://vercel.com/new)
-3. Click **"Import Git Repository"** and select your repo
-4. In the **Environment Variables** section, add all variables from your `.env.local`:
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. Add all environment variables in **Vercel Dashboard → Your Project → Settings → Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-5. Click **"Deploy"** — Vercel will build and deploy your app automatically
+   - `TELEGRAM_BOT_TOKEN` (if used)
+   - `TELEGRAM_BOT_SECRET` (if used)
+4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add all environment variables in Vercel before deploying. Without them, your app won't be able to connect to Supabase or Telegram.
+> ⚠️ **Important**: Make sure all environment variables from your `.env.local` are also added in Vercel, otherwise your app will break in production.
 
 ## 📝 License
 
