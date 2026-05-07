@@ -4,14 +4,13 @@
  * These functions are idempotent and side-effect free — suitable for
  * unit testing and independent of any Supabase or React context.
  *
- * All stats (win rate surface, momentum) are now read directly from
- * match_stats columns _p1 / _p2. The player_stats table query is removed.
+ * card3 now reads from the tournament_pace table instead of momentum_td.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { TodaysStats } from '@/lib/types/dashboard'
 
-/** Raw match row — includes the per-player _p1 / _p2 stats needed for card2/card3. */
+/** Raw match row — includes the per-player _p1 / _p2 stats needed for card2. */
 export interface MatchRow {
   player1: string
   player2: string
@@ -23,15 +22,24 @@ export interface MatchRow {
   momentum_td_p2: number | null
 }
 
+/** Raw row from tournament_pace. */
+interface PaceRow {
+  tourney_name: string
+  surface: string
+  pace_index: number
+}
+
 /**
- * Builds the TodaysStats object from raw match_stats rows.
+ * Builds the TodaysStats object from raw match_stats rows and tournament_pace rows.
  *
  * @param todaysMatches — match_stats rows where date_match = today
  * @param tournaments   — unique { name, surface } entries from todaysMatches
+ * @param paceRows     — rows from tournament_pace (null = query failed)
  */
 export function buildTodaysStats(
   todaysMatches: MatchRow[],
-  tournaments: Array<{ name: string; surface: string }>
+  tournaments: Array<{ name: string; surface: string }>,
+  paceRows: PaceRow[] | null
 ): TodaysStats {
   // Card 1 — simple count + tournament list
   const card1 = {
@@ -42,8 +50,8 @@ export function buildTodaysStats(
   // Card 2 — highest surface win rate across both players in all matches
   const card2 = findSurfaceSpecialist(todaysMatches)
 
-  // Card 3 — highest |momentum| across both players in all matches
-  const card3 = findExtremeMomentum(todaysMatches)
+  // Card 3 — surface speed from tournament_pace for each active tournament
+  const card3 = buildCard3(tournaments, paceRows)
 
   return { card1, card2, card3 }
 }
@@ -82,36 +90,34 @@ function findSurfaceSpecialist(
 }
 
 /**
- * Card 3: selects the player with the highest absolute momentum across all matches.
- * Returns null if no player has a non-null momentum value.
+ * Card 3: surface speed from tournament_pace for each active tournament.
+ *
+ * @param tournaments — unique { name, surface } from match_stats
+ * @param paceRows   — null when the query failed; [] when no rows returned;
+ *                     entries with paceIndex = null mean no match found in tournament_pace
  */
-function findExtremeMomentum(
-  matches: MatchRow[]
+function buildCard3(
+  tournaments: Array<{ name: string; surface: string }>,
+  paceRows: PaceRow[] | null
 ): TodaysStats['card3'] {
-  let best: { player1: string; player2: string; momentum: number } | null = null
+  // Query failed — signal to the UI to show "Données indisponibles"
+  if (paceRows === null) return null
 
-  for (const match of matches) {
-    const { momentum_td_p1, momentum_td_p2 } = match
-
-    for (const [player1, momentum] of [
-      [match.player1, momentum_td_p1] as [string, number | null],
-      [match.player2, momentum_td_p2] as [string, number | null],
-    ]) {
-      if (momentum === null) continue
-      const player2 = player1 === match.player1 ? match.player2 : match.player1
-      const absMomentum = Math.abs(momentum)
-
-      if (best === null || absMomentum > Math.abs(best.momentum)) {
-        best = {
-          player1,
-          player2,
-          momentum,
-        }
-      }
+  // Build the ordered list: one entry per tournament, paceIndex resolved via lowercase matching
+  const card3 = tournaments.map(({ name, surface }) => {
+    const match = paceRows.find(
+      (p) =>
+        p.tourney_name.toLowerCase() === name.toLowerCase() &&
+        p.surface.toLowerCase() === surface.toLowerCase()
+    )
+    return {
+      name,
+      surface,
+      paceIndex: match?.pace_index ?? null,
     }
-  }
+  })
 
-  return best
+  return card3
 }
 
 /**
@@ -136,7 +142,8 @@ export function extractTournaments(
 }
 
 /**
- * Fetches today's match data from Supabase and computes TodaysStats.
+ * Fetches today's match data and tournament pace metadata from Supabase,
+ * then computes TodaysStats.
  *
  * This is the async wrapper intended for use in Server Components.
  * Pure calculation lives in `buildTodaysStats` for testability.
@@ -149,8 +156,7 @@ export async function computeTodaysStats(
 ): Promise<TodaysStats | undefined> {
   const today = new Date().toISOString().slice(0, 10)
 
-  // Fetch today's matches — now includes all _p1 / _p2 columns needed
-  // for card2 (win_rate_surf_td) and card3 (momentum_td)
+  // Fetch today's matches — includes all _p1 / _p2 columns needed for card2
   const { data: todaysMatches, error: matchesError } = await supabase
     .from('match_stats')
     .select(
@@ -164,5 +170,13 @@ export async function computeTodaysStats(
 
   const tournaments = extractTournaments(todaysMatches)
 
-  return buildTodaysStats(todaysMatches, tournaments)
+  // Fetch tournament_pace rows — lowercase matching is done in-memory (see buildCard3)
+  const { data: paceData, error: paceError } = await supabase
+    .from('tournament_pace')
+    .select('tourney_name, surface, pace_index')
+
+  const paceRows: PaceRow[] | null =
+    paceError || !paceData ? null : paceData
+
+  return buildTodaysStats(todaysMatches, tournaments, paceRows)
 }

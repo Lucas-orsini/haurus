@@ -17,7 +17,7 @@ export default function StatCardsRow({ todaysStats }: StatCardsRowProps) {
       {/* Card 2 — Spécialiste surface */}
       <Card2 card2={todaysStats?.card2} />
 
-      {/* Card 3 — Momentum extrême */}
+      {/* Card 3 — Vitesse de surface */}
       <Card3 card3={todaysStats?.card3} />
     </div>
   )
@@ -98,13 +98,13 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
 }
 
 function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
-  if (!card3) {
+  if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Momentum extrême
+            Vitesse de surface
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
@@ -112,26 +112,62 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
     )
   }
 
-  const isPositive = card3.momentum >= 0
-  const arrow = isPositive ? '↑' : '↓'
-  const sign = isPositive ? '+' : '-'
-  const formattedValue = `${arrow} ${sign}${Math.abs(card3.momentum).toFixed(2)}`
-  const valueColor = isPositive ? 'text-[var(--green)]' : 'text-[var(--red)]'
+  if (!card3 || card3.length === 0) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Vitesse de surface
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">—</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-2">
         <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Momentum extrême
+          Vitesse de surface
         </p>
       </div>
-      <p className={cn('text-2xl font-medium font-mono tabular-nums tracking-tight', valueColor)}>
-        {formattedValue}
-      </p>
-      <p className="text-[11px] text-[var(--text-3)] mt-2">
-        {card3.player1} vs {card3.player2}
-      </p>
+      <div className="flex flex-col gap-1">
+        {card3.map((entry, i) => {
+          const { textClass, suffix } = getPaceColor(entry.paceIndex)
+          return (
+            <p key={i} className={cn('text-[11px]', textClass)}>
+              {entry.name}
+              <span className="mx-1 text-[var(--text-3)]">·</span>
+              {entry.surface}
+              <span className="mx-1 text-[var(--text-3)]">·</span>
+              {suffix}
+            </p>
+          )
+        })}
+      </div>
     </div>
   )
+}
+
+/**
+ * Retourne les classes de couleur et le texte formaté pour un paceIndex.
+ * - paceIndex === null → —(lent) en couleur atténuée
+ * - paceIndex < 0.80  → couleur atténuée + (lent)
+ * - 0.80 ≤ paceIndex ≤ 1.20 → couleur normale + (moyen)
+ * - paceIndex > 1.20  → couleur accentuée + (rapide)
+ */
+function getPaceColor(paceIndex: number | null): { textClass: string; suffix: string } {
+  if (paceIndex === null) {
+    return { textClass: 'text-[var(--text-2)]', suffix: '— (lent)' }
+  }
+  if (paceIndex < 0.80) {
+    return { textClass: 'text-[var(--text-2)]', suffix: `${paceIndex.toFixed(3)} (lent)` }
+  }
+  if (paceIndex > 1.20) {
+    return { textClass: 'text-[var(--accent-hi)]', suffix: `${paceIndex.toFixed(3)} (rapide)` }
+  }
+  return { textClass: 'text-[var(--text-1)]', suffix: `${paceIndex.toFixed(3)} (moyen)` }
 }
