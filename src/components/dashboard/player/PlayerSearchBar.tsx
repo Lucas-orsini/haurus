@@ -126,7 +126,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
   }
 
   return (
-    <div ref={containerRef} className="relative w-full px-4 md:px-0 md:max-w-md md:mx-auto">
+    <div ref={containerRef} className="relative w-full px-4">
       {/* Input */}
       <div className="relative">
         <Search
@@ -140,7 +140,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Rechercher un joueur ATP..."
+          placeholder="Recherchez un joueur ATP"
           className={cn(
             'w-full h-9 pl-9 pr-9 rounded-md text-sm',
             'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -163,6 +163,13 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
           ) : null}
         </div>
       </div>
+
+      {/* Helper text */}
+      {query.length < MIN_CHARS && (
+        <p className="text-xs text-[var(--text-3)] mt-1.5 ml-px leading-relaxed">
+          Tapez au moins 2 caractères pour démarrer
+        </p>
+      )}
 
       {/* Dropdown — full width on mobile, constrained on desktop */}
       {open && (
