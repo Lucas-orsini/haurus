@@ -4,6 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Dashboard** — Visual analytics dashboard with chart components
 - **Authentication** — Secure login and signup with Supabase
 - **Responsive Design** — Tailwind CSS for modern, responsive layouts
 - **Animations** — Smooth transitions with Framer Motion
@@ -90,14 +91,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side Supabase access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses RLS |
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → chat with [@BotFather](https://t.me/botfather) → send `/newbot` → follow prompts → copy the token | Your Telegram bot's API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook (any random string) | Secret string used to verify webhook requests with HMAC-SHA256 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side operations |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → search **@BotFather** → send `/newbot` → follow prompts → copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself when setting up your webhook (any random string you choose) | Secret used to verify incoming webhook requests |
 
 ## 🧪 Running Tests
 
-Unit tests check that individual pieces of your app work correctly — like making sure a button click does what it should.
+Tests are automated checks that make sure your code works correctly — they run pieces of your app and confirm the results match what you expect.
 
 Run all tests:
 
@@ -111,43 +112,49 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you change a file):
+Run in watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output**: `PASS` means all tests in that file passed ✅. `FAIL` means something broke — the error message shows exactly which test failed and why.
+**Reading test output:**
+- `PASS` — Everything works correctly
+- `FAIL` — Something broke. Look at the error message below for clues (which test failed and why)
 
-The test suite covers:
-- Auth validation logic
-- Auth flow and state
-- Dashboard metric formatting
-- Dashboard statistics calculations
-- Utility functions
+**What the tests cover:**
+- `__tests__/auth-validators.test.ts` — Validation rules for authentication inputs
+- `__tests__/auth.test.ts` — Authentication flow logic
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting in the dashboard
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `__tests__/lib/utils.test.ts` — Utility functions for the dashboard
+- `__tests__/utils.test.ts` — General utility helpers (className merging, Tailwind handling)
 
 ## 📁 Project Structure
 
-- src/components/sections — Reusable section components for pages (e.g., Hero)
+- `src/components/dashboard` — Dashboard UI components
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step-by-step**:
+**Step by step:**
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add every variable from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy**
+3. In the **Environment Variables** section, add all variables from your `.env.local` file:
 
-Vercel will automatically build and deploy your app. Every push to `main` triggers a new deployment.
+| Name | Value |
+|------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | (paste from .env.local) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (paste from .env.local) |
+| `SUPABASE_SERVICE_ROLE_KEY` | (paste from .env.local) |
+| `TELEGRAM_BOT_TOKEN` | (paste from .env.local) |
+| `TELEGRAM_BOT_SECRET` | (paste from .env.local) |
+
+4. Click **Deploy**
+
+> ⚠️ **Important**: All environment variables must be added in Vercel before deploying, otherwise your app will crash on startup.
 
 ## 📝 License
 
