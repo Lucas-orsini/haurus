@@ -20,11 +20,12 @@ export type TodaysStats = {
     winRate: number
     surface: string
   } | null
-  card3: {
-    /** Name of the player with the highest |momentum| in this match. */
-    player1: string
-    /** Name of the opponent in the same match. */
-    player2: string
-    momentum: number
-  } | null
+  /**
+   * Surface speed for each active tournament today.
+   *
+   * - null       → tournament_pace query failed (show "Données indisponibles")
+   * - []         → query succeeded but no tournament matched (show "—")
+   * - [...]      → one entry per tournament, paceIndex may be null if no match in tournament_pace
+   */
+  card3: Array<{ name: string; surface: string; paceIndex: number | null }> | null
 }
