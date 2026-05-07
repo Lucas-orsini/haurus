@@ -166,7 +166,7 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
             <motion.div
               initial={{ left: '0%' }}
               animate={{
-                left: `calc(${Math.min(Math.max(paceIndex, 0), 2) / 2 * 100}% - 5px)`,
+                left: `calc(${Math.min(Math.max(paceIndex, 0), 1) * 100}% - 5px)`,
               }}
               transition={{ duration: 0.7, delay: index * 0.06, ease: 'easeOut' }}
               className="absolute top-0 w-[10px] h-4"
