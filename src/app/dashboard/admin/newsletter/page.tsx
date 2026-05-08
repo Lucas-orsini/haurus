@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import NewsletterSendForm from '@/components/dashboard/admin/NewsletterSendForm'
 
@@ -11,13 +10,26 @@ export const metadata = {
 }
 
 export default async function NewsletterAdminPage() {
-  const session = await getSession()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!session || session.role !== 'admin') {
+  // Not logged in → /login
+  if (!user) {
+    redirect('/login')
+  }
+
+  // Fetch role from profiles table
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  // Connected but not admin → /dashboard
+  if (profile?.role !== 'admin') {
     redirect('/dashboard')
   }
 
-  const supabase = await createClient()
   const { count } = await supabase
     .from('newsletter_subscribers')
     .select('*', { count: 'exact', head: true })
