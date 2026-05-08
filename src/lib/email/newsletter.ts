@@ -42,7 +42,7 @@ export function buildNewsletterHtml(
     <tr>
       <td align="center" style="padding:32px 16px;">
         <table width="600" cellpadding="0" cellspacing="0" border="0"
-               style="background-color:#ffffff;border-radius:8px;overflow:hidden;
+               style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;
                       box-shadow:0 1px 3px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>

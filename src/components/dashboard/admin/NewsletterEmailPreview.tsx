@@ -56,6 +56,7 @@ export default function NewsletterEmailPreview({
             title="Newsletter preview"
             className="w-full h-full border-none min-h-[400px]"
             sandbox="allow-same-origin"
+            style={{ maxWidth: '100%' }}
           />
         )}
       </div>
