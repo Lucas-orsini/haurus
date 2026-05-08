@@ -8,7 +8,7 @@ import { LogIn } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateEmail, validatePassword, login, getSession } from '@/lib/auth'
+import { validateEmail, validatePassword, login, loginWithGoogle, getSession } from '@/lib/auth'
 
 type FormState = 'idle' | 'loading' | 'redirecting'
 
