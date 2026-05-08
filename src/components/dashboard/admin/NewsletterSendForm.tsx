@@ -12,7 +12,15 @@ interface SuccessData {
   failed: number
 }
 
-export default function NewsletterSendForm() {
+interface NewsletterSendFormProps {
+  onSubjectChange?: (value: string) => void
+  onBodyChange?: (value: string) => void
+}
+
+export default function NewsletterSendForm({
+  onSubjectChange,
+  onBodyChange,
+}: NewsletterSendFormProps) {
   const [state, setState] = useState<FormState>('idle')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -96,6 +104,7 @@ export default function NewsletterSendForm() {
         onChange={(e) => {
           setSubject(e.target.value)
           if (subjectError) setSubjectError('')
+          onSubjectChange?.(e.target.value)
         }}
         error={subjectError}
         disabled={isLoading}
@@ -118,6 +127,7 @@ export default function NewsletterSendForm() {
           onChange={(e) => {
             setBody(e.target.value)
             if (bodyError) setBodyError('')
+            onBodyChange?.(e.target.value)
           }}
           disabled={isLoading}
           className={[

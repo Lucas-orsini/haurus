@@ -89,7 +89,7 @@ RESEND_API_KEY=
 # For dev, you can use onboarding@resend.dev (sends only to account owner)
 RESEND_FROM_EMAIL=hello@yourdomain.com
 
-# === App URL ===
+# === App Base URL ===
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -101,65 +101,60 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: open the integrated terminal with Ctrl+` (or Cmd+` on Mac)
+> 💡 **VS Code tip**: open the integrated terminal with Ctrl+\` (or Cmd+\` on Mac)
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `TELEGRAM_BOT_TOKEN` | Optional | Open Telegram, chat with [@BotFather](https://t.me/botfather), send `/newbot`, follow steps, copy the token | Telegram bot API token for sending messages and handling updates |
-| `TELEGRAM_BOT_SECRET` | Optional | Create a secret token yourself (any random string) | Used for HMAC-SHA256 signature verification on incoming webhook requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Optional | Your bot's username on Telegram (e.g., `MyAwesomeBot`) | Public username of your Telegram bot |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project URL | Supabase project URL for authentication and database |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project API keys → `anon` / `public` key | Public anon key for client-side Supabase operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project API keys → `service_role` key | Secret service role key for server-side admin operations |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials → OAuth 2.0 Client IDs | Google OAuth client ID for "Sign in with Google" |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | [PostHog](https://eu.posthog.com) → Project Settings → Project API Key | PostHog project API key for analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog self-host URL or cloud URL | PostHog server host URL |
-| `RESEND_API_KEY` | Yes | [Resend](https://resend.com/api-keys) → Create API Key → copy | Resend API key for sending transactional emails |
-| `RESEND_FROM_EMAIL` | Yes | Must be a domain verified in [Resend Dashboard](https://resend.com/domains) → Domains | Sender email address for newsletters and notifications |
-| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` for local dev, or your production URL | Base URL of your application |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Supabase anonymous key (safe to expose in browser) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Supabase service role key — **never expose publicly** |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For "Sign in with Google" |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog → Project Settings → Project API Key | PostHog analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog → Project Settings → Project API Key | PostHog host URL |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys | Resend email API key |
+| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains | Verified sender email address |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather | Bot token for Telegram integration |
+| `TELEGRAM_BOT_SECRET` | No | You set this yourself | HMAC-SHA256 secret for webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram bot username | Your bot's @username |
+| `NEXT_PUBLIC_APP_URL` | Yes | You set this yourself | Base URL of your app (for email links) |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly. They run instantly and catch bugs before they reach your app.
+Unit tests automatically check that specific parts of the code work correctly — think of them as automated quality checks.
 
 Run all tests:
-
 ```bash
 npx jest
 ```
 
 Run a specific test file:
-
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs on file change during development):
-
+Run tests in watch mode (re-runs automatically when you change files):
 ```bash
 npx jest --watch
 ```
 
 **How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌, the error message shows which test failed and why
+- `PASS` ✅ — everything works
+- `FAIL` ❌ — something broke, check the error message below for details
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — Auth validation logic
-- `__tests__/auth.test.ts` — Authentication flow tests
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
-- `__tests__/lib/utils.test.ts` — Utility function tests
-- `__tests__/utils.test.ts` — General utility tests
+**Tests cover:**
+- Auth validators — validation logic for authentication
+- Auth utilities — authentication helper functions
+- Dashboard utilities — metric formatting and statistics calculations
+- General utilities — shared helper functions
 
 ## 📁 Project Structure
 
-Only folders containing actual files from this repository are listed below.
-
-- `src/app` — Next.js App Router pages and layouts (includes dashboard/admin/newsletter page)
-- `__tests__` — Jest test files for components, utilities, and services
+- `src/lib/email` — Email sending utilities (newsletter)
+- `src/app/api/admin/newsletter/send` — API route for sending newsletters
+- `src/components/dashboard/admin` — Admin dashboard components (newsletter preview, send form)
+- `src/app/dashboard/admin/newsletter` — Admin newsletter page
 
 ## 🚀 Deploy to Vercel
 
@@ -167,16 +162,15 @@ Only folders containing actual files from this repository are listed below.
 
 **Step by step:**
 
-1. Push your code to GitHub
-2. Go to [vercel.com/new](https://vercel.com/new)
-3. Click **"Import Git Repository"** and select your repo
-4. Vercel will auto-detect Next.js — click **Deploy**
-5. Add all environment variables:
-   - Go to your project → **Settings** → **Environment Variables**
-   - Add each variable from `.env.local` (copy all the keys and values)
-6. Redeploy: **Deployments** → **..."** menu → **Redeploy**
+1. Click the button above or go to https://vercel.com/new
+2. Import your GitHub repository
+3. In **Environment Variables**, add every variable from your `.env.local` file:
+   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Copy each variable name and value from `.env.local`
+   - Click Save for each one
+4. Click **Deploy**
 
-> ⚠️ **Important**: Every variable from your `.env.local` must be added to Vercel, or your app will crash. Pay special attention to `SUPABASE_SERVICE_ROLE_KEY` — this is a secret key and should be marked as **"Secret"** not "Plain".
+> ⚠️ **Important**: Make sure to add all environment variables before deploying. If you forget one, redeploy after adding it.
 
 ## 📝 License
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createHash } from 'crypto'
 import { getResend, FROM_EMAIL } from '@/lib/resend'
+import { buildNewsletterHtml } from '@/lib/email/newsletter'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,80 +41,6 @@ function buildIdempotencyKey(
     .digest('hex')
     .slice(0, 12)
   return `newsletter-${adminId}-${today}-${subject.slice(0, 30)}-${bodyHash}-${batchIndex}`
-}
-
-/**
- * Construit le HTML de la newsletter avec lien d'unsubscribe.
- * Styles inline (les clients email ne supportent pas <style> dans <head>).
- */
-function buildNewsletterHtml(subject: string, body: string, baseUrl: string): string {
-  // Échapper les caractères HTML pour éviter l'injection
-  const escapeHtml = (s: string): string =>
-    s.replace(/[&<>"']/g, (c) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
-    }[c]!))
-
-  const escapedSubject = escapeHtml(subject)
-  const escapedBody = escapeHtml(body)
-
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>${escapedSubject}</title>
-</head>
-<body style="margin:0;padding:0;background-color:#f6f9fc;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f6f9fc;">
-    <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table width="600" cellpadding="0" cellspacing="0" border="0"
-               style="background-color:#ffffff;border-radius:8px;overflow:hidden;
-                      box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-          <!-- Header -->
-          <tr>
-            <td style="background-color:#0a0a0a;padding:24px 32px;text-align:center;">
-              <p style="margin:0;font-size:18px;font-weight:700;color:#f0f0f0;letter-spacing:-0.02em;">
-                🏇 Haurus
-              </p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;
-                         color:#09090b;letter-spacing:-0.02em;line-height:1.3;">
-                ${escapedSubject}
-              </h1>
-              <div style="font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;">
-                ${escapedBody}
-              </div>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding:24px 32px;border-top:1px solid #e4e4e7;
-                       background-color:#fafafa;">
-              <p style="margin:0 0 8px;font-size:12px;color:#71717a;text-align:center;">
-                Tu reçois cet email parce que tu es inscrit à la newsletter Haurus.
-              </p>
-              <p style="margin:0;text-align:center;">
-                <a href="${baseUrl}/unsubscribe"
-                   style="font-size:12px;color:#6366f1;text-decoration:none;">
-                  Se désabonner
-                </a>
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`
 }
 
 /**
