@@ -238,43 +238,6 @@ export async function signup(
 }
 
 /**
- * Sign in with Google via Supabase OAuth.
- *
- * Initiates the OAuth flow with Google's sign-in UI.
- * On success, Google redirects to /auth/callback with a code,
- * which is then exchanged for a session cookie server-side.
- *
- * @returns The error object if the OAuth initiation fails, null otherwise.
- *          Callers should check the returned error to display inline messages
- *          or redirect on success (Supabase handles the redirect automatically).
- */
-export async function signInWithGoogle(): Promise<{ error: Error } | null> {
-  const supabase = createClient()
-  if (!supabase) {
-    return { error: new Error('Service temporarily unavailable. Please refresh and try again.') }
-  }
-
-  const redirectTo = `${window.location.origin}/auth/callback`
-
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'select_account',
-      },
-    },
-  })
-
-  if (error) {
-    return { error }
-  }
-
-  return null
-}
-
-/**
  * Update the authenticated user's profile — name and avatar URL.
  *
  * Flow:
