@@ -5,6 +5,8 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **Secure Authentication** — Login and signup powered by Supabase with secure callback handling
+- **Account Management** — Delete your account with confirmation dialogs
+- **User Profile** — Manage your profile settings from the dashboard
 
 ## 🛠️ Tech Stack
 
@@ -90,14 +92,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side queries with Row Level Security |
-| `SUPABASE_SERVICE_ROLE_KEY` | For webhook endpoints | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses Row Level Security |
-| `TELEGRAM_BOT_TOKEN` | For Telegram bot | Open Telegram, chat with **@BotFather**, send `/newbot`, follow prompts, copy the token | Your Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | For webhook verification | You define this yourself — any secret string you want (e.g., generate with `openssl rand -hex 32`) | Used to verify incoming Telegram webhook requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Recommended | Your Telegram bot's username (without @) — shown by BotFather after you create the bot | Used for client-side Telegram interactions |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses RLS (keep secret!) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram → Search **@BotFather** → Send `/newbot` → Follow prompts → Copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | Yes | You choose this when setting up your webhook. Pick any random string (e.g., `openssl rand -hex 32`) | Secret used to verify incoming webhook requests |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Yes | After creating your bot with BotFather, it tells you the username (e.g., `MyAwesomeBot`) | Your Telegram bot's username (without the @) |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly — like making sure the login validation doesn't accept empty passwords.
+Tests automatically check that key parts of the app work correctly — like authentication, data formatting, and utility functions.
 
 Run all tests:
 
@@ -111,27 +113,27 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save changes):
+Watch mode (re-runs tests automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke. Look at the error message below to see which test failed and why.
+**Reading the output:**
+- `PASS` — All checks in that file passed ✅
+- `FAIL` — Something broke ❌ — look at the error message below for what needs fixing
 
-**What the tests cover:**
-- `__tests__/auth.test.ts` — Authentication flow and user sessions
-- `__tests__/auth-validators.test.ts` — Form validation for login/signup
-- `__tests__/lib/utils.test.ts` — General utility functions
-- `__tests__/utils.test.ts` — Common helper functions
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting logic
+The test suite covers:
+- Authentication validators and flows
+- Dashboard metric formatting
+- Statistics utilities
+- General utility functions
 
 ## 📁 Project Structure
 
-src/app — Next.js App Router pages, layouts, and API routes (including auth callback handling)
+- src/app — Next.js App Router pages, layouts, and API routes
+- src/components/dashboard — Dashboard-specific UI components
+- src/components/ui — Reusable UI components (buttons, dialogs, etc.)
 
 ## 🚀 Deploy to Vercel
 
@@ -139,21 +141,16 @@ src/app — Next.js App Router pages, layouts, and API routes (including auth ca
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
+3. In **Environment Variables**, add every variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_BOT_SECRET`
+   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
+4. Click **Deploy**
 
-| Variable | Value |
-|----------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | (your Supabase URL) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (your Supabase anon key) |
-| `SUPABASE_SERVICE_ROLE_KEY` | (your Supabase service role key) |
-| `TELEGRAM_BOT_TOKEN` | (your Telegram bot token) |
-| `TELEGRAM_BOT_SECRET` | (your webhook secret) |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | (your bot username) |
-
-5. Click **Deploy** — Vercel will automatically build and deploy your app
-
-> ⚠️ **Important**: Never deploy with missing environment variables. The app will crash if Supabase credentials are missing.
+> ⚠️ **Important**: Don't skip adding environment variables in Vercel! Your app will crash without them.
 
 ## 📝 License
 
