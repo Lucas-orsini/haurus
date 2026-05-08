@@ -238,6 +238,61 @@ export async function signup(
 }
 
 /**
+ * Initiates Google OAuth sign-in via Supabase.
+ * Redirects the browser to Google's OAuth consent screen and then to /auth/callback.
+ *
+ * @returns Error message string on failure, null on success (browser redirects).
+ */
+export async function loginWithGoogle(): Promise<string | null> {
+  return _signInWithGoogle('login')
+}
+
+/**
+ * Initiates Google OAuth sign-up via Supabase.
+ * Redirects the browser to Google's OAuth consent screen and then to /auth/callback.
+ *
+ * @returns Error message string on failure, null on success (browser redirects).
+ */
+export async function signupWithGoogle(): Promise<string | null> {
+  return _signInWithGoogle('signup')
+}
+
+/**
+ * Internal helper — shared logic for Google OAuth flow.
+ * Uses the browser client to open the OAuth redirect to Supabase's Google provider.
+ *
+ * @param _flow — 'login' or 'signup' (informational; both use the same Supabase endpoint)
+ * @returns Error message string on failure, null on success (browser navigates away).
+ */
+async function _signInWithGoogle(_flow: 'login' | 'signup'): Promise<string | null> {
+  const supabase = createClient()
+  if (!supabase) {
+    return 'Service temporarily unavailable. Please refresh and try again.'
+  }
+
+  if (typeof window === 'undefined') {
+    return 'OAuth must be initiated from the browser.'
+  }
+
+  const origin = window.location.origin
+  const redirectTo = `${origin}/auth/callback`
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+    },
+  })
+
+  if (error) {
+    return error.message
+  }
+
+  // On success, Supabase redirects the browser — we never reach here.
+  return null
+}
+
+/**
  * Update the authenticated user's profile — name and avatar URL.
  *
  * Flow:

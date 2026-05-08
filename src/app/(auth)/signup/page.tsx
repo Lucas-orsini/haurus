@@ -8,7 +8,7 @@ import { UserPlus } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateName, validateEmail, validatePassword, signup } from '@/lib/auth'
+import { validateName, validateEmail, validatePassword, signup, signupWithGoogle } from '@/lib/auth'
 
 type FormState = 'idle' | 'loading' | 'error'
 
