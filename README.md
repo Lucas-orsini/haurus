@@ -89,7 +89,7 @@ RESEND_API_KEY=
 # For dev, you can use onboarding@resend.dev (sends only to account owner)
 RESEND_FROM_EMAIL=hello@yourdomain.com
 
-# === App ===
+# === App URL ===
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -99,30 +99,30 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` ` (Windows/Linux) or `Cmd+`` ` ` (Mac), then type the command above.
+> 💡 **VS Code tip**: open the integrated terminal with Ctrl+` (or Cmd+` on Mac)
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Anonymous key for client-side queries (safe with Row Level Security) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side key that bypasses RLS (keep secret!) |
-| `TELEGRAM_BOT_TOKEN` | No | Open Telegram, chat with [@BotFather](https://t.me/BotFather), create a bot, copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | You define this yourself when setting up webhook verification | Secret for HMAC-SHA256 webhook signature verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Same as above — enter your bot's username without the @ symbol | Your Telegram bot's username |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → **APIs & Services** → **Credentials** → create OAuth 2.0 Client ID | Enables "Sign in with Google" |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | [eu.posthog.com](https://eu.posthog.com) → **Project Settings** → **Project API Key** | PostHog project API key for analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | Provided by PostHog — usually `https://eu.i.posthog.com` | PostHog API host URL |
-| `RESEND_API_KEY` | No | [resend.com/api-keys](https://resend.com/api-keys) | API key for sending emails |
-| `RESEND_FROM_EMAIL` | No | Resend Dashboard → **Domains** — must be a verified domain | Sender email address |
-| `NEXT_PUBLIC_APP_URL` | No | You define this — `http://localhost:3000` for local dev | Base URL of your app |
+| `TELEGRAM_BOT_TOKEN` | Optional | Open Telegram, chat with [@BotFather](https://t.me/botfather), send `/newbot`, follow steps, copy the token | Telegram bot API token for sending messages and handling updates |
+| `TELEGRAM_BOT_SECRET` | Optional | Create a secret token yourself (any random string) | Used for HMAC-SHA256 signature verification on incoming webhook requests |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Optional | Your bot's username on Telegram (e.g., `MyAwesomeBot`) | Public username of your Telegram bot |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project URL | Supabase project URL for authentication and database |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project API keys → `anon` / `public` key | Public anon key for client-side Supabase operations |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | [Supabase Dashboard](https://supabase.com) → Project Settings → API → Project API keys → `service_role` key | Secret service role key for server-side admin operations |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials → OAuth 2.0 Client IDs | Google OAuth client ID for "Sign in with Google" |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | [PostHog](https://eu.posthog.com) → Project Settings → Project API Key | PostHog project API key for analytics |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog self-host URL or cloud URL | PostHog server host URL |
+| `RESEND_API_KEY` | Yes | [Resend](https://resend.com/api-keys) → Create API Key → copy | Resend API key for sending transactional emails |
+| `RESEND_FROM_EMAIL` | Yes | Must be a domain verified in [Resend Dashboard](https://resend.com/domains) → Domains | Sender email address for newsletters and notifications |
+| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` for local dev, or your production URL | Base URL of your application |
 
 ## 🧪 Running Tests
 
-Unit tests verify that specific parts of the code work correctly — like checking that a function returns the right output for a given input.
+Unit tests automatically check that specific parts of the code work correctly. They run instantly and catch bugs before they reach your app.
 
 Run all tests:
 
@@ -133,10 +133,10 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Watch mode (re-runs on file change during development):
 
 ```bash
 npx jest --watch
@@ -144,47 +144,39 @@ npx jest --watch
 
 **How to read the output:**
 - `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌ — the error message shows which test failed and why
+- `FAIL` — Something broke ❌, the error message shows which test failed and why
 
 **Tests included:**
-- Auth validators — email/password validation logic
-- Dashboard stats — metrics formatting and calculations
-- Utility functions — shared helper functions
+- `__tests__/auth-validators.test.ts` — Auth validation logic
+- `__tests__/auth.test.ts` — Authentication flow tests
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
+- `__tests__/lib/utils.test.ts` — Utility function tests
+- `__tests__/utils.test.ts` — General utility tests
 
 ## 📁 Project Structure
 
-- **src/lib** — Utility libraries (Resend email client)
-- **src/app/api/admin/newsletter/send** — API route for sending newsletters
-- **src/components/dashboard** — Dashboard UI components (sidebar, admin forms)
-- **src/app/dashboard/admin/newsletter** — Admin newsletter management page
+Only folders containing actual files from this repository are listed below.
+
+- `src/app` — Next.js App Router pages and layouts (includes dashboard/admin/newsletter page)
+- `__tests__` — Jest test files for components, utilities, and services
 
 ## 🚀 Deploy to Vercel
-
-The easiest way to deploy is with Vercel:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
-   - `NEXT_PUBLIC_POSTHOG_KEY`
-   - `NEXT_PUBLIC_POSTHOG_HOST`
-   - `RESEND_API_KEY`
-   - `RESEND_FROM_EMAIL`
-   - `NEXT_PUBLIC_APP_URL`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
-5. Click **Deploy**
+1. Push your code to GitHub
+2. Go to [vercel.com/new](https://vercel.com/new)
+3. Click **"Import Git Repository"** and select your repo
+4. Vercel will auto-detect Next.js — click **Deploy**
+5. Add all environment variables:
+   - Go to your project → **Settings** → **Environment Variables**
+   - Add each variable from `.env.local` (copy all the keys and values)
+6. Redeploy: **Deployments** → **..."** menu → **Redeploy**
 
-> 💡 **Important**: Make sure to set `NEXT_PUBLIC_APP_URL` to your production URL (e.g., `https://your-app.vercel.app`) after deployment.
+> ⚠️ **Important**: Every variable from your `.env.local` must be added to Vercel, or your app will crash. Pay special attention to `SUPABASE_SERVICE_ROLE_KEY` — this is a secret key and should be marked as **"Secret"** not "Plain".
 
 ## 📝 License
 
