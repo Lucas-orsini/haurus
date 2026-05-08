@@ -7,9 +7,10 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import type { AuthUser } from '@/lib/auth'
 import { validateName } from '@/lib/auth'
-import { updateProfile } from '@/lib/auth'
+import { updateProfile, signOut } from '@/lib/auth'
 
 interface UserProfileModalProps {
   user: AuthUser
@@ -59,6 +60,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
   const [tokenRevealed, setTokenRevealed] = useState(false)
   const [disconnectLoading, setDisconnectLoading] = useState(false)
   const [disconnectError, setDisconnectError] = useState<string | null>(null)
+
+  // ── Delete account states ──
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // ── Reset reveal state when leaving Telegram tab ──
   useEffect(() => {
@@ -137,6 +142,23 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
       setDisconnectError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
       setDisconnectLoading(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeleteLoading(true)
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Erreur lors de la suppression')
+      }
+      setShowDeleteConfirm(false)
+      await signOut()
+      router.push('/')
+    } catch (err) {
+      console.error('[UserProfileModal] Failed to delete account:', err)
+      setDeleteLoading(false)
     }
   }
 
@@ -525,45 +547,75 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
 
           {/* Footer — profil only */}
           {activeSection === 'profile' && (
-            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)] shrink-0">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                disabled={isSaving}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                form="profile-form"
-                variant="primary"
-                size="sm"
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <>
-                    <svg
-                      className="animate-spin shrink-0"
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
-                    Enregistrement...
-                  </>
-                ) : (
-                  'Enregistrer'
-                )}
-              </Button>
+            <div className="flex flex-col shrink-0">
+              {/* Danger zone */}
+              <div className="border-t border-[var(--border)]">
+                <div className="flex items-center justify-center px-5 py-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="text-xs text-[var(--red)] hover:text-[var(--red)]/80 transition-colors duration-150"
+                  >
+                    Supprimer mon compte
+                  </button>
+                </div>
+              </div>
+
+              {/* Save / Cancel */}
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)]">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  disabled={isSaving}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  form="profile-form"
+                  variant="primary"
+                  size="sm"
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <svg
+                        className="animate-spin shrink-0"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                      Enregistrement...
+                    </>
+                  ) : (
+                    'Enregistrer'
+                  )}
+                </Button>
+              </div>
             </div>
           )}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Delete account confirmation */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <ConfirmDialog
+            title="Supprimer votre compte"
+            message="Cette action est irréversible. Toutes vos données seront définitivement supprimées."
+            confirmLabel="Supprimer"
+            loading={deleteLoading}
+            onConfirm={handleDeleteAccount}
+            onCancel={() => setShowDeleteConfirm(false)}
+          />
+        )}
       </AnimatePresence>
     </div>
   )
