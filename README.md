@@ -85,13 +85,15 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **Project URL** | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → **Project Settings** → **API** → copy **anon/public** key | Client-safe key for browser-side queries with Row Level Security |
-| `SUPABASE_SERVICE_ROLE_KEY` | For webhook endpoints | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses RLS — never expose to client |
-| `TELEGRAM_BOT_TOKEN` | For Telegram bot | Open Telegram, chat with **@BotFather**, follow the setup flow, copy the token he gives you | Authenticates your bot with the Telegram API |
-| `TELEGRAM_BOT_SECRET` | For webhook verification | You define this yourself — any random string you choose | Used to verify that incoming webhook requests are actually from Telegram |
+| `SUPABASE_SERVICE_ROLE_KEY` | For webhook endpoints | Supabase Dashboard → **Project Settings** → **API** → copy **service_role** key | Server-side only key that bypasses Row Level Security |
+| `TELEGRAM_BOT_TOKEN` | For Telegram integration | Telegram BotFather → `/newbot` command, then copy the token | Your Telegram bot's API token |
+| `TELEGRAM_BOT_SECRET` | For webhook verification | You choose this when setting up your webhook | Secret string used to verify incoming Telegram updates |
 
 ## 🧪 Running Tests
 
-Unit tests check that small pieces of your code work correctly — like checking that a password validation function returns the right result for different inputs.
+Unit tests automatically check that specific parts of your code work correctly without needing the full app running.
+
+Run all tests:
 
 ```bash
 npx jest
@@ -103,47 +105,43 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
+Watch mode (re-runs tests automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — all tests passed, nothing is broken
-- `FAIL` — something broke, Jest will show which test failed and why
+**Reading the output:**
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — authentication validation logic
-- `__tests__/auth.test.ts` — authentication flow tests
-- `__tests__/dashboard/formatMetric.test.ts` — metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — dashboard statistics logic
-- `__tests__/lib/utils.test.ts` — utility function tests
-- `__tests__/utils.test.ts` — general utility tests
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke. Look below for the error message showing which test failed and why
+
+**What the tests cover:**
+
+- Authentication validators and logic
+- Dashboard formatting utilities
+- Stats calculations
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/lib` — Shared libraries (authentication utilities)
-- `src/app` — Next.js App Router pages and API routes
+- `src/app/(auth)` — Authentication pages (login, signup)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step-by-step:**
-
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add all the variables from your `.env.local` file:
+3. Add all environment variables in **Vercel Dashboard → Settings → Environment Variables**:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_BOT_SECRET`
-5. Click **Deploy**
+4. Click **Deploy**
 
-Vercel will automatically build and deploy your app. Every time you push to `main`, Vercel will rebuild and redeploy.
+> 💡 **Important**: `SUPABASE_SERVICE_ROLE_KEY` and `TELEGRAM_BOT_SECRET` are sensitive — set them as "Secret" variables, not "Plain".
 
 ## 📝 License
 
