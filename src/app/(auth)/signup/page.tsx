@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -8,9 +8,9 @@ import { UserPlus } from 'lucide-react'
 
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { validateName, validateEmail, validatePassword, signup, signupWithGoogle } from '@/lib/auth'
+import { validateName, validateEmail, validatePassword, signup, signupWithGoogle, getSession } from '@/lib/auth'
 
-type FormState = 'idle' | 'loading' | 'error'
+type FormState = 'idle' | 'loading' | 'redirecting' | 'error'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -28,6 +28,22 @@ export default function SignupPage() {
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('idle')
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  // Check for existing session on mount — redirect if already authenticated
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const session = await getSession()
+        if (session) {
+          setFormState('redirecting')
+          router.push(getRedirectTo())
+        }
+      } catch {
+        // Session check failed — stay on signup page
+      }
+    }
+    checkSession()
+  }, [router])
 
   function getRedirectTo(): string {
     if (typeof window === 'undefined') return '/dashboard'
@@ -63,6 +79,7 @@ export default function SignupPage() {
 
     try {
       await signup(name, email, password)
+      setFormState('redirecting')
       router.push(getRedirectTo())
     } catch (err) {
       setFormState('idle')
@@ -118,7 +135,7 @@ export default function SignupPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             error={errors.name}
-            disabled={formState === 'loading'}
+            disabled={formState !== 'idle'}
             autoComplete="name"
           />
 
@@ -129,7 +146,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={errors.email}
-            disabled={formState === 'loading'}
+            disabled={formState !== 'idle'}
             autoComplete="email"
           />
 
@@ -140,7 +157,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={errors.password}
-            disabled={formState === 'loading'}
+            disabled={formState !== 'idle'}
             autoComplete="new-password"
           />
 
@@ -151,7 +168,7 @@ export default function SignupPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={errors.confirmPassword}
-            disabled={formState === 'loading'}
+            disabled={formState !== 'idle'}
             autoComplete="new-password"
           />
 
@@ -165,13 +182,18 @@ export default function SignupPage() {
             type="submit"
             variant="primary"
             size="lg"
-            disabled={formState === 'loading'}
+            disabled={formState !== 'idle'}
             className="w-full mt-1"
           >
             {formState === 'loading' ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
                 Création...
+              </span>
+            ) : formState === 'redirecting' ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
+                Redirection...
               </span>
             ) : (
               'Créer mon compte'
