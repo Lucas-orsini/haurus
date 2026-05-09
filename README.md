@@ -149,7 +149,7 @@ npx jest --watch
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the "Deploy with Vercel" button above (or go to vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
 3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local`
 4. Click Deploy
