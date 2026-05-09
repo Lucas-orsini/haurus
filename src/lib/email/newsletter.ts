@@ -55,7 +55,7 @@ export function buildNewsletterHtml(
           </tr>
           <!-- Body -->
           <tr>
-            <td style="padding:32px;">
+            <td style="padding:32px 32px 48px 32px;">
               <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;
                          color:#09090b;letter-spacing:-0.02em;line-height:1.3;">
                 ${escapedSubject}
@@ -65,6 +65,17 @@ export function buildNewsletterHtml(
               </div>
             </td>
           </tr>
+          <!-- CTA -->
+          <tr>
+            <td style="background-color:#ffffff;text-align:center;padding:24px 32px;">
+              <a href="${baseUrl}"
+                 style="display:inline-block;background-color:#f2cb38;color:#0a0a0a;
+                        padding:14px 28px;border-radius:6px;text-decoration:none;
+                        font-weight:600;font-size:16px;">
+                Découvrir Haurus →
+              </a>
+            </td>
+          </tr>
           <!-- Footer -->
           <tr>
             <td style="padding:24px 32px;border-top:1px solid #e4e4e7;
@@ -72,10 +83,18 @@ export function buildNewsletterHtml(
               <p style="margin:0 0 8px;font-size:12px;color:#71717a;text-align:center;">
                 Tu reçois cet email parce que tu es inscrit à la newsletter Haurus.
               </p>
-              <p style="margin:0;text-align:center;">
+              <p style="margin:0 0 8px;text-align:center;">
                 <a href="${baseUrl}/unsubscribe"
                    style="font-size:12px;color:#6366f1;text-decoration:none;">
                   Se désabonner
+                </a>
+              </p>
+              <p style="margin:0;text-align:center;">
+                <a href="https://x.com/lucas_orsini_"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="font-size:12px;color:#6366f1;text-decoration:none;">
+                  Twitter / X
                 </a>
               </p>
             </td>
