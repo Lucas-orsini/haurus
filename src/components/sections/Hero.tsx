@@ -116,7 +116,7 @@ export default function Hero() {
             className="text-lg text-[var(--text-2)] max-w-xl font-light mb-10 leading-relaxed"
           >
             Accédez aux données qui structurent les cotes ATP.
-            Aucune prédiction. Uniquement des métriques fiables et exploitables.
+            Aucune prédiction. Uniquement des métriques fiables et exploitables. TEST
           </motion.p>
 
           {/* CTAs */}
