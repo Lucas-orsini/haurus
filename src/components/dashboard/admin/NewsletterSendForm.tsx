@@ -15,17 +15,25 @@ interface SuccessData {
 interface NewsletterSendFormProps {
   onSubjectChange?: (value: string) => void
   onBodyChange?: (value: string) => void
+  onButtonTextChange?: (value: string) => void
+  onButtonUrlChange?: (value: string) => void
 }
 
 export default function NewsletterSendForm({
   onSubjectChange,
   onBodyChange,
+  onButtonTextChange,
+  onButtonUrlChange,
 }: NewsletterSendFormProps) {
   const [state, setState] = useState<FormState>('idle')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
+  const [buttonText, setButtonText] = useState('')
+  const [buttonUrl, setButtonUrl] = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [bodyError, setBodyError] = useState('')
+  const [buttonTextError, setButtonTextError] = useState('')
+  const [buttonUrlError, setButtonUrlError] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successData, setSuccessData] = useState<SuccessData | null>(null)
 
@@ -64,7 +72,12 @@ export default function NewsletterSendForm({
       const res = await fetch('/api/admin/newsletter/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject: subject.trim(), body: body.trim() }),
+        body: JSON.stringify({
+          subject: subject.trim(),
+          body: body.trim(),
+          buttonText: buttonText.trim() || undefined,
+          buttonUrl: buttonUrl.trim() || undefined,
+        }),
       })
 
       const data = await res.json()
@@ -87,8 +100,12 @@ export default function NewsletterSendForm({
     setState('idle')
     setSubject('')
     setBody('')
+    setButtonText('')
+    setButtonUrl('')
     setSubjectError('')
     setBodyError('')
+    setButtonTextError('')
+    setButtonUrlError('')
     setErrorMessage('')
     setSuccessData(null)
   }
@@ -146,6 +163,38 @@ export default function NewsletterSendForm({
           <p className="text-xs text-[var(--red)] leading-tight">{bodyError}</p>
         )}
       </div>
+
+      {/* Button text field */}
+      <Input
+        label="Texte du bouton CTA"
+        type="text"
+        placeholder="Découvrir Haurus"
+        value={buttonText}
+        onChange={(e) => {
+          setButtonText(e.target.value)
+          if (buttonTextError) setButtonTextError('')
+          onButtonTextChange?.(e.target.value)
+        }}
+        error={buttonTextError}
+        disabled={isLoading}
+        autoComplete="off"
+      />
+
+      {/* Button URL field */}
+      <Input
+        label="URL du bouton CTA"
+        type="url"
+        placeholder="https://haurus.io"
+        value={buttonUrl}
+        onChange={(e) => {
+          setButtonUrl(e.target.value)
+          if (buttonUrlError) setButtonUrlError('')
+          onButtonUrlChange?.(e.target.value)
+        }}
+        error={buttonUrlError}
+        disabled={isLoading}
+        autoComplete="off"
+      />
 
       {/* Error alert */}
       {state === 'error' && errorMessage && (
