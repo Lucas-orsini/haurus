@@ -6,18 +6,26 @@ import { Mail } from 'lucide-react'
 interface NewsletterEmailPreviewProps {
   subject: string
   body: string
+  buttonText?: string
+  buttonUrl?: string
 }
 
 export default function NewsletterEmailPreview({
   subject,
   body,
+  buttonText,
+  buttonUrl,
 }: NewsletterEmailPreviewProps) {
   const isEmpty = !subject.trim() && !body.trim()
+
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io').replace(/\/$/, '')
 
   const html = buildNewsletterHtml(
     subject,
     body,
-    process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io',
+    baseUrl,
+    buttonText,
+    buttonUrl,
   )
 
   return (
