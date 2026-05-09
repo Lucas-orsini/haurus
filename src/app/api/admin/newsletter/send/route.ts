@@ -183,7 +183,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── 5. Construire le HTML et envoyer via batch ───────────────────────────
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io'
+  // Normalise : supprime tout slash terminal pour éviter //unsubscribe si
+  // NEXT_PUBLIC_APP_URL est défini avec un trailing slash (ex: https://haurus.io/)
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io').replace(/\/$/, '')
   const html = buildNewsletterHtml(subject, emailBody, baseUrl)
 
   let result: SendResult
