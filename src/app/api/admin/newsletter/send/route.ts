@@ -7,14 +7,12 @@ import { buildNewsletterHtml } from '@/lib/email/newsletter'
 
 export const dynamic = 'force-dynamic'
 
-const BATCH_SIZE = 100
-const INTER_BATCH_DELAY_MS = 1000
+const BATCH_SIZE = 100      // Limite hard Resend Batch API
+const INTER_BATCH_DELAY_MS = 1000 // 1s entre batches si > 500 destinataires
 
 interface NewsletterBody {
   subject: string
   body: string
-  buttonText?: string
-  buttonUrl?: string
 }
 
 interface SendResult {
@@ -22,13 +20,22 @@ interface SendResult {
   failed: number
 }
 
+/**
+ * Génère une idempotency key stable basée sur le contenu de la newsletter.
+ * Stable = même clé pour le même contenu + même jour.
+ * Évite les doublons en cas de retry réseau.
+ *
+ * Pattern : sha256(adminId + subject + dateYYYYMMDD + bodyHash)
+ * bodyHash = 12 premiers caractères du SHA-256 du body pour éviter
+ * d'avoir à hasher tout le HTML (peut être très long).
+ */
 function buildIdempotencyKey(
   adminId: string,
   subject: string,
   body: string,
   batchIndex: number
 ): string {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = new Date().toISOString().slice(0, 10) // "2026-05-08"
   const bodyHash = createHash('sha256')
     .update(body)
     .digest('hex')
@@ -36,11 +43,16 @@ function buildIdempotencyKey(
   return `newsletter-${adminId}-${today}-${subject.slice(0, 30)}-${bodyHash}-${batchIndex}`
 }
 
+/**
+ * Envoie la newsletter par batches de 100 via Resend Batch API.
+ * Retourne le nombre d'emails envoyés et échoués.
+ */
 async function sendNewsletterBatch(
   recipients: string[],
   subject: string,
   html: string,
   adminId: string,
+  baseUrl: string
 ): Promise<SendResult> {
   if (recipients.length === 0) {
     return { sent: 0, failed: 0 }
@@ -56,13 +68,15 @@ async function sendNewsletterBatch(
     const chunk = recipients.slice(i, i + BATCH_SIZE)
     const batchIndex = Math.floor(i / BATCH_SIZE)
 
+    // Préparer les payloads — from est DANS chaque email du tableau
     const payloads = chunk.map((email) => ({
       from: FROM_EMAIL,
       to: [email],
       subject,
-      html,
+      html: html,
     }))
 
+    // Idempotency key stable par chunk
     const idempotencyKey = buildIdempotencyKey(adminId, subject, recipients.join(','), batchIndex)
 
     const { data, error } = await resend.batch.send(payloads, {
@@ -70,9 +84,11 @@ async function sendNewsletterBatch(
     })
 
     if (error) {
+      // Erreur API — tout le chunk est marqué failed
       console.error(`[resend] batch ${batchIndex} failed:`, error)
       failed += chunk.length
     } else if (data) {
+      // data.data est l'array des emails créés (SDK v6.x)
       const successIds: string[] = (data.data ?? []).map(
         (e: { id: string }) => e.id
       )
@@ -86,6 +102,7 @@ async function sendNewsletterBatch(
       }
     }
 
+    // Délai entre batches si > 500 destinataires et pas dernier batch
     if (needsDelay && batchIndex < totalBatches - 1) {
       await new Promise((resolve) => setTimeout(resolve, INTER_BATCH_DELAY_MS))
     }
@@ -95,6 +112,7 @@ async function sendNewsletterBatch(
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // ── 1. Auth ────────────────────────────────────────────────────────────────
   let body: NewsletterBody
   try {
     body = (await request.json()) as NewsletterBody
@@ -102,7 +120,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'invalid_payload' }, { status: 400 })
   }
 
-  const { subject, body: emailBody, buttonText, buttonUrl } = body
+  const { subject, body: emailBody } = body
 
   if (!subject?.trim() || !emailBody?.trim()) {
     return NextResponse.json(
@@ -111,17 +129,7 @@ export async function POST(request: Request): Promise<Response> {
     )
   }
 
-  // Validation croisée : si un champ CTA est fourni, les deux doivent l'être
-  const hasButtonText = (buttonText ?? '').trim().length > 0
-  const hasButtonUrl  = (buttonUrl  ?? '').trim().length > 0
-  if (hasButtonText !== hasButtonUrl) {
-    return NextResponse.json(
-      { error: 'buttonText and buttonUrl must both be provided or both omitted' },
-      { status: 400 }
-    )
-  }
-
-  // ── Auth ─────────────────────────────────────────────────────────────────
+  // ── 2. Authz — récupérer l'user ──────────────────────────────────────────
   const supabase = await createClient()
   const {
     data: { user },
@@ -131,7 +139,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  // ── Admin check via profiles.role ─────────────────────────────────────────
+  // ── 3. Admin check via profiles.role ──────────────────────────────────────
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -145,7 +153,8 @@ export async function POST(request: Request): Promise<Response> {
     )
   }
 
-  // ── Récupérer les abonnés via service_role (bypass RLS) ───────────────────
+  // ── 4. Récupérer les abonnés via service_role (bypass RLS) ───────────────
+  // On filtre sur subscribed = true pour exclure les désabonnés.
   const admin = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -173,19 +182,15 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ sent: 0, failed: 0 })
   }
 
-  // ── Construire le HTML et envoyer via batch ──────────────────────────────
+  // ── 5. Construire le HTML et envoyer via batch ───────────────────────────
+  // Normalise : supprime tout slash terminal pour éviter //unsubscribe si
+  // NEXT_PUBLIC_APP_URL est défini avec un trailing slash (ex: https://haurus.io/)
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io').replace(/\/$/, '')
-  const html = buildNewsletterHtml(
-    subject,
-    emailBody,
-    baseUrl,
-    hasButtonText ? buttonText!.trim() : undefined,
-    hasButtonUrl  ? buttonUrl!.trim()  : undefined,
-  )
+  const html = buildNewsletterHtml(subject, emailBody, baseUrl)
 
   let result: SendResult
   try {
-    result = await sendNewsletterBatch(emails, subject, html, user.id)
+    result = await sendNewsletterBatch(emails, subject, html, user.id, baseUrl)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown_error'
     console.error('[newsletter] send failed:', err)
