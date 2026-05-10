@@ -147,18 +147,13 @@ npx jest --watch
 
 Tests cover: auth validation, auth functionality, dashboard metric formatting, dashboard stats utilities, general utilities, and email newsletter helpers.
 
-### What the tests cover
+## 📁 Project Structure
 
 - `src/app/api/admin/newsletter/send` — API route for sending newsletters
 - `src/components/dashboard/admin` — Admin dashboard components (NewsletterSendForm, NewsletterEmailPreview)
 - `src/lib/email` — Email utilities (newsletter helpers)
 
-- `auth-validators.test.ts` — Authentication validation logic
-- `auth.test.ts` — Authentication functionality
-- `formatMetric.test.ts` — Dashboard metric formatting
-- `stats.test.ts` — Dashboard statistics calculations
-- `lib/utils.test.ts` — General utility functions
-- `utils.test.ts` — General utility functions
+## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
