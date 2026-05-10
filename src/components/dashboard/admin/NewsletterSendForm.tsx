@@ -32,7 +32,6 @@ export default function NewsletterSendForm({
   const [ctaHref, setCtaHref] = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [bodyError, setBodyError] = useState('')
-  const [ctaError, setCtaError] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successData, setSuccessData] = useState<SuccessData | null>(null)
 
@@ -53,16 +52,6 @@ export default function NewsletterSendForm({
       valid = false
     } else {
       setBodyError('')
-    }
-
-    // CTA: both or neither
-    const hasCtaText = ctaText.trim()
-    const hasCtaLink = ctaLink.trim()
-    if (hasCtaText !== hasCtaLink) {
-      setCtaError('Remplissez les deux champs CTA ou laissez-les vides.')
-      valid = false
-    } else {
-      setCtaError('')
     }
 
     return valid
@@ -115,7 +104,6 @@ export default function NewsletterSendForm({
     setCtaHref('')
     setSubjectError('')
     setBodyError('')
-    setCtaError('')
     setErrorMessage('')
     setSuccessData(null)
   }
