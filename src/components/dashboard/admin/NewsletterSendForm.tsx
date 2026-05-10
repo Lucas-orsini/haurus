@@ -15,19 +15,21 @@ interface SuccessData {
 interface NewsletterSendFormProps {
   onSubjectChange?: (value: string) => void
   onBodyChange?: (value: string) => void
-  onCtaChange?: (text: string, link: string) => void
+  onCtaLabelChange?: (value: string) => void
+  onCtaHrefChange?: (value: string) => void
 }
 
 export default function NewsletterSendForm({
   onSubjectChange,
   onBodyChange,
-  onCtaChange,
+  onCtaLabelChange,
+  onCtaHrefChange,
 }: NewsletterSendFormProps) {
   const [state, setState] = useState<FormState>('idle')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
-  const [ctaText, setCtaText] = useState('')
-  const [ctaLink, setCtaLink] = useState('')
+  const [ctaLabel, setCtaLabel] = useState('')
+  const [ctaHref, setCtaHref] = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [bodyError, setBodyError] = useState('')
   const [ctaError, setCtaError] = useState('')
@@ -80,10 +82,8 @@ export default function NewsletterSendForm({
         subject: subject.trim(),
         body: body.trim(),
       }
-      if (ctaText.trim() && ctaLink.trim()) {
-        payload.ctaText = ctaText.trim()
-        payload.ctaLink = ctaLink.trim()
-      }
+      if (ctaLabel.trim()) payload.ctaLabel = ctaLabel.trim()
+      if (ctaHref.trim()) payload.ctaHref = ctaHref.trim()
 
       const res = await fetch('/api/admin/newsletter/send', {
         method: 'POST',
@@ -111,8 +111,8 @@ export default function NewsletterSendForm({
     setState('idle')
     setSubject('')
     setBody('')
-    setCtaText('')
-    setCtaLink('')
+    setCtaLabel('')
+    setCtaHref('')
     setSubjectError('')
     setBodyError('')
     setCtaError('')
@@ -174,36 +174,29 @@ export default function NewsletterSendForm({
         )}
       </div>
 
-      {/* CTA fields */}
-      <div className="flex flex-col gap-1.5">
-        <p className="text-xs font-medium text-[var(--text-2)] select-none">
-          Bouton CTA <span className="text-[var(--text-3)]">(optionnel)</span>
-        </p>
+      {/* CTA configuration — two fields side by side */}
+      <div className="grid grid-cols-2 gap-3">
         <Input
-          label="Texte du bouton CTA"
+          label="Label du bouton CTA"
           type="text"
-          placeholder="Découvrir Haurus"
-          value={ctaText}
+          placeholder="Voir les matchs du jour"
+          value={ctaLabel}
           onChange={(e) => {
-            setCtaText(e.target.value)
-            if (ctaError) setCtaError('')
-            onCtaChange?.(e.target.value, ctaLink)
+            setCtaLabel(e.target.value)
+            onCtaLabelChange?.(e.target.value)
           }}
-          error={ctaError}
           disabled={isLoading}
           autoComplete="off"
         />
         <Input
-          label="URL du lien CTA"
+          label="URL de destination"
           type="url"
-          placeholder="https://haurus.io"
-          value={ctaLink}
+          placeholder="https://haurus.io/dashboard"
+          value={ctaHref}
           onChange={(e) => {
-            setCtaLink(e.target.value)
-            if (ctaError) setCtaError('')
-            onCtaChange?.(ctaText, e.target.value)
+            setCtaHref(e.target.value)
+            onCtaHrefChange?.(e.target.value)
           }}
-          error={ctaError && !ctaText.trim() ? ctaError : undefined}
           disabled={isLoading}
           autoComplete="off"
         />

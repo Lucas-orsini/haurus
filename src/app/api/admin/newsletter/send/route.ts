@@ -13,8 +13,8 @@ const INTER_BATCH_DELAY_MS = 1000 // 1s entre batches si > 500 destinataires
 interface NewsletterBody {
   subject: string
   body: string
-  ctaText?: string
-  ctaLink?: string
+  ctaLabel?: string
+  ctaHref?: string
 }
 
 interface SendResult {
@@ -104,7 +104,7 @@ async function sendNewsletterBatch(
 }
 
 export async function POST(request: Request): Promise<Response> {
-  // ── 1. Auth ────────────────────────────────────────────────────────────────
+  // ── 1. Parse body ─────────────────────────────────────────────────────────
   let body: NewsletterBody
   try {
     body = (await request.json()) as NewsletterBody
@@ -112,7 +112,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'invalid_payload' }, { status: 400 })
   }
 
-  const { subject, body: emailBody, ctaText, ctaLink } = body
+  const { subject, body: emailBody, ctaLabel, ctaHref } = body
 
   if (!subject?.trim() || !emailBody?.trim()) {
     return NextResponse.json(
@@ -155,7 +155,6 @@ export async function POST(request: Request): Promise<Response> {
   const { data: subscribers, error: subscribersError } = await admin
     .from('newsletter_subscribers')
     .select('email')
-    .not('email', 'is', null)
 
   if (subscribersError) {
     console.error('[newsletter] failed to fetch subscribers:', subscribersError)
@@ -175,7 +174,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // ── 5. Construire le HTML et envoyer via batch ───────────────────────────
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io').replace(/\/$/, '')
-  const html = buildNewsletterHtml(subject, emailBody, baseUrl, ctaText, ctaLink)
+  const html = buildNewsletterHtml(subject, emailBody, baseUrl, ctaLabel, ctaHref)
 
   let result: SendResult
   try {
