@@ -6,6 +6,9 @@ The metrics bookmakers use. Now yours.
 
 - **Newsletter Management** — Send newsletters to subscribers with a dedicated admin form and email preview
 - **Supabase Integration** — Auth and database powered by Supabase
+- **PostHog Analytics Integration** — Track user behavior with PostHog analytics
+- **Telegram Bot Support** — Webhook verification for Telegram bot integration
+- **Email Delivery** — Send transactional emails using Resend
 
 ## 🛠️ Tech Stack
 
@@ -45,7 +48,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials that your app needs to connect to external services.
 
-**What is `.env.local`?** It's a special file where you store secrets like API keys and passwords. It lives on your computer only — never commit it to GitHub. When the app starts, Next.js reads these variables so your app can talk to Supabase, Resend, and other services.
+**What is `.env.local`?** It's a special file where you store secrets like API keys and passwords. It lives on your computer only — never commit it to GitHub. When the app starts, Next.js reads these variables so your app can talk to Supabase, PostHog, Resend, and other services.
 
 To create this file, open your terminal and `cd` into your project folder and run:
 
@@ -70,6 +73,9 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
+# === Google OAuth (optional — for Sign in with Google) ===
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+
 # === PostHog Analytics ===
 # Get your key from https://eu.posthog.com → Project Settings → Project API Key
 NEXT_PUBLIC_POSTHOG_KEY=
@@ -85,18 +91,6 @@ RESEND_FROM_EMAIL=hello@yourdomain.com
 RESEND_AUDIENCE_ID=
 # Base URL of your app (for unsubscribe links in emails)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# === Google OAuth (optional — for Sign in with Google) ===
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-
-# === Telegram Bot (optional) ===
-# Get your bot token from @BotFather on Telegram
-# https://core.telegram.org/bots/tutorial#creating-your-first-bot
-TELEGRAM_BOT_TOKEN=
-# Used for HMAC-SHA256 signature verification on incoming webhook requests
-TELEGRAM_BOT_SECRET=
-# Your bot's username (e.g., if your bot is @MyBot, enter "MyBot")
-NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
 ```
 
 ### 4. Run the development server
@@ -107,7 +101,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac), then run the commands above.
+> 💡 **VS Code tip**: open the integrated terminal with Ctrl+` (or Cmd+` on Mac)
 
 ## 🔑 Environment Variables
 
