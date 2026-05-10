@@ -113,23 +113,25 @@ Then open http://localhost:3000 in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `TELEGRAM_BOT_TOKEN` | Yes | Open Telegram, search for @BotFather, create bot with `/newbot`, copy the token | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | Yes | You define this yourself — it's a secret string for HMAC verification | Used to verify incoming webhook requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Yes | Your bot's username (without @) | Used publicly in the app |
+| `TELEGRAM_BOT_TOKEN` | Yes* | Open Telegram, chat with @BotFather, create a bot and copy the token | Telegram bot API token for sending messages and handling webhooks |
+| `TELEGRAM_BOT_SECRET` | Yes* | You define this yourself — it's used to verify incoming webhook requests | Secret key for HMAC-SHA256 signature verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Yes* | Your bot's username on Telegram (without the @ symbol) | Bot username used for webhook configuration |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon / public | Public API key (safe to expose) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role | Server-only key (never expose) |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | https://eu.posthog.com → Project Settings → Project API Key | PostHog analytics key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Default is `https://eu.i.posthog.com` | PostHog server host |
-| `RESEND_API_KEY` | Yes | https://resend.com/api-keys → Create API Key | Resend email API key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public anon key for client-side queries |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side secret key for admin operations |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | OAuth client ID for Sign in with Google |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | PostHog analytics project API key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Provided by PostHog — use `https://eu.i.posthog.com` | PostHog server URL |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | API key for sending emails |
 | `RESEND_FROM_EMAIL` | Yes | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
-| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → Settings | Audience ID for email lists |
-| `NEXT_PUBLIC_APP_URL` | Yes | Use `http://localhost:3000` for local dev | Base URL of your app |
+| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → click audience → Settings | Audience ID for managing email subscribers |
+| `NEXT_PUBLIC_APP_URL` | Yes | You define this — use `http://localhost:3000` for dev | Base URL of your app for email links |
+
+*Only required if using Telegram bot features
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that small pieces of code (like helper functions) work correctly without needing the whole app running.
+Unit tests verify that small pieces of code work correctly — they check that functions return the right results.
 
 Run all tests:
 
@@ -143,21 +145,28 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+Watch mode (re-runs tests automatically when you save changes):
 
 ```bash
 npx jest --watch
 ```
 
-**How to read the output**: `PASS` means everything works. `FAIL` means something broke — look at the error message below for details on what went wrong.
+**Reading Jest output:**
+- `PASS` — all tests passed, nothing is broken
+- `FAIL` — something broke, you'll see which test failed and why (expected vs received value)
 
-Tests cover: auth validation, auth functionality, dashboard metric formatting, dashboard stats utilities, general utilities, and email newsletter helpers.
+**Tests included:**
+- `auth-validators.test.ts` — authentication validation logic
+- `auth.test.ts` — authentication flows and behavior
+- `dashboard/formatMetric.test.ts` — metric formatting utilities
+- `lib/dashboard/stats.test.ts` — dashboard statistics calculations
+- `lib/utils.test.ts` — general utility functions
+- `utils.test.ts` — common utility functions
 
 ## 📁 Project Structure
 
-- `src/app/api/admin/newsletter/send` — API route for sending newsletters
-- `src/components/dashboard/admin` — Admin dashboard components (NewsletterSendForm, NewsletterEmailPreview)
-- `src/lib/email` — Email utilities (newsletter helpers)
+- `src/app` — Next.js App Router pages and layouts (includes unsubscribe functionality)
+- Root config files — TypeScript, Tailwind, PostCSS, Jest, ESLint, and Next.js configuration
 
 ## 🚀 Deploy to Vercel
 
@@ -165,13 +174,12 @@ Tests cover: auth validation, auth functionality, dashboard metric formatting, d
 
 1. Click the button above or go to https://vercel.com/new
 2. Import your GitHub repository
-3. Add all environment variables in Vercel → Settings → Environment Variables:
+3. Add all environment variables in Vercel dashboard → Settings → Environment Variables:
    - Copy every variable from your `.env.local` file
-   - For `NEXT_PUBLIC_` variables: set Environment to "All" (client + server)
-   - For server-only variables (like `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`): set Environment to "Server"
+   - For `NEXT_PUBLIC_*` variables, make sure to set them as "Public" environment variables
 4. Click Deploy
 
-Your app will be live at `https://your-project.vercel.app` once deployment completes.
+> ⚠️ **Important**: Don't forget to add ALL environment variables in Vercel. If you miss any, your app may fail to build or run incorrectly.
 
 ## 📝 License
 
