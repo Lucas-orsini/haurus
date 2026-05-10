@@ -7,6 +7,8 @@ export function buildNewsletterHtml(
   subject: string,
   body: string,
   baseUrl: string,
+  ctaText?: string,
+  ctaLink?: string,
 ): string {
   // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -30,6 +32,23 @@ export function buildNewsletterHtml(
 
   const escapedSubject = escapeHtml(subject)
   const escapedBody    = escapeHtml(body)
+  const escapedCtaText = ctaText ? escapeHtml(ctaText) : ''
+
+  // ── CTA block (only if both ctaText AND ctaLink are provided) ───────────
+  const hasCta = ctaText?.trim() && ctaLink?.trim()
+  const ctaBlock = hasCta ? `
+          <tr>
+            <td style="padding:0 32px 24px;text-align:center;">
+              <a href="${ctaLink?.trim()}"
+                 style="display:inline-block;padding:12px 28px;background-color:#f2cb38;color:#09090b;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px;letter-spacing:-0.01em;">
+                ${escapedCtaText}
+              </a>
+            </td>
+          </tr>` : ''
+
+  // ── X/Twitter link in footer ─────────────────────────────────────────────
+  const twitterUrl = 'https://x.com/your-account'
+  const xIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -55,27 +74,31 @@ export function buildNewsletterHtml(
           </tr>
           <!-- Body -->
           <tr>
-            <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;
-                         color:#09090b;letter-spacing:-0.02em;line-height:1.3;">
-                ${escapedSubject}
-              </h1>
+            <td style="padding:32px;text-align:left;">
               <div style="font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;">
                 ${escapedBody}
               </div>
             </td>
-          </tr>
+          </tr>${ctaBlock}
           <!-- Footer -->
           <tr>
-            <td style="padding:24px 32px;border-top:1px solid #e4e4e7;
-                       background-color:#fafafa;">
+            <td style="padding:24px 32px;border-top:1px solid #e4e4e7;background-color:#fafafa;text-align:center;">
               <p style="margin:0 0 8px;font-size:12px;color:#71717a;text-align:center;">
                 Tu reçois cet email parce que tu es inscrit à la newsletter Haurus.
               </p>
-              <p style="margin:0;text-align:center;">
+              <p style="margin:0 0 10px;font-size:12px;text-align:center;">
                 <a href="${baseUrl}/unsubscribe"
                    style="font-size:12px;color:#6366f1;text-decoration:none;">
                   Se désabonner
+                </a>
+              </p>
+              <p style="margin:0;font-size:12px;text-align:center;">
+                <a href="${twitterUrl}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#71717a;text-decoration:none;">
+                  ${xIconSvg}
+                  <span>X / Twitter</span>
                 </a>
               </p>
             </td>

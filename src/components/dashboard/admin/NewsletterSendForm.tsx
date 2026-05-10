@@ -15,17 +15,22 @@ interface SuccessData {
 interface NewsletterSendFormProps {
   onSubjectChange?: (value: string) => void
   onBodyChange?: (value: string) => void
+  onCtaChange?: (text: string, link: string) => void
 }
 
 export default function NewsletterSendForm({
   onSubjectChange,
   onBodyChange,
+  onCtaChange,
 }: NewsletterSendFormProps) {
   const [state, setState] = useState<FormState>('idle')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
+  const [ctaText, setCtaText] = useState('')
+  const [ctaLink, setCtaLink] = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [bodyError, setBodyError] = useState('')
+  const [ctaError, setCtaError] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successData, setSuccessData] = useState<SuccessData | null>(null)
 
@@ -48,6 +53,16 @@ export default function NewsletterSendForm({
       setBodyError('')
     }
 
+    // CTA: both or neither
+    const hasCtaText = ctaText.trim()
+    const hasCtaLink = ctaLink.trim()
+    if (hasCtaText !== hasCtaLink) {
+      setCtaError('Remplissez les deux champs CTA ou laissez-les vides.')
+      valid = false
+    } else {
+      setCtaError('')
+    }
+
     return valid
   }
 
@@ -61,10 +76,19 @@ export default function NewsletterSendForm({
     setSuccessData(null)
 
     try {
+      const payload: Record<string, string> = {
+        subject: subject.trim(),
+        body: body.trim(),
+      }
+      if (ctaText.trim() && ctaLink.trim()) {
+        payload.ctaText = ctaText.trim()
+        payload.ctaLink = ctaLink.trim()
+      }
+
       const res = await fetch('/api/admin/newsletter/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject: subject.trim(), body: body.trim() }),
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
@@ -87,8 +111,11 @@ export default function NewsletterSendForm({
     setState('idle')
     setSubject('')
     setBody('')
+    setCtaText('')
+    setCtaLink('')
     setSubjectError('')
     setBodyError('')
+    setCtaError('')
     setErrorMessage('')
     setSuccessData(null)
   }
@@ -145,6 +172,41 @@ export default function NewsletterSendForm({
         {bodyError && (
           <p className="text-xs text-[var(--red)] leading-tight">{bodyError}</p>
         )}
+      </div>
+
+      {/* CTA fields */}
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs font-medium text-[var(--text-2)] select-none">
+          Bouton CTA <span className="text-[var(--text-3)]">(optionnel)</span>
+        </p>
+        <Input
+          label="Texte du bouton CTA"
+          type="text"
+          placeholder="Découvrir Haurus"
+          value={ctaText}
+          onChange={(e) => {
+            setCtaText(e.target.value)
+            if (ctaError) setCtaError('')
+            onCtaChange?.(e.target.value, ctaLink)
+          }}
+          error={ctaError}
+          disabled={isLoading}
+          autoComplete="off"
+        />
+        <Input
+          label="URL du lien CTA"
+          type="url"
+          placeholder="https://haurus.io"
+          value={ctaLink}
+          onChange={(e) => {
+            setCtaLink(e.target.value)
+            if (ctaError) setCtaError('')
+            onCtaChange?.(ctaText, e.target.value)
+          }}
+          error={ctaError && !ctaText.trim() ? ctaError : undefined}
+          disabled={isLoading}
+          autoComplete="off"
+        />
       </div>
 
       {/* Error alert */}
