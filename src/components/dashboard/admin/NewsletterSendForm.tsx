@@ -245,7 +245,7 @@ export default function NewsletterSendForm({
           type="submit"
           variant="primary"
           size="md"
-          disabled={isLoading}
+          disabled={isLoading || !subject.trim() || !body.trim()}
           iconLeft={
             isLoading ? (
               <Loader2 size={13} strokeWidth={1.5} className="animate-spin shrink-0" />

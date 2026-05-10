@@ -56,11 +56,7 @@ export function buildNewsletterHtml(
           <!-- Body -->
           <tr>
             <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;
-                         color:#09090b;letter-spacing:-0.02em;line-height:1.3;">
-                ${escapedSubject}
-              </h1>
-              <div style="font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;">
+              <div style="text-align:left;font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;">
                 ${escapedBody}
               </div>
             </td>
