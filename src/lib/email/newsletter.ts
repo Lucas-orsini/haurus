@@ -59,6 +59,13 @@ export function buildNewsletterHtml(
 
   const xLogoDataUri = `data:image/svg+xml;base64,${Buffer.from(xLogoSvg).toString('base64')}`
 
+  const ctaHref = baseUrl ? escapeHtml(baseUrl) : '#'
+
+  const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(escapedSubject)}&url=${encodeURIComponent(baseUrl || '')}`
+
+  // Inline SVG logo X (Twitter/X) — brand logos removed in lucide-react v1
+  const xLogoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -97,6 +104,25 @@ export function buildNewsletterHtml(
               </h1>
               <div style="font-size:16px;color:#3f3f46;line-height:1.7;white-space:pre-wrap;">
                 ${escapedBody}
+              </div>
+              <!-- CTA Button -->
+              <div style="text-align:center;margin-top:32px;">
+                <a href="${ctaHref}"
+                   style="display:inline-block;background-color:#0a0a0a;color:#ffffff;font-size:15px;font-weight:600;
+                          text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:-0.01em;">
+                  Découvrir Haurus
+                </a>
+              </div>
+              <!-- Twitter Share -->
+              <div style="text-align:center;margin-top:20px;">
+                <a href="${twitterShareUrl}"
+                   aria-label="Partager sur X"
+                   style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+                          font-size:13px;color:#71717a;padding:8px 16px;border:1px solid #e4e4e7;
+                          border-radius:8px;">
+                  ${xLogoSvg}
+                  <span>Partager sur X</span>
+                </a>
               </div>
             </td>
           </tr>
