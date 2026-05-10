@@ -31,6 +31,13 @@ export function buildNewsletterHtml(
   const escapedSubject = escapeHtml(subject)
   const escapedBody    = escapeHtml(body)
 
+  const ctaHref = baseUrl ? escapeHtml(baseUrl) : '#'
+
+  const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(escapedSubject)}&url=${encodeURIComponent(baseUrl || '')}`
+
+  // Inline SVG logo X (Twitter/X) — brand logos removed in lucide-react v1
+  const xLogoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -55,13 +62,28 @@ export function buildNewsletterHtml(
           </tr>
           <!-- Body -->
           <tr>
-            <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-size:20px;font-weight:600;
-                         color:#09090b;letter-spacing:-0.02em;line-height:1.3;">
-                ${escapedSubject}
-              </h1>
-              <div style="font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;">
+            <td style="padding:32px;text-align:left;">
+              <div style="font-size:15px;color:#3f3f46;line-height:1.6;white-space:pre-wrap;text-align:left;">
                 ${escapedBody}
+              </div>
+              <!-- CTA Button -->
+              <div style="text-align:center;margin-top:32px;">
+                <a href="${ctaHref}"
+                   style="display:inline-block;background-color:#0a0a0a;color:#ffffff;font-size:15px;font-weight:600;
+                          text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:-0.01em;">
+                  Découvrir Haurus
+                </a>
+              </div>
+              <!-- Twitter Share -->
+              <div style="text-align:center;margin-top:20px;">
+                <a href="${twitterShareUrl}"
+                   aria-label="Partager sur X"
+                   style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+                          font-size:13px;color:#71717a;padding:8px 16px;border:1px solid #e4e4e7;
+                          border-radius:8px;">
+                  ${xLogoSvg}
+                  <span>Partager sur X</span>
+                </a>
               </div>
             </td>
           </tr>
@@ -69,10 +91,10 @@ export function buildNewsletterHtml(
           <tr>
             <td style="padding:24px 32px;border-top:1px solid #e4e4e7;
                        background-color:#fafafa;">
-              <p style="margin:0 0 8px;font-size:12px;color:#71717a;text-align:center;">
+              <p style="margin:0 0 8px;font-size:12px;color:#71717a;text-align:left;">
                 Tu reçois cet email parce que tu es inscrit à la newsletter Haurus.
               </p>
-              <p style="margin:0;text-align:center;">
+              <p style="margin:0;text-align:left;">
                 <a href="${baseUrl}/unsubscribe"
                    style="font-size:12px;color:#6366f1;text-decoration:none;">
                   Se désabonner
