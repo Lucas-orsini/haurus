@@ -16,7 +16,8 @@ export default function NewsletterEmailPreview({
   ctaLabel,
   ctaHref,
 }: NewsletterEmailPreviewProps) {
-  const isEmpty = !subject.trim() && !body.trim()
+  const isEmpty =
+    !subject.trim() && !body.trim() && !ctaText?.trim() && !ctaLink?.trim()
 
   const html = buildNewsletterHtml(
     subject,
