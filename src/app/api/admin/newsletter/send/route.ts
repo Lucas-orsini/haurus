@@ -13,8 +13,6 @@ const INTER_BATCH_DELAY_MS = 1000 // 1s entre batches si > 500 destinataires
 interface NewsletterBody {
   subject: string
   body: string
-  ctaLabel?: string
-  ctaHref?: string
 }
 
 interface SendResult {
@@ -114,7 +112,7 @@ async function sendNewsletterBatch(
 }
 
 export async function POST(request: Request): Promise<Response> {
-  // ── 1. Parse body ─────────────────────────────────────────────────────────
+  // ── 1. Auth ────────────────────────────────────────────────────────────────
   let body: NewsletterBody
   try {
     body = (await request.json()) as NewsletterBody
@@ -122,7 +120,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'invalid_payload' }, { status: 400 })
   }
 
-  const { subject, body: emailBody, ctaLabel, ctaHref } = body
+  const { subject, body: emailBody } = body
 
   if (!subject?.trim() || !emailBody?.trim()) {
     return NextResponse.json(
@@ -156,6 +154,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── 4. Récupérer les abonnés via service_role (bypass RLS) ───────────────
+  // On filtre sur subscribed = true pour exclure les désabonnés.
   const admin = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -165,6 +164,7 @@ export async function POST(request: Request): Promise<Response> {
   const { data: subscribers, error: subscribersError } = await admin
     .from('newsletter_subscribers')
     .select('email')
+    .eq('subscribed', true)
 
   if (subscribersError) {
     console.error('[newsletter] failed to fetch subscribers:', subscribersError)
@@ -186,7 +186,7 @@ export async function POST(request: Request): Promise<Response> {
   // Normalise : supprime tout slash terminal pour éviter //unsubscribe si
   // NEXT_PUBLIC_APP_URL est défini avec un trailing slash (ex: https://haurus.io/)
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://haurus.io').replace(/\/$/, '')
-  const html = buildNewsletterHtml(subject, emailBody, baseUrl, ctaLabel, ctaHref)
+  const html = buildNewsletterHtml(subject, emailBody, baseUrl)
 
   let result: SendResult
   try {
