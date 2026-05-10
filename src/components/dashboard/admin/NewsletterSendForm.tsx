@@ -15,15 +15,21 @@ interface SuccessData {
 interface NewsletterSendFormProps {
   onSubjectChange?: (value: string) => void
   onBodyChange?: (value: string) => void
+  onCtaLabelChange?: (value: string) => void
+  onCtaHrefChange?: (value: string) => void
 }
 
 export default function NewsletterSendForm({
   onSubjectChange,
   onBodyChange,
+  onCtaLabelChange,
+  onCtaHrefChange,
 }: NewsletterSendFormProps) {
   const [state, setState] = useState<FormState>('idle')
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
+  const [ctaLabel, setCtaLabel] = useState('')
+  const [ctaHref, setCtaHref] = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [bodyError, setBodyError] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -61,10 +67,17 @@ export default function NewsletterSendForm({
     setSuccessData(null)
 
     try {
+      const payload: Record<string, string> = {
+        subject: subject.trim(),
+        body: body.trim(),
+      }
+      if (ctaLabel.trim()) payload.ctaLabel = ctaLabel.trim()
+      if (ctaHref.trim()) payload.ctaHref = ctaHref.trim()
+
       const res = await fetch('/api/admin/newsletter/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject: subject.trim(), body: body.trim() }),
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
@@ -87,6 +100,8 @@ export default function NewsletterSendForm({
     setState('idle')
     setSubject('')
     setBody('')
+    setCtaLabel('')
+    setCtaHref('')
     setSubjectError('')
     setBodyError('')
     setErrorMessage('')
@@ -145,6 +160,34 @@ export default function NewsletterSendForm({
         {bodyError && (
           <p className="text-xs text-[var(--red)] leading-tight">{bodyError}</p>
         )}
+      </div>
+
+      {/* CTA configuration — two fields side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          label="Label du bouton CTA"
+          type="text"
+          placeholder="Voir les matchs du jour"
+          value={ctaLabel}
+          onChange={(e) => {
+            setCtaLabel(e.target.value)
+            onCtaLabelChange?.(e.target.value)
+          }}
+          disabled={isLoading}
+          autoComplete="off"
+        />
+        <Input
+          label="URL de destination"
+          type="url"
+          placeholder="https://haurus.io/dashboard"
+          value={ctaHref}
+          onChange={(e) => {
+            setCtaHref(e.target.value)
+            onCtaHrefChange?.(e.target.value)
+          }}
+          disabled={isLoading}
+          autoComplete="off"
+        />
       </div>
 
       {/* Error alert */}
