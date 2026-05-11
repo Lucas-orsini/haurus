@@ -64,7 +64,18 @@ function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
   )
 }
 
-function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
+type WeatherCardData = {
+  temperature: number | null
+  humidity: number | null
+  wind_speed: number | null
+  pop: number | null
+  conditions: string | null
+  conditions_icon: string | null
+}
+
+type Card2Entry = { name: string; weather: WeatherCardData }
+
+function Card2({ card2 }: { card2?: Card2Entry[] | null }) {
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -80,8 +91,8 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
     )
   }
 
-  // State: empty — no active tournament today (card2 is null)
-  if (card2 === null) {
+  // State: empty — no active tournament today (card2 is null or [])
+  if (!card2 || card2.length === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
@@ -96,7 +107,7 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
     )
   }
 
-  // State: success — render weather data in 2-column layout
+  // State: success — render one weather block per tournament entry
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-3">
@@ -106,53 +117,67 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
         </p>
       </div>
 
-      {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
-      <div className="flex flex-col sm:flex-row gap-4 min-w-0">
-        {/* Left zone — conditions label + OpenWeatherMap icon */}
-        <div className="flex flex-col items-center justify-center gap-2 shrink-0 sm:w-28">
-          {card2.conditions_icon ? (
-            <img
-              src={`https://openweathermap.org/img/wn/${card2.conditions_icon}@2x.png`}
-              alt={card2.conditions ?? 'Conditions météo'}
-              className="w-12 h-12 object-contain"
-            />
-          ) : (
-            <span className="text-sm text-[var(--text-3)] text-center leading-tight">
-              {card2.conditions ?? '—'}
-            </span>
-          )}
-          <p className="text-[11px] text-[var(--text-3)] text-center leading-tight">
-            {card2.conditions ?? '—'}
-          </p>
-        </div>
+      <div className="flex flex-col gap-4">
+        {card2.map((entry, i) => {
+          const { name, weather: w } = entry
+          return (
+            <div key={i} className="flex flex-col gap-2">
+              {/* Tournament name */}
+              <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
+                {name}
+              </p>
 
-        {/* Right zone — 4 stacked metrics */}
-        <div className="flex flex-col gap-2 flex-1 min-w-0">
-          <WeatherMetric
-            label="Température"
-            value={card2.temperature !== null && card2.temperature !== undefined
-              ? `${card2.temperature}°C`
-              : '—'}
-          />
-          <WeatherMetric
-            label="Humidité"
-            value={card2.humidity !== null && card2.humidity !== undefined
-              ? `${card2.humidity}%`
-              : '—'}
-          />
-          <WeatherMetric
-            label="Vent"
-            value={card2.wind_speed !== null && card2.wind_speed !== undefined
-              ? `${card2.wind_speed} km/h`
-              : '—'}
-          />
-          <WeatherMetric
-            label="POP"
-            value={card2.pop !== null && card2.pop !== undefined
-              ? `${card2.pop}%`
-              : '—'}
-          />
-        </div>
+              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
+              <div className="flex flex-col sm:flex-row gap-3 min-w-0">
+                {/* Left zone — conditions label + OpenWeatherMap icon */}
+                <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
+                  {w.conditions_icon ? (
+                    <img
+                      src={`https://openweathermap.org/img/wn/${w.conditions_icon}@2x.png`}
+                      alt={w.conditions ?? 'Conditions météo'}
+                      className="w-10 h-10 object-contain"
+                    />
+                  ) : (
+                    <span className="text-sm text-[var(--text-3)] text-center leading-tight">
+                      {w.conditions ?? '—'}
+                    </span>
+                  )}
+                  <p className="text-[10px] text-[var(--text-3)] text-center leading-tight">
+                    {w.conditions ?? '—'}
+                  </p>
+                </div>
+
+                {/* Right zone — 4 stacked metrics */}
+                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                  <WeatherMetric
+                    label="Température"
+                    value={w.temperature !== null && w.temperature !== undefined
+                      ? `${w.temperature}°C`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="Humidité"
+                    value={w.humidity !== null && w.humidity !== undefined
+                      ? `${w.humidity}%`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="Vent"
+                    value={w.wind_speed !== null && w.wind_speed !== undefined
+                      ? `${w.wind_speed} km/h`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="POP"
+                    value={w.pop !== null && w.pop !== undefined
+                      ? `${w.pop}%`
+                      : '—'}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
