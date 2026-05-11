@@ -7,16 +7,17 @@ import { motion } from 'framer-motion'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
+  onTournamentClick?: (tourneyName: string) => void
 }
 
-export default function StatCardsRow({ todaysStats }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats, onTournamentClick }: StatCardsRowProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
       <Card1 card1={todaysStats?.card1} />
 
       {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} />
+      <Card2 card2={todaysStats?.card2} onTournamentClick={onTournamentClick} />
 
       {/* Card 3 — Vitesse de surface */}
       <Card3 card3={todaysStats?.card3} />
@@ -75,7 +76,7 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2 }: { card2?: Card2Entry[] | null }) {
+function Card2({ card2, onTournamentClick }: { card2?: Card2Entry[] | null; onTournamentClick?: (name: string) => void }) {
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -122,10 +123,16 @@ function Card2({ card2 }: { card2?: Card2Entry[] | null }) {
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
-              {/* Tournament name */}
-              <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
-                {name}
-              </p>
+              {/* Tournament name — clickable */}
+              <button
+                onClick={() => onTournamentClick?.(name)}
+                className="text-left cursor-pointer hover:bg-white/[0.04] rounded-md p-1 -m-1 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 w-full"
+                title={`Voir les prévisions horaires pour ${name}`}
+              >
+                <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
+                  {name}
+                </p>
+              </button>
 
               {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">
@@ -246,9 +253,9 @@ function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
 
 /** Palette hex pour la jauge — indexée par PaceColor */
 const PACE_COLOR_HEX: Record<string, string> = {
-  blue:   '#3b82f6',   // bg-blue-500
-  yellow: '#facc15',  // bg-yellow-400
-  red:    '#f87171',  // bg-red-500
+  blue:   '#3b82f6',
+  yellow: '#facc15',
+  red:    '#f87171',
 }
 
 function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
@@ -258,21 +265,17 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
   const paceCategory = getPaceCategory(paceIndex)
   const colorHex = PACE_COLOR_HEX[paceColor]
 
-  // CONSTRAINT 1 — Normalisation curseur sur échelle 0–2 :
-  // paceIndex 0 → 0%, 0.80 → 40%, 1.10 → 55%, 2.0 → 100%
   const normalizedPace = Math.min(Math.max(paceIndex ?? 0, 0), 2) / 2
   const cursorLeft = `calc(${normalizedPace * 100}% - 5px)`
 
   return (
     <div className="flex flex-col gap-1">
-      {/* Label tournoi + surface */}
       <p className="text-[11px] text-[var(--text-3)]">
         {entry.name}
         <span className="mx-1 text-[var(--text-3)]">·</span>
         {entry.surface}
       </p>
 
-      {/* Valeur + catégorie — AU-DESSUS de la barre */}
       <div className="flex items-baseline gap-2">
         <p className="text-sm font-semibold text-[var(--text-1)] tabular-nums tracking-tight">
           {displayValue}
@@ -287,9 +290,7 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
         )}
       </div>
 
-      {/* Zone curseur + barre */}
       <div className="relative h-[44px] flex flex-col justify-end gap-0 overflow-hidden">
-        {/* Curseur triangulaire — AU-DESSUS de la barre */}
         <div className="relative h-7 flex items-end">
           {paceIndex !== null ? (
             <motion.div
@@ -298,14 +299,12 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
               transition={{ duration: 0.7, delay: index * 0.06, ease: 'easeOut' }}
               className="absolute top-0 w-[10px] h-7 flex flex-col items-center"
             >
-              {/* Badge inline au-dessus de la flèche */}
               <span
                 className="text-[9px] font-mono font-semibold whitespace-nowrap px-1 py-px rounded"
                 style={{ color: colorHex, backgroundColor: `${colorHex}22` }}
               >
                 {displayValue}
               </span>
-              {/* Flèche triangulaire pointant vers le bas */}
               <div
                 className="w-[10px] h-[14px] -mt-px"
                 style={{
@@ -318,22 +317,15 @@ function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
           ) : null}
         </div>
 
-        {/* Barre unie + marqueurs de seuil */}
-        {/* CONSTRAINT 2 & 3 — barre dynamique + seuils visuels */}
         <div className="relative h-[10px] rounded-full overflow-hidden bg-[var(--surface-3)]">
-          {/* Barre de couleur dynamique */}
           <div
             className="h-full rounded-full"
             style={{ backgroundColor: colorHex, opacity: 0.85 }}
           />
-
-          {/* Marqueur seuil 0.80 → 40% */}
           <div
             className="absolute top-0 bottom-0 w-[1px] bg-white opacity-25"
             style={{ left: '40%' }}
           />
-
-          {/* Marqueur seuil 1.10 → 55% */}
           <div
             className="absolute top-0 bottom-0 w-[1px] bg-white opacity-25"
             style={{ left: '55%' }}
