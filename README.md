@@ -97,47 +97,48 @@ Then open http://localhost:3000 in your browser.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard > Project Settings > API > service_role key | Server-side admin key (keep secret!) |
 | `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot creation | Telegram bot authentication token |
 | `TELEGRAM_BOT_SECRET` | No | You define this yourself when setting up the webhook | Secret for verifying incoming Telegram requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username on Telegram | Public bot username |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console > APIs & Services > Credentials | For "Sign in with Google" feature |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username on Telegram | Username for your Telegram bot |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console > APIs & Services > Credentials | OAuth client ID for Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard > Project Settings > Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog instance URL | Your PostHog server address |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog instance URL | Your PostHog host URL (defaults to EU) |
 | `RESEND_API_KEY` | No | Resend Dashboard > API Keys | Email service API key |
-| `RESEND_FROM_EMAIL` | No | Resend Dashboard > Domains | Verified sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard > Audiences > Settings | Email audience identifier |
-| `NEXT_PUBLIC_APP_URL` | No | You define this | Base URL of your app for email links |
+| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend > Domains | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard > Audiences > Settings | Email audience/list ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | You define this | Your app's base URL for email links |
 
 ## 🧪 Running Tests
 
-Unit tests verify that individual pieces of code work correctly. They run automatically and check if your code does what it's supposed to do.
+Tests automatically check that specific parts of the code work correctly — think of them as automated quality checks that run every time you make changes.
+
+Run all tests:
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
+Run a specific test file:
+
+```bash
 npx jest __tests__/auth-validators.test.ts
+```
 
-# Watch mode — re-runs tests when files change
+Watch mode (re-runs tests automatically when you save a file):
+
+```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — Everything works correctly
-- `FAIL` — Something broke. Jest will show which test failed and why
+**Reading the output**: `PASS` means everything worked correctly. `FAIL` means something broke — the error message will show you exactly which test failed and why.
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — Auth validation logic
-- `__tests__/auth.test.ts` — Authentication flows
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
-- `__tests__/lib/utils.test.ts` — Utility functions
-- `__tests__/utils.test.ts` — General utilities
+Tests covered:
+- Authentication validators and flows
+- Dashboard metric formatting and calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/lib/types/dashboard.ts` — TypeScript type definitions for dashboard data
-- `src/lib/dashboard/stats.ts` — Dashboard statistics calculation and data processing
-- `src/components/dashboard/StatCardsRow.tsx` — React component for displaying stat cards
+- `src/lib/types` — TypeScript type definitions for dashboard data structures
+- `src/components/dashboard` — Dashboard UI components (stat cards, overview, weather forecast modal)
 
 ## 🚀 Deploy to Vercel
 
@@ -145,12 +146,10 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in Vercel Dashboard > Settings > Environment Variables:
-   - Copy each variable from your `.env.local` file
-   - Include both development and production values
+3. Add all environment variables from your `.env.local` file in Vercel > Settings > Environment Variables
 4. Click Deploy
 
-> ⚠️ **Important**: Don't forget to add `SUPABASE_SERVICE_ROLE_KEY` — this is a server-side secret that should never be exposed to the browser.
+> ⚠️ **Important**: Make sure to add ALL environment variables listed in the `.env.local` template to Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` which must remain secret.
 
 ## 📝 License
 

@@ -27,6 +27,21 @@ export type WeatherCardData = {
   conditions_icon: string | null
 }
 
+export type HourlyForecastEntry = {
+  /** Hour of day (0-23). */
+  hour: number
+  /** Precipitation amount in mm/h. */
+  rain_mm_h: number | null
+  /** Temperature in Celsius. */
+  temperature: number | null
+  /** Probability of precipitation (0-100). */
+  pop: number | null
+  /** OpenWeatherMap icon code (e.g. '10d'). */
+  conditions_icon: string | null
+  /** Human-readable weather condition label. */
+  conditions: string | null
+}
+
 export type TodaysStats = {
   card1: {
     count: number

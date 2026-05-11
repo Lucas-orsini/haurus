@@ -5,8 +5,10 @@ import { Search, X, ChevronDown, AlertCircle, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MatchRow from './MatchRow'
 import StatCardsRow from './StatCardsRow'
+import WeatherForecastModal from './WeatherForecastModal'
 import type { MatchStats } from '@/lib/types/match'
-import type { TodaysStats } from '@/lib/types/dashboard'
+import type { TodaysStats, HourlyForecastEntry } from '@/lib/types/dashboard'
+import { createClient } from '@/lib/supabase/client'
 
 interface DashboardOverviewProps {
   matches: MatchStats[]
@@ -27,6 +29,64 @@ export default function DashboardOverview({
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set())
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [localFavoriteIds, setLocalFavoriteIds] = useState<string[]>(favoriteMatchIds)
+
+  // ── Weather modal state ───────────────────────────────────────────────────
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTournament, setSelectedTournament] = useState<string | null>(null)
+  const [hourlyData, setHourlyData] = useState<HourlyForecastEntry[]>([])
+  const [hourlyLoading, setHourlyLoading] = useState(false)
+  const [hourlyError, setHourlyError] = useState<string | null>(null)
+
+  async function handleTournamentClick(tourneyName: string) {
+    setSelectedTournament(tourneyName)
+    setHourlyError(null)
+    setHourlyData([])
+    setIsModalOpen(true)
+    setHourlyLoading(true)
+
+    try {
+      const supabase = createClient()
+      if (!supabase) {
+        throw new Error('Client Supabase non disponible')
+      }
+
+      const today = new Date().toISOString().slice(0, 10)
+
+      const { data, error } = await supabase
+        .from('tournament_weather')
+        .select('hour, rain_mm_h, temperature, pop, conditions_icon, conditions')
+        .eq('tourney_name', tourneyName)
+        .eq('date', today)
+        .order('hour', { ascending: true })
+
+      if (error) throw error
+
+      const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
+        hour: row.hour as number,
+        rain_mm_h: (row.rain_mm_h as number) ?? null,
+        temperature: (row.temperature as number) ?? null,
+        pop: (row.pop as number) ?? null,
+        conditions_icon: (row.conditions_icon as string) ?? null,
+        conditions: (row.conditions as string) ?? null,
+      }))
+
+      setHourlyData(entries)
+    } catch (err) {
+      setHourlyError(
+        err instanceof Error ? err.message : 'Échec du chargement des prévisions météo.'
+      )
+      setHourlyData([])
+    } finally {
+      setHourlyLoading(false)
+    }
+  }
+
+  function handleModalClose() {
+    setIsModalOpen(false)
+    setSelectedTournament(null)
+    setHourlyData([])
+    setHourlyError(null)
+  }
 
   const tournaments = useMemo(() => {
     const seen = new Set<string>()
@@ -95,7 +155,10 @@ export default function DashboardOverview({
     <div className="space-y-4">
 
       {/* Stat cards row */}
-      <StatCardsRow todaysStats={todaysStats} />
+      <StatCardsRow
+        todaysStats={todaysStats}
+        onTournamentClick={handleTournamentClick}
+      />
 
       {/* Error banner */}
       {fetchError && (
@@ -288,6 +351,17 @@ export default function DashboardOverview({
           </table>
         </div>
       </div>
+
+      {/* Weather forecast modal */}
+      {isModalOpen && (
+        <WeatherForecastModal
+          tourneyName={selectedTournament ?? ''}
+          hourlyData={hourlyData}
+          isLoading={hourlyLoading}
+          error={hourlyError}
+          onClose={handleModalClose}
+        />
+      )}
     </div>
   )
 }
