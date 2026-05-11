@@ -4,6 +4,8 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Dashboard Statistics** — Display and format metrics in a clean stat cards layout
+- **TypeScript Types** — Type-safe dashboard data structures
 - **Newsletter Management** — Admin endpoint for sending newsletters to subscribers
 - **Unsubscribe Landing Page** — Allow subscribers to unsubscribe from email communications
 - **Supabase Integration** — Auth and database powered by Supabase
@@ -109,81 +111,67 @@ Then open http://localhost:3000 in your browser.
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public key for client-side auth |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon / public key | Public key for client-side Supabase access |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Google OAuth sign-in |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave as `https://eu.i.posthog.com` | PostHog server endpoint |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave default | PostHog server URL |
 | `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email delivery API key |
 | `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
 | `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
-| `NEXT_PUBLIC_APP_URL` | Yes | Local: `http://localhost:3000` / Production: your domain | App base URL |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather after creating a bot | Bot API token |
-| `TELEGRAM_BOT_SECRET` | No | Set manually — used for webhook signature verification | HMAC secret for webhook security |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username from @BotFather | Bot username for client-side use |
+| `TELEGRAM_BOT_TOKEN` | No | Start a chat with @BotFather on Telegram | Bot API token |
+| `TELEGRAM_BOT_SECRET` | No | You define this yourself (any random string) | Webhook signature verification secret |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username from BotFather | Bot username (without @) |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that small pieces of code (like utility functions) work correctly without needing the full app running.
-
-Run all tests:
+Unit tests check that small pieces of code (like functions) work correctly — they catch bugs before they reach your users.
 
 ```bash
+# Run all tests
 npx jest
-```
 
-Run a specific test file:
+# Run a specific test file
+npx jest __tests__/auth-validators.test.ts
 
-```bash
-npx jest __tests__/utils.test.ts
-```
-
-Run tests in watch mode (re-runs automatically when files change):
-
-```bash
+# Run tests in watch mode (re-runs automatically when you save a file)
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke, with a summary of what failed and why
+**How to read the output:**
+- ✅ **PASS** — all tests in that file passed
+- ❌ **FAIL** — something broke; check the error message below for which test failed and why
 
 **Tests included:**
-- Auth validators and authentication logic
-- Dashboard utilities (formatting metrics, calculating stats)
-- General utility functions
+- `__tests__/auth-validators.test.ts` — authentication validation logic
+- `__tests__/auth.test.ts` — authentication flows
+- `__tests__/dashboard/formatMetric.test.ts` — metric formatting for dashboard
+- `__tests__/lib/dashboard/stats.test.ts` — dashboard statistics calculations
+- `__tests__/lib/utils.test.ts` — utility functions
+- `__tests__/utils.test.ts` — general utilities
 
 ## 📁 Project Structure
 
-- `src/app/api/admin/newsletter/send` — Admin API route for sending newsletters
-- `__tests__` — Jest unit tests for auth, dashboard utilities, and general utils
+Only folders with actual source files are listed below.
+
+- `src/lib/types/dashboard.ts` — TypeScript types for dashboard data
+- `src/lib/dashboard/stats.ts` — Dashboard statistics logic
+- `src/components/dashboard/StatCardsRow.tsx` — Dashboard stat cards UI component
+- `__tests__/` — Jest test files for auth, dashboard, and utilities
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the "Deploy with Vercel" button above (or go to [vercel.com/new](https://vercel.com/new))
+1. Click the button above or go to https://vercel.com/new
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (if using Google OAuth)
-   - `NEXT_PUBLIC_POSTHOG_KEY`
-   - `NEXT_PUBLIC_POSTHOG_HOST`
-   - `RESEND_API_KEY`
-   - `RESEND_FROM_EMAIL`
-   - `RESEND_AUDIENCE_ID`
-   - `NEXT_PUBLIC_APP_URL` (set to your production URL)
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
-5. Click **Deploy** — Vercel will automatically build and deploy your app
+3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
+   - Copy every variable from your `.env.local` file
+   - For `NEXT_PUBLIC_` variables: set Environment to "All" (client + server)
+   - For server-only variables like `SUPABASE_SERVICE_ROLE_KEY`: set to "Server"
+4. Click Deploy
 
-> ⚠️ **Important**: Make sure to set `NEXT_PUBLIC_APP_URL` to your actual production domain (e.g., `https://your-app.vercel.app`) before deploying, or email unsubscribe links will point to localhost.
+Your app will be live at a `.vercel.app` URL within seconds.
 
 ## 📝 License
 
