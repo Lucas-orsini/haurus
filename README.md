@@ -4,9 +4,10 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Overview** — Main dashboard view displaying key metrics
-- **Weather Forecast Modal** — Modal component for weather forecast data
-- **TypeScript Types** — Type-safe dashboard data structures
+- **Weather Forecast Modal** — Interactive modal for displaying weather forecast data with animations
+- **Dashboard Components** — Reusable UI components with Tailwind styling
+- **Real-time Analytics** — PostHog integration for tracking user behavior
+- **Email Notifications** — Resend integration for transactional emails
 
 ## 🛠️ Tech Stack
 
@@ -46,7 +47,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` ` (Windows/Linux) or `` Cmd+`` ` ` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` ` ` (Windows/Linux) or `` Cmd+`` ` ` `` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -97,65 +98,66 @@ Then open http://localhost:3000 in your browser.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog Dashboard → Project Settings | Analytics host URL (default: https://eu.i.posthog.com) |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email service API key |
-| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains → verify your domain | Sender email address |
-| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → Settings | Email audience/list ID |
-| `NEXT_PUBLIC_APP_URL` | Yes | Set manually | Your app's base URL |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather chat → /newbot | Telegram bot token for notifications |
-| `TELEGRAM_BOT_SECRET` | No | Set manually | Secret for HMAC-SHA256 webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather chat | Your bot's username |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog Dashboard → Project Settings | Analytics host URL |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys | API key for sending emails |
+| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains | Verified sender email domain |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot creation | Telegram bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | Your own generated secret | HMAC secret for webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram bot profile | Your bot's username |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → Credentials | Google OAuth client ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | Local: http://localhost:3000 / Production: your deployment URL | Base URL for email links |
 
 ## 🧪 Running Tests
 
-Tests automatically check that your code works correctly — think of them as a robot reviewer that clicks through your app and confirms everything behaves as expected.
+Tests automatically verify that core functionality works correctly — they run small checks on your code to make sure nothing broke when you made changes.
 
-Run all tests:
+**Run all tests:**
 
 ```bash
 npx jest
 ```
 
-Run a specific test file:
+**Run a specific test file:**
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-Watch mode (re-runs automatically when you save a file):
+**Run tests in watch mode (re-runs automatically when files change):**
 
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — Everything works correctly ✅
-- `FAIL` — Something broke. Read the error message below to see which test failed and why.
+**Reading test output:**
+- `PASS` means everything worked — all checks passed
+- `FAIL` means something broke — look at the error message below for details on what went wrong
 
-The test suite covers:
-- Auth validators and authentication logic
-- Dashboard metric formatting and display
-- Dashboard statistics calculations
-- Utility functions
+**Test coverage:**
+- Auth validators (email/password validation logic)
+- Auth flow (authentication functions)
+- Dashboard formatting (metric display formatting)
+- Dashboard stats (statistics calculations)
+- Utility functions (helper functions)
 
 ## 📁 Project Structure
 
-- `src/lib/types` — TypeScript type definitions for dashboard data
-- `src/components/dashboard` — Dashboard UI components (overview, weather forecast modal)
+- `src/components/dashboard` — Dashboard UI components including the Weather Forecast modal
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
-   - Copy every variable from your `.env.local` file
-   - Include both `NEXT_PUBLIC_*` (public) and regular (secret) variables
-4. Click **Deploy**
+**Step by step:**
 
-Your app will be live at `https://your-project.vercel.app` within seconds.
+1. Click the button above or go to https://vercel.com/new
+2. Import your GitHub repository
+3. In the Vercel dashboard, go to **Settings → Environment Variables**
+4. Add all variables from your `.env.local` file (copy each key-value pair)
+5. Click **Deploy**
+
+Make sure to add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `NEXT_PUBLIC_APP_URL` in Vercel's environment variables.
 
 ## 📝 License
 

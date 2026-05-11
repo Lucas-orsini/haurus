@@ -185,7 +185,7 @@ export default function WeatherForecastModal({
                             title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
                           >
                             {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
-                            <div className="relative w-full flex flex-col items-center justify-end h-[112px]">
+                            <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
                               {/* Y-axis labels */}
                               <span className="absolute -top-4 text-[9px] text-[var(--text-3)] tabular-nums">
                                 {idx === 0 || idx === hourlyData.length - 1
@@ -223,14 +223,14 @@ export default function WeatherForecastModal({
 
                             {/* X-axis hour label + day offset badge — fixed-height container so bar baseline stays stable */}
                             <div className="relative flex flex-col items-center justify-end h-[28px]">
-                              {isNextDay && (
-                                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none whitespace-nowrap">
-                                  +1j
-                                </span>
-                              )}
                               <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
                                 {formatHourChart(hour.hour)}
                               </span>
+                              {isNextDay && (
+                                <span className="mt-0.5 text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none whitespace-nowrap">
+                                  +1j
+                                </span>
+                              )}
                             </div>
                           </div>
                         )
@@ -291,20 +291,6 @@ export default function WeatherForecastModal({
                             </span>
                           </div>
 
-                          {/* Feels like */}
-                          {hour.feels_like !== undefined && hour.feels_like !== null && (
-                            <div className="flex items-center gap-1">
-                              <Thermometer
-                                size={10}
-                                strokeWidth={1.5}
-                                className="text-[var(--text-3)] shrink-0"
-                              />
-                              <span className="text-[10px] text-[var(--text-3)] tabular-nums">
-                                {`${Math.round(hour.feels_like)}°`}
-                              </span>
-                            </div>
-                          )}
-
                           {/* Wind speed */}
                           {hour.wind_speed !== undefined && hour.wind_speed !== null && (
                             <div className="flex items-center gap-1">
@@ -329,29 +315,6 @@ export default function WeatherForecastModal({
                               />
                               <span className="text-[11px] text-[var(--text-2)] tabular-nums">
                                 {`${hour.humidity}%`}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* POP */}
-                          <div className="flex items-center gap-1">
-                            <Droplets
-                              size={10}
-                              strokeWidth={1.5}
-                              className="text-[var(--accent-hi)] shrink-0"
-                            />
-                            <span className="text-[11px] text-[var(--text-2)] tabular-nums">
-                              {hour.pop !== null && hour.pop !== undefined
-                                ? `${hour.pop}%`
-                                : '—'}
-                            </span>
-                          </div>
-
-                          {/* Pressure */}
-                          {hour.pressure !== undefined && hour.pressure !== null && (
-                            <div className="flex items-center gap-1">
-                              <span className="text-[9px] text-[var(--text-3)] tabular-nums leading-none">
-                                {`${hour.pressure}`}
                               </span>
                             </div>
                           )}
