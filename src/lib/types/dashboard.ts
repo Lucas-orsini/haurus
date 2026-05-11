@@ -40,6 +40,12 @@ export type HourlyForecastEntry = {
   conditions_icon: string | null
   /** Human-readable weather condition label. */
   conditions: string | null
+  /**
+   * Day offset from the reference date.
+   * 0 = today, 1 = tomorrow.
+   * Used by WeatherForecastModal to show a "+1j" badge for hours after midnight.
+   */
+  dayOffset: 0 | 1
 }
 
 export type TodaysStats = {

@@ -7,17 +7,17 @@ import { motion } from 'framer-motion'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
-  onTournamentClick?: (tourneyName: string) => void
+  onWeatherClick?: (tourneyName: string) => void
 }
 
-export default function StatCardsRow({ todaysStats, onTournamentClick }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsRowProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
       <Card1 card1={todaysStats?.card1} />
 
       {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} onTournamentClick={onTournamentClick} />
+      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
 
       {/* Card 3 — Vitesse de surface */}
       <Card3 card3={todaysStats?.card3} />
@@ -76,7 +76,7 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2, onTournamentClick }: { card2?: Card2Entry[] | null; onTournamentClick?: (name: string) => void }) {
+function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -116,6 +116,14 @@ function Card2({ card2, onTournamentClick }: { card2?: Card2Entry[] | null; onTo
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
           Météo
         </p>
+        {/* Bouton explicite — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
+        <button
+          onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
+          title="Voir les prévisions horaires"
+          className="ml-auto w-6 h-6 flex items-center justify-center rounded-md text-[var(--text-3)] hover:text-[var(--accent-hi)] hover:bg-[var(--accent)]/10 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
+        >
+          <Cloud size={13} strokeWidth={1.5} />
+        </button>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -123,16 +131,10 @@ function Card2({ card2, onTournamentClick }: { card2?: Card2Entry[] | null; onTo
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
-              {/* Tournament name — clickable */}
-              <button
-                onClick={() => onTournamentClick?.(name)}
-                className="text-left cursor-pointer hover:bg-white/[0.04] rounded-md p-1 -m-1 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 w-full"
-                title={`Voir les prévisions horaires pour ${name}`}
-              >
-                <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
-                  {name}
-                </p>
-              </button>
+              {/* Tournament name — non cliquable */}
+              <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
+                {name}
+              </p>
 
               {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">

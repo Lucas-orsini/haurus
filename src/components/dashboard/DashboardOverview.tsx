@@ -37,7 +37,7 @@ export default function DashboardOverview({
   const [hourlyLoading, setHourlyLoading] = useState(false)
   const [hourlyError, setHourlyError] = useState<string | null>(null)
 
-  async function handleTournamentClick(tourneyName: string) {
+  async function handleWeatherClick(tourneyName: string) {
     setSelectedTournament(tourneyName)
     setHourlyError(null)
     setHourlyData([])
@@ -50,17 +50,37 @@ export default function DashboardOverview({
         throw new Error('Client Supabase non disponible')
       }
 
-      const today = new Date().toISOString().slice(0, 10)
+      // Compute Paris date + hour for rolling 24h window
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Paris',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hour12: false,
+      })
+      const parts = formatter.formatToParts(new Date())
+      const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
+      const today = `${get('year')}-${get('month')}-${get('day')}`
+      const currentHour = parseInt(get('hour'), 10)
 
+      // Compute tomorrow date
+      const tomorrowDate = new Date()
+      tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+      const tomorrow = tomorrowDate.toISOString().slice(0, 10)
+
+      // Fetch both today and tomorrow weather entries for this tournament
       const { data, error } = await supabase
         .from('tournament_weather')
-        .select('hour, rain_mm_h, temperature, pop, conditions_icon, conditions')
+        .select('hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date')
         .eq('tourney_name', tourneyName)
-        .eq('date', today)
+        .in('date', [today, tomorrow])
+        .order('date', { ascending: true })
         .order('hour', { ascending: true })
 
       if (error) throw error
 
+      // Build entries with dayOffset: 0 = today, 1 = tomorrow
       const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
         hour: row.hour as number,
         rain_mm_h: (row.rain_mm_h as number) ?? null,
@@ -68,9 +88,23 @@ export default function DashboardOverview({
         pop: (row.pop as number) ?? null,
         conditions_icon: (row.conditions_icon as string) ?? null,
         conditions: (row.conditions as string) ?? null,
+        dayOffset: (row.date as string) === today ? (0 as const) : (1 as const),
       }))
 
-      setHourlyData(entries)
+      // Build the rolling 24h window starting from current hour today
+      const now = new Date()
+      const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+      const windowEntries = entries.filter((e) => {
+        const entryDate = new Date(
+          e.dayOffset === 0
+            ? `${today}T${String(e.hour).padStart(2, '0')}:00:00`
+            : `${tomorrow}T${String(e.hour).padStart(2, '0')}:00:00`
+        )
+        return entryDate >= now && entryDate < cutoff
+      })
+
+      setHourlyData(windowEntries.slice(0, 24))
     } catch (err) {
       setHourlyError(
         err instanceof Error ? err.message : 'Échec du chargement des prévisions météo.'
@@ -157,7 +191,7 @@ export default function DashboardOverview({
       {/* Stat cards row */}
       <StatCardsRow
         todaysStats={todaysStats}
-        onTournamentClick={handleTournamentClick}
+        onWeatherClick={handleWeatherClick}
       />
 
       {/* Error banner */}
