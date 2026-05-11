@@ -5,7 +5,6 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **Dashboard Overview** — Main dashboard view displaying key metrics
-- **Stat Cards Row** — Clean stat cards layout for formatted metrics display
 - **Weather Forecast Modal** — Modal component for weather forecast data
 - **TypeScript Types** — Type-safe dashboard data structures
 
@@ -98,19 +97,19 @@ Then open http://localhost:3000 in your browser.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Already provided | PostHog API host URL |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email sending API key |
-| `RESEND_FROM_EMAIL` | Yes | Must match a verified domain in Resend Dashboard → Domains | Sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletters |
-| `NEXT_PUBLIC_APP_URL` | Yes | Already provided | Base URL of your app |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot creation | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | You define this webhook secret | HMAC-SHA256 verification secret |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | From Telegram BotFather | Your bot's username |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | Google OAuth client ID |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog Dashboard → Project Settings | Analytics host URL (default: https://eu.i.posthog.com) |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email service API key |
+| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains → verify your domain | Sender email address |
+| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → Settings | Email audience/list ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set manually | Your app's base URL |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather chat → /newbot | Telegram bot token for notifications |
+| `TELEGRAM_BOT_SECRET` | No | Set manually | Secret for HMAC-SHA256 webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather chat | Your bot's username |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → Credentials | Google OAuth client ID |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly. They compare actual results against expected results to catch bugs before deployment.
+Tests automatically check that your code works correctly — think of them as a robot reviewer that clicks through your app and confirms everything behaves as expected.
 
 Run all tests:
 
@@ -124,53 +123,39 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+Watch mode (re-runs automatically when you save a file):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading Jest output:**
-- `PASS` — All assertions passed, the code works as expected
-- `FAIL` — Something broke; look at the error message to see which test failed and why
+**Understanding the output:**
+- `PASS` — Everything works correctly ✅
+- `FAIL` — Something broke. Read the error message below to see which test failed and why.
 
-**What these tests cover:**
-- Authentication validators (`__tests__/auth-validators.test.ts`)
-- Authentication flow (`__tests__/auth.test.ts`)
-- Dashboard metric formatting (`__tests__/dashboard/formatMetric.test.ts`)
-- Dashboard statistics (`__tests__/lib/dashboard/stats.test.ts`)
-- Utility functions (`__tests__/utils.test.ts`, `__tests__/lib/utils.test.ts`)
+The test suite covers:
+- Auth validators and authentication logic
+- Dashboard metric formatting and display
+- Dashboard statistics calculations
+- Utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (StatCardsRow, WeatherForecastModal)
-- `src/lib/types` — TypeScript type definitions for dashboard data structures
+- `src/lib/types` — TypeScript type definitions for dashboard data
+- `src/components/dashboard` — Dashboard UI components (overview, weather forecast modal)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
 1. Click the deploy button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In Vercel Dashboard → Settings → Environment Variables, add all variables from your `.env.local` file:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `NEXT_PUBLIC_POSTHOG_KEY`
-   - `NEXT_PUBLIC_POSTHOG_HOST`
-   - `RESEND_API_KEY`
-   - `RESEND_FROM_EMAIL`
-   - `RESEND_AUDIENCE_ID`
-   - `NEXT_PUBLIC_APP_URL`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_BOT_SECRET`
-   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
-   - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
+   - Copy every variable from your `.env.local` file
+   - Include both `NEXT_PUBLIC_*` (public) and regular (secret) variables
 4. Click **Deploy**
 
-Your app will be live at `https://your-project.vercel.app`.
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 

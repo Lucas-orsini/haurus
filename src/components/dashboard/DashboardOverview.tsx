@@ -62,7 +62,6 @@ export default function DashboardOverview({
       const parts = formatter.formatToParts(new Date())
       const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
       const today = `${get('year')}-${get('month')}-${get('day')}`
-      const currentHour = parseInt(get('hour'), 10)
 
       // Compute tomorrow date
       const tomorrowDate = new Date()
@@ -72,7 +71,9 @@ export default function DashboardOverview({
       // Fetch both today and tomorrow weather entries for this tournament
       const { data, error } = await supabase
         .from('tournament_weather')
-        .select('hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date')
+        .select(
+          'hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date, wind_speed, humidity, pressure, feels_like'
+        )
         .eq('tourney_name', tourneyName)
         .in('date', [today, tomorrow])
         .order('date', { ascending: true })
@@ -89,6 +90,10 @@ export default function DashboardOverview({
         conditions_icon: (row.conditions_icon as string) ?? null,
         conditions: (row.conditions as string) ?? null,
         dayOffset: (row.date as string) === today ? (0 as const) : (1 as const),
+        wind_speed: (row.wind_speed as number) ?? null,
+        humidity: (row.humidity as number) ?? null,
+        pressure: (row.pressure as number) ?? null,
+        feels_like: (row.feels_like as number) ?? null,
       }))
 
       // Build the rolling 24h window starting from current hour today
