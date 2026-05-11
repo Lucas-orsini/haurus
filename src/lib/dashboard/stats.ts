@@ -4,11 +4,12 @@
  * These functions are idempotent and side-effect free — suitable for
  * unit testing and independent of any Supabase or React context.
  *
- * card3 now reads from the tournament_pace table instead of momentum_td.
+ * card3 reads from the tournament_pace table.
+ * card2 reads from the tournament_weather table.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { TodaysStats } from '@/lib/types/dashboard'
+import type { TodaysStats, WeatherCardData } from '@/lib/types/dashboard'
 
 /** Raw match row — includes the per-player _p1 / _p2 stats needed for card2. */
 export interface MatchRow {
@@ -29,17 +30,31 @@ interface PaceRow {
   pace_index: number
 }
 
+/** Raw row from tournament_weather — only the columns we need. */
+interface WeatherRow {
+  tourney_name: string | null
+  temperature: number | string | null
+  humidity: number | string | null
+  conditions: string | null
+  conditions_icon: string | null
+  wind_speed: number | string | null
+  pop: number | string | null
+  hour: number
+}
+
 /**
  * Builds the TodaysStats object from raw match_stats rows and tournament_pace rows.
  *
- * @param todaysMatches — match_stats rows where date_match = today
- * @param tournaments   — unique { name, surface } entries from todaysMatches
- * @param paceRows     — rows from tournament_pace (null = query failed)
+ * @param todaysMatches   — match_stats rows where date_match = today
+ * @param tournaments     — unique { name, surface } entries from todaysMatches
+ * @param paceRows       — rows from tournament_pace (null = query failed)
+ * @param weatherEntries — weather data per tournament (null = query failed, [] = no matches)
  */
 export function buildTodaysStats(
   todaysMatches: MatchRow[],
   tournaments: Array<{ name: string; surface: string }>,
-  paceRows: PaceRow[] | null
+  paceRows: PaceRow[] | null,
+  weatherEntries: Array<{ name: string; weather: WeatherCardData }> | null
 ): TodaysStats {
   // Card 1 — simple count + tournament list
   const card1 = {
@@ -47,46 +62,13 @@ export function buildTodaysStats(
     tournaments,
   }
 
-  // Card 2 — highest surface win rate across both players in all matches
-  const card2 = findSurfaceSpecialist(todaysMatches)
+  // Card 2 — weather per active tournament (array, or null if no tournaments)
+  const card2 = weatherEntries
 
   // Card 3 — surface speed from tournament_pace for each active tournament
   const card3 = buildCard3(tournaments, paceRows)
 
   return { card1, card2, card3 }
-}
-
-/**
- * Card 2: selects the match where one player has the highest win_rate_surf_td.
- * Returns null if no player has a non-null value in any match.
- */
-function findSurfaceSpecialist(
-  matches: MatchRow[]
-): TodaysStats['card2'] {
-  let best: { player1: string; player2: string; winRate: number; surface: string } | null = null
-
-  for (const match of matches) {
-    const { win_rate_surf_td_p1, win_rate_surf_td_p2, surface } = match
-
-    for (const [player1, winRate] of [
-      [match.player1, win_rate_surf_td_p1] as [string, number | null],
-      [match.player2, win_rate_surf_td_p2] as [string, number | null],
-    ]) {
-      if (winRate === null) continue
-      const player2 = player1 === match.player1 ? match.player2 : match.player1
-
-      if (best === null || winRate > best.winRate) {
-        best = {
-          player1,
-          player2,
-          winRate,
-          surface: surface ?? 'Unknown',
-        }
-      }
-    }
-  }
-
-  return best
 }
 
 /**
@@ -103,7 +85,7 @@ function findSurfaceSpecialist(
  *   "Monte-Carlo"      → "monte carlo"
  *   "Rome"             → "rome"
  */
-function normalizeTournamentName(name: string): string {
+export function normalizeTournamentName(name: string): string {
   return (
     name
       .trim()
@@ -175,8 +157,29 @@ export function extractTournaments(
   return result
 }
 
+/** Safely coerce numeric fields that come as string | null from the DB */
+function toNum(v: unknown): number {
+  return typeof v === 'number'
+    ? v
+    : v !== null && v !== ''
+      ? Number(v)
+      : 0
+}
+
+/** Maps a WeatherRow to WeatherCardData */
+function toWeatherCardData(row: WeatherRow): WeatherCardData {
+  return {
+    temperature: toNum(row.temperature),
+    humidity: toNum(row.humidity),
+    conditions: row.conditions ?? null,
+    conditions_icon: row.conditions_icon ?? null,
+    wind_speed: toNum(row.wind_speed),
+    pop: toNum(row.pop),
+  }
+}
+
 /**
- * Fetches today's match data and tournament pace metadata from Supabase,
+ * Fetches today's match data, tournament pace metadata, and weather from Supabase,
  * then computes TodaysStats.
  *
  * This is the async wrapper intended for use in Server Components.
@@ -188,15 +191,29 @@ export function extractTournaments(
 export async function computeTodaysStats(
   supabase: SupabaseClient
 ): Promise<TodaysStats | undefined> {
-  const today = new Date().toISOString().slice(0, 10)
+  // ── Compute Paris date + hour ──────────────────────────────────────────────
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hour12: false,
+  })
 
-  // Fetch today's matches — includes all _p1 / _p2 columns needed for card2
+  const parts = formatter.formatToParts(new Date())
+  const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
+
+  const parisDate = `${get('year')}-${get('month')}-${get('day')}`
+  const parisHour = parseInt(get('hour'), 10)
+
+  // Fetch today's matches
   const { data: todaysMatches, error: matchesError } = await supabase
     .from('match_stats')
     .select(
       'player1, player2, surface, tournoi, win_rate_surf_td_p1, win_rate_surf_td_p2, momentum_td_p1, momentum_td_p2'
     )
-    .eq('date_match', today)
+    .eq('date_match', parisDate)
 
   if (matchesError || !todaysMatches || todaysMatches.length === 0) {
     return undefined
@@ -204,7 +221,8 @@ export async function computeTodaysStats(
 
   const tournaments = extractTournaments(todaysMatches)
 
-  // Fetch tournament_pace rows — normalized matching is done in-memory (see buildCard3)
+  // ── Card 3: tournament_pace ──────────────────────────────────────────────
+
   const { data: paceData, error: paceError } = await supabase
     .from('tournament_pace')
     .select('tourney_name, surface, pace_index')
@@ -221,5 +239,80 @@ export async function computeTodaysStats(
   const paceRows: PaceRow[] | null =
     paceError || !paceData ? null : paceData
 
-  return buildTodaysStats(todaysMatches, tournaments, paceRows)
+  // ── Card 2: tournament_weather per tournament ────────────────────────────
+  // For each active tournament:
+  //   1. Exact query: date = parisDate, hour = parisHour, name normalized match
+  //   2. Fallback:    date = parisDate, hour <= parisHour, order hour DESC, limit 1
+  // Use normalizeTournamentName bidirectionally on both sides.
+
+  const weatherEntries: Array<{ name: string; weather: WeatherCardData }> = []
+
+  for (const tournament of tournaments) {
+    const normalizedName = normalizeTournamentName(tournament.name)
+
+    // Helper: check if a DB row's name matches our normalized name bidirectionally
+    const rowMatches = (rowTourneyName: string | null): boolean => {
+      if (!rowTourneyName) return false
+      const dbNorm = normalizeTournamentName(rowTourneyName)
+      return (
+        dbNorm.includes(normalizedName) ||
+        normalizedName.includes(dbNorm)
+      )
+    }
+
+    // Exact query: date + hour + matching name
+    const { data: exactRows } = await supabase
+      .from('tournament_weather')
+      .select(
+        'tourney_name, temperature, humidity, conditions, conditions_icon, wind_speed, pop, hour'
+      )
+      .eq('date', parisDate)
+      .eq('hour', parisHour)
+      .limit(1)
+
+    const exactMatch = (exactRows ?? []).find((r) => rowMatches(r.tourney_name))
+
+    if (exactMatch) {
+      weatherEntries.push({
+        name: tournament.name,
+        weather: toWeatherCardData(exactMatch as WeatherRow),
+      })
+      continue
+    }
+
+    // Fallback: closest hour <= parisHour for this date + matching name
+    const { data: fallbackRows } = await supabase
+      .from('tournament_weather')
+      .select(
+        'tourney_name, temperature, humidity, conditions, conditions_icon, wind_speed, pop, hour'
+      )
+      .eq('date', parisDate)
+      .lte('hour', parisHour)
+      .order('hour', { ascending: false })
+      .limit(10)
+
+    const fallbackMatch = (fallbackRows ?? []).find((r) => rowMatches(r.tourney_name))
+
+    if (fallbackMatch) {
+      weatherEntries.push({
+        name: tournament.name,
+        weather: toWeatherCardData(fallbackMatch as WeatherRow),
+      })
+    }
+    // If no match for this tournament: skip (weatherEntries stays shorter)
+  }
+
+  console.log('[computeTodaysStats] tournament_weather results:', {
+    parisDate,
+    parisHour,
+    tournamentCount: tournaments.length,
+    weatherEntryCount: weatherEntries.length,
+    entries: weatherEntries.map((e) => ({ name: e.name, temp: e.weather.temperature })),
+  })
+
+  // Pass null if no tournament has weather data (no entries found)
+  const weatherData: Array<{ name: string; weather: WeatherCardData }> | null =
+    weatherEntries.length === 0 ? null : weatherEntries
+
+  return buildTodaysStats(todaysMatches, tournaments, paceRows, weatherData)
 }
