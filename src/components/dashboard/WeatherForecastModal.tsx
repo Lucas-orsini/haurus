@@ -186,13 +186,6 @@ export default function WeatherForecastModal({
                           >
                             {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
                             <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
-                              {/* Y-axis labels */}
-                              <span className="absolute -top-4 text-[9px] text-[var(--text-3)] tabular-nums">
-                                {idx === 0 || idx === hourlyData.length - 1
-                                  ? `${maxRain.toFixed(2)}`
-                                  : ''}
-                              </span>
-
                               {rain > 0 ? (
                                 <div
                                   className="w-7 rounded-t-sm transition-all duration-300"
