@@ -221,10 +221,10 @@ export default function WeatherForecastModal({
                               )}
                             </div>
 
-                            {/* X-axis hour label + day offset badge */}
-                            <div className="flex flex-col items-center gap-0.5">
+                            {/* X-axis hour label + day offset badge — fixed-height container so bar baseline stays stable */}
+                            <div className="relative flex flex-col items-center justify-end h-[28px]">
                               {isNextDay && (
-                                <span className="text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none">
+                                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none whitespace-nowrap">
                                   +1j
                                 </span>
                               )}
