@@ -68,7 +68,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center border-t border-[var(--border-md)] pt-8 gap-4">
           <p className="text-xs text-[var(--text-3)]">
-            © 2024 Haurus. Tous droits réservés.
+            © 2026 Haurus. Tous droits réservés.
           </p>
 
           {/* Social links */}
