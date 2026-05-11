@@ -4,11 +4,12 @@
  * These functions are idempotent and side-effect free — suitable for
  * unit testing and independent of any Supabase or React context.
  *
- * card3 now reads from the tournament_pace table instead of momentum_td.
+ * card3 reads from the tournament_pace table.
+ * card2 reads from the tournament_weather table.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { TodaysStats } from '@/lib/types/dashboard'
+import type { TodaysStats, WeatherCardData } from '@/lib/types/dashboard'
 
 /** Raw match row — includes the per-player _p1 / _p2 stats needed for card2. */
 export interface MatchRow {
@@ -29,17 +30,30 @@ interface PaceRow {
   pace_index: number
 }
 
+/** Raw row from tournament_weather — only the columns we need. */
+interface WeatherRow {
+  tourney_name: string | null
+  temperature: number | string | null
+  humidity: number | string | null
+  conditions: string | null
+  conditions_icon: string | null
+  wind_speed: number | string | null
+  pop: number | string | null
+}
+
 /**
  * Builds the TodaysStats object from raw match_stats rows and tournament_pace rows.
  *
- * @param todaysMatches — match_stats rows where date_match = today
- * @param tournaments   — unique { name, surface } entries from todaysMatches
- * @param paceRows     — rows from tournament_pace (null = query failed)
+ * @param todaysMatches   — match_stats rows where date_match = today
+ * @param tournaments     — unique { name, surface } entries from todaysMatches
+ * @param paceRows       — rows from tournament_pace (null = query failed)
+ * @param weatherData     — weather data from tournament_weather (null = no match found)
  */
 export function buildTodaysStats(
   todaysMatches: MatchRow[],
   tournaments: Array<{ name: string; surface: string }>,
-  paceRows: PaceRow[] | null
+  paceRows: PaceRow[] | null,
+  weatherData: WeatherCardData | null
 ): TodaysStats {
   // Card 1 — simple count + tournament list
   const card1 = {
@@ -47,46 +61,13 @@ export function buildTodaysStats(
     tournaments,
   }
 
-  // Card 2 — highest surface win rate across both players in all matches
-  const card2 = findSurfaceSpecialist(todaysMatches)
+  // Card 2 — weather for the active tournament of the day
+  const card2 = weatherData
 
   // Card 3 — surface speed from tournament_pace for each active tournament
   const card3 = buildCard3(tournaments, paceRows)
 
   return { card1, card2, card3 }
-}
-
-/**
- * Card 2: selects the match where one player has the highest win_rate_surf_td.
- * Returns null if no player has a non-null value in any match.
- */
-function findSurfaceSpecialist(
-  matches: MatchRow[]
-): TodaysStats['card2'] {
-  let best: { player1: string; player2: string; winRate: number; surface: string } | null = null
-
-  for (const match of matches) {
-    const { win_rate_surf_td_p1, win_rate_surf_td_p2, surface } = match
-
-    for (const [player1, winRate] of [
-      [match.player1, win_rate_surf_td_p1] as [string, number | null],
-      [match.player2, win_rate_surf_td_p2] as [string, number | null],
-    ]) {
-      if (winRate === null) continue
-      const player2 = player1 === match.player1 ? match.player2 : match.player1
-
-      if (best === null || winRate > best.winRate) {
-        best = {
-          player1,
-          player2,
-          winRate,
-          surface: surface ?? 'Unknown',
-        }
-      }
-    }
-  }
-
-  return best
 }
 
 /**
@@ -103,7 +84,7 @@ function findSurfaceSpecialist(
  *   "Monte-Carlo"      → "monte carlo"
  *   "Rome"             → "rome"
  */
-function normalizeTournamentName(name: string): string {
+export function normalizeTournamentName(name: string): string {
   return (
     name
       .trim()
@@ -176,7 +157,7 @@ export function extractTournaments(
 }
 
 /**
- * Fetches today's match data and tournament pace metadata from Supabase,
+ * Fetches today's match data, tournament pace metadata, and weather from Supabase,
  * then computes TodaysStats.
  *
  * This is the async wrapper intended for use in Server Components.
@@ -204,6 +185,8 @@ export async function computeTodaysStats(
 
   const tournaments = extractTournaments(todaysMatches)
 
+  // ── Card 3: tournament_pace ──────────────────────────────────────────────
+
   // Fetch tournament_pace rows — normalized matching is done in-memory (see buildCard3)
   const { data: paceData, error: paceError } = await supabase
     .from('tournament_pace')
@@ -221,5 +204,63 @@ export async function computeTodaysStats(
   const paceRows: PaceRow[] | null =
     paceError || !paceData ? null : paceData
 
-  return buildTodaysStats(todaysMatches, tournaments, paceRows)
+  // ── Card 2: tournament_weather ────────────────────────────────────────────
+  // Determine the active tournament by matching the first entry in tournaments
+  // against tournament_weather.tourney_name using the same normalizeTournamentName
+  // logic as card3.
+
+  let weatherData: WeatherCardData | null = null
+
+  if (tournaments.length > 0) {
+    const firstTournament = tournaments[0]
+    const normalizedMatchName = normalizeTournamentName(firstTournament.name)
+
+    // Fetch all weather rows for today that match the normalized tournament name
+    const { data: weatherRows, error: weatherError } = await supabase
+      .from('tournament_weather')
+      .select(
+        'tourney_name, temperature, humidity, conditions, conditions_icon, wind_speed, pop'
+      )
+      .eq('date', today)
+
+    console.log('[computeTodaysStats] tournament_weather response:', {
+      rowCount: weatherRows?.length ?? null,
+      normalizedMatchName,
+      surface: firstTournament.surface,
+      weatherError,
+    })
+
+    if (!weatherError && weatherRows && weatherRows.length > 0) {
+      // Find the first row whose normalized tourney_name matches our normalized name
+      const matchedRow = weatherRows.find((row: WeatherRow) => {
+        const dbName = row.tourney_name ?? ''
+        return (
+          normalizeTournamentName(dbName).includes(normalizedMatchName) ||
+          normalizedMatchName.includes(normalizeTournamentName(dbName))
+        )
+      })
+
+      if (matchedRow) {
+        // Safely coerce numeric fields that come as string | null from the DB
+        const toNum = (v: unknown): number =>
+          typeof v === 'number'
+            ? v
+            : v !== null && v !== ''
+              ? Number(v)
+              : 0
+
+        weatherData = {
+          temperature: toNum(matchedRow.temperature),
+          humidity: toNum(matchedRow.humidity),
+          conditions: matchedRow.conditions ?? '',
+          conditions_icon: matchedRow.conditions_icon ?? null,
+          wind_speed: toNum(matchedRow.wind_speed),
+          pop: toNum(matchedRow.pop),
+        }
+      }
+    }
+    // If error or no match: weatherData stays null — StatCardsRow shows "—" gracefully
+  }
+
+  return buildTodaysStats(todaysMatches, tournaments, paceRows, weatherData)
 }

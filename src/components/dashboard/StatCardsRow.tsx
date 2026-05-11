@@ -2,7 +2,7 @@
 
 import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
-import { CalendarDays, TrendingUp } from 'lucide-react'
+import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 interface StatCardsRowProps {
@@ -15,7 +15,7 @@ export default function StatCardsRow({ todaysStats }: StatCardsRowProps) {
       {/* Card 1 — Matchs du jour */}
       <Card1 card1={todaysStats?.card1} />
 
-      {/* Card 2 — Spécialiste surface */}
+      {/* Card 2 — Météo */}
       <Card2 card2={todaysStats?.card2} />
 
       {/* Card 3 — Vitesse de surface */}
@@ -65,13 +65,14 @@ function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
 }
 
 function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
-  if (!card2) {
+  // State: idle — data not yet loaded (card2 is undefined)
+  if (card2 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Spécialiste surface
+            Météo
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
@@ -79,20 +80,92 @@ function Card2({ card2 }: { card2?: TodaysStats['card2'] }) {
     )
   }
 
+  // State: empty — no active tournament today (card2 is null)
+  if (card2 === null) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Météo
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">—</p>
+        <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
+      </div>
+    )
+  }
+
+  // State: success — render weather data in 2-column layout
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
-      <div className="flex items-center gap-2 mb-2">
-        <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+      <div className="flex items-center gap-2 mb-3">
+        <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Spécialiste surface
+          Météo
         </p>
       </div>
-      <p className="text-2xl font-medium text-[var(--text-1)] font-mono tabular-nums tracking-tight">
-        {Math.round((card2.winRate ?? 0) * 100)}%
+
+      {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
+      <div className="flex flex-col sm:flex-row gap-4 min-w-0">
+        {/* Left zone — conditions label + OpenWeatherMap icon */}
+        <div className="flex flex-col items-center justify-center gap-2 shrink-0 sm:w-28">
+          {card2.conditions_icon ? (
+            <img
+              src={`https://openweathermap.org/img/wn/${card2.conditions_icon}@2x.png`}
+              alt={card2.conditions ?? 'Conditions météo'}
+              className="w-12 h-12 object-contain"
+            />
+          ) : (
+            <span className="text-sm text-[var(--text-3)] text-center leading-tight">
+              {card2.conditions ?? '—'}
+            </span>
+          )}
+          <p className="text-[11px] text-[var(--text-3)] text-center leading-tight">
+            {card2.conditions ?? '—'}
+          </p>
+        </div>
+
+        {/* Right zone — 4 stacked metrics */}
+        <div className="flex flex-col gap-2 flex-1 min-w-0">
+          <WeatherMetric
+            label="Température"
+            value={card2.temperature !== null && card2.temperature !== undefined
+              ? `${card2.temperature}°C`
+              : '—'}
+          />
+          <WeatherMetric
+            label="Humidité"
+            value={card2.humidity !== null && card2.humidity !== undefined
+              ? `${card2.humidity}%`
+              : '—'}
+          />
+          <WeatherMetric
+            label="Vent"
+            value={card2.wind_speed !== null && card2.wind_speed !== undefined
+              ? `${card2.wind_speed} km/h`
+              : '—'}
+          />
+          <WeatherMetric
+            label="POP"
+            value={card2.pop !== null && card2.pop !== undefined
+              ? `${card2.pop}%`
+              : '—'}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WeatherMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between min-w-0">
+      <p className="text-[11px] text-[var(--text-3)] uppercase tracking-wider">
+        {label}
       </p>
-      <p className="text-xs text-[var(--text-3)] mt-0.5">{card2.surface}</p>
-      <p className="text-[11px] text-[var(--text-3)] mt-2">
-        {card2.player1} vs {card2.player2}
+      <p className="text-sm font-medium text-[var(--text-1)] tabular-nums shrink-0 ml-3">
+        {value}
       </p>
     </div>
   )
