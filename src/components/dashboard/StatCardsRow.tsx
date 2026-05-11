@@ -20,7 +20,7 @@ export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsR
       <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
 
       {/* Card 3 — Vitesse de surface */}
-      <Card3 card3={todaysStats?.card3} />
+      <Card3 card3={todaysStats?.card3 ?? null} />
     </div>
   )
 }
@@ -116,13 +116,13 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
           Météo
         </p>
-        {/* Bouton explicite — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
+        {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
           onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
           title="Voir les prévisions horaires"
-          className="ml-auto w-6 h-6 flex items-center justify-center rounded-md text-[var(--text-3)] hover:text-[var(--accent-hi)] hover:bg-[var(--accent)]/10 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
+          className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
-          <Cloud size={13} strokeWidth={1.5} />
+          Prévision
         </button>
       </div>
 
@@ -207,7 +207,7 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
 
 type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
-function Card3({ card3 }: { card3?: TodaysStats['card3'] }) {
+function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
   if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">

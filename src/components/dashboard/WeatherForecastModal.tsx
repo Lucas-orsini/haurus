@@ -45,7 +45,7 @@ export default function WeatherForecastModal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // ── Derived values for bar chart ────────────────────────────────────────
+  // ── Derived values for bar chart ───────────────────────────────────────
   const rainValues = hourlyData.map((h) => h.rain_mm_h ?? 0)
   const maxRain = Math.max(...rainValues, 0.1) // ≥ 0.1 so chart never empties
 
@@ -166,7 +166,7 @@ export default function WeatherForecastModal({
                     </p>
                     {hasRain && (
                       <span className="ml-auto text-[11px] text-[var(--text-3)] tabular-nums">
-                        max {maxRain.toFixed(1)} mm/h
+                        max {maxRain.toFixed(2)} mm/h
                       </span>
                     )}
                   </div>
@@ -182,14 +182,14 @@ export default function WeatherForecastModal({
                           <div
                             key={idx}
                             className="flex flex-col items-center gap-0.5 w-12 shrink-0"
-                            title={`${formatHour(hour.hour)}: ${rain} mm/h`}
+                            title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
                           >
-                            {/* Rain bar */}
-                            <div className="relative w-full flex flex-col items-center justify-end h-28">
+                            {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
+                            <div className="relative w-full flex flex-col items-center justify-end h-[112px]">
                               {/* Y-axis labels */}
                               <span className="absolute -top-4 text-[9px] text-[var(--text-3)] tabular-nums">
                                 {idx === 0 || idx === hourlyData.length - 1
-                                  ? `${maxRain.toFixed(1)}`
+                                  ? `${maxRain.toFixed(2)}`
                                   : ''}
                               </span>
 
@@ -211,7 +211,7 @@ export default function WeatherForecastModal({
                                   {heightPct > 25 && (
                                     <span className="absolute inset-x-0 top-1 flex justify-center">
                                       <span className="text-[9px] font-medium text-[var(--accent-hi)] tabular-nums leading-none">
-                                        {rain.toFixed(1)}
+                                        {rain.toFixed(2)}
                                       </span>
                                     </span>
                                   )}
@@ -244,7 +244,7 @@ export default function WeatherForecastModal({
                   <div className="flex items-center gap-2 mb-3">
                     <Thermometer size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
                     <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-                      Détail horaire
+                      Prévision 24h
                     </p>
                   </div>
 
@@ -291,6 +291,48 @@ export default function WeatherForecastModal({
                             </span>
                           </div>
 
+                          {/* Feels like */}
+                          {hour.feels_like !== undefined && hour.feels_like !== null && (
+                            <div className="flex items-center gap-1">
+                              <Thermometer
+                                size={10}
+                                strokeWidth={1.5}
+                                className="text-[var(--text-3)] shrink-0"
+                              />
+                              <span className="text-[10px] text-[var(--text-3)] tabular-nums">
+                                {`${Math.round(hour.feels_like)}°`}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Wind speed */}
+                          {hour.wind_speed !== undefined && hour.wind_speed !== null && (
+                            <div className="flex items-center gap-1">
+                              <Wind
+                                size={10}
+                                strokeWidth={1.5}
+                                className="text-[var(--text-3)] shrink-0"
+                              />
+                              <span className="text-[11px] text-[var(--text-2)] tabular-nums">
+                                {`${hour.wind_speed} km/h`}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Humidity */}
+                          {hour.humidity !== undefined && hour.humidity !== null && (
+                            <div className="flex items-center gap-1">
+                              <Droplets
+                                size={10}
+                                strokeWidth={1.5}
+                                className="text-[var(--accent-hi)] shrink-0"
+                              />
+                              <span className="text-[11px] text-[var(--text-2)] tabular-nums">
+                                {`${hour.humidity}%`}
+                              </span>
+                            </div>
+                          )}
+
                           {/* POP */}
                           <div className="flex items-center gap-1">
                             <Droplets
@@ -304,6 +346,15 @@ export default function WeatherForecastModal({
                                 : '—'}
                             </span>
                           </div>
+
+                          {/* Pressure */}
+                          {hour.pressure !== undefined && hour.pressure !== null && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[9px] text-[var(--text-3)] tabular-nums leading-none">
+                                {`${hour.pressure}`}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

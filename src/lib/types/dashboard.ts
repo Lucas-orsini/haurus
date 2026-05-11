@@ -46,6 +46,16 @@ export type HourlyForecastEntry = {
    * Used by WeatherForecastModal to show a "+1j" badge for hours after midnight.
    */
   dayOffset: 0 | 1
+  /** Date string for this forecast entry. */
+  date?: string | null
+  /** Feels-like temperature in Celsius. */
+  feels_like?: number | null
+  /** Wind speed in km/h. */
+  wind_speed?: number | null
+  /** Relative humidity in percent. */
+  humidity?: number | null
+  /** Atmospheric pressure in hPa. */
+  pressure?: number | null
 }
 
 export type TodaysStats = {
