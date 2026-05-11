@@ -13,9 +13,14 @@ interface WeatherForecastModalProps {
   onClose: () => void
 }
 
-/** Format hour integer (0-23) to HH:mm string. */
+/** Format hour integer (0-23) to HH:00 string. */
 function formatHour(hour: number): string {
   return `${String(hour).padStart(2, '0')}:00`
+}
+
+/** Format hour integer (0-23) to "15h" string for bar chart x-axis labels. */
+function formatHourChart(hour: number): string {
+  return `${hour}h`
 }
 
 /** OpenWeatherMap icon base URL. */
@@ -167,16 +172,16 @@ export default function WeatherForecastModal({
                   </div>
 
                   <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
-                    <div className="flex items-end gap-1 min-w-max">
+                    <div className="flex items-end gap-1 min-w-max pb-4">
                       {hourlyData.map((hour, idx) => {
                         const rain = hour.rain_mm_h ?? 0
                         const heightPct = Math.max((rain / maxRain) * 100, rain > 0 ? 4 : 0)
-                        const isZero = rain === 0
+                        const isNextDay = hour.dayOffset === 1
 
                         return (
                           <div
                             key={idx}
-                            className="flex flex-col items-center gap-1 w-8 shrink-0"
+                            className="flex flex-col items-center gap-0.5 w-12 shrink-0"
                             title={`${formatHour(hour.hour)}: ${rain} mm/h`}
                           >
                             {/* Rain bar */}
@@ -190,7 +195,7 @@ export default function WeatherForecastModal({
 
                               {rain > 0 ? (
                                 <div
-                                  className="w-6 rounded-t-sm transition-all duration-300"
+                                  className="w-7 rounded-t-sm transition-all duration-300"
                                   style={{
                                     height: `${heightPct}%`,
                                     background:
@@ -212,14 +217,21 @@ export default function WeatherForecastModal({
                                   )}
                                 </div>
                               ) : (
-                                <div className="w-6 h-[4px] rounded-sm bg-[var(--border-md)]" />
+                                <div className="w-7 h-[4px] rounded-sm bg-[var(--border-md)]" />
                               )}
                             </div>
 
-                            {/* X-axis hour label */}
-                            <span className="text-[9px] text-[var(--text-3)] tabular-nums font-mono leading-none">
-                              {formatHour(hour.hour).slice(0, 2)}
-                            </span>
+                            {/* X-axis hour label + day offset badge */}
+                            <div className="flex flex-col items-center gap-0.5">
+                              {isNextDay && (
+                                <span className="text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none">
+                                  +1j
+                                </span>
+                              )}
+                              <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
+                                {formatHourChart(hour.hour)}
+                              </span>
+                            </div>
                           </div>
                         )
                       })}
