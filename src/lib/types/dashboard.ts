@@ -4,6 +4,11 @@
  * Exported from src/lib/types/dashboard.ts so both the page (server) and
  * DashboardOverview (client) can reference the same contract.
  *
+ * card2 changed from WeatherCardData | null to
+ * Array<{ name: string; weather: WeatherCardData }> | null
+ * to support multi-tournament weather display.
+ */
+
 /**
  * Weather data for a tournament card displayed on the dashboard.
  */
@@ -27,8 +32,14 @@ export type TodaysStats = {
     count: number
     tournaments: Array<{ name: string; surface: string }>
   }
-  /** Weather for the active tournament. null = no active tournament today. */
-  card2: WeatherCardData | null
+  /**
+   * Weather data per active tournament.
+   *
+   * - null       → no active tournaments today, or query failed (show "—" gracefully)
+   * - []         → query succeeded but no tournament matched (show "—")
+   * - [...]      → one entry per tournament with name + weather fields
+   */
+  card2: Array<{ name: string; weather: WeatherCardData }> | null
   /**
    * Surface speed for each active tournament today.
    *
