@@ -98,57 +98,80 @@ Then open http://localhost:3000 in your browser.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | Google OAuth client ID for Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog Dashboard → Project Settings → Project API Key | PostHog API host URL |
-| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | API key for sending emails |
-| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Verified sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Audience ID for email campaigns |
-| `NEXT_PUBLIC_APP_URL` | Yes | — | Base URL of your app (for email links) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | — | HMAC-SHA256 secret for webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather | Telegram bot username |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Pre-filled | PostHog server URL |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Sender email (must be a verified domain) |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for contacts |
+| `NEXT_PUBLIC_APP_URL` | Yes | Pre-filled for dev | Base URL of your app |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Telegram Bot Settings | HMAC-SHA256 secret for webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather | Your bot's username for display purposes |
 
 ## 🧪 Running Tests
 
-Unit tests verify that specific parts of the code work correctly — like checking that a login function handles wrong passwords properly.
+Unit tests automatically check that specific parts of the code work correctly without needing the whole app running.
+
+### Run all tests
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
+### Run a specific test file
+
+```bash
 npx jest __tests__/auth.test.ts
+```
 
-# Watch mode — re-runs tests automatically when files change
+### Run tests in watch mode (re-runs on file changes)
+
+```bash
 npx jest --watch
 ```
 
-**Reading test output:**
-- `PASS` — all tests in that file passed ✅
-- `FAIL` — something broke, check the error message below for which test failed
+### Reading the output
 
-**Tests in this project:**
-- Authentication validators (`__tests__/auth-validators.test.ts`)
-- Authentication flows (`__tests__/auth.test.ts`)
-- Dashboard formatting (`__tests__/dashboard/formatMetric.test.ts`)
-- Dashboard statistics (`__tests__/lib/dashboard/stats.test.ts`)
-- Utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+- **PASS** ✅ — All assertions passed, the code works as expected
+- **FAIL** ❌ — Something broke. Check the error message above for which test failed and why
+
+### What the tests cover
+
+Based on the test files in this project:
+
+- `auth-validators` — Authentication input validation logic
+- `auth` — User authentication flows and callbacks
+- `dashboard/formatMetric` — Metric formatting utilities
+- `lib/dashboard/stats` — Dashboard statistics calculations
+- `lib/utils` — Shared utility functions
+- `utils` — General helper functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and API routes
-- `src/components` — React components including dashboard UI
-- `src/lib` — Utility functions and Supabase client setup
+- `__tests__` — Jest test files for components, utilities, and feature modules
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repository
-3. Add all environment variables from `.env.local` in Vercel → Settings → Environment Variables
-4. Click Deploy
+### Step by step
 
-> ⚠️ **Important**: Add ALL environment variables listed in the `.env.local` section above. Missing variables will cause the app to fail.
+1. **Connect your GitHub repo** — Click the button above, then select your repository from the list
+2. **Add environment variables** — In the Vercel dashboard, go to Settings → Environment Variables and add every variable from your `.env.local` file:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+   - `NEXT_PUBLIC_POSTHOG_KEY`
+   - `NEXT_PUBLIC_POSTHOG_HOST`
+   - `RESEND_API_KEY`
+   - `RESEND_FROM_EMAIL`
+   - `RESEND_AUDIENCE_ID`
+   - `NEXT_PUBLIC_APP_URL` (set to your production URL, e.g., `https://your-app.vercel.app`)
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_BOT_SECRET`
+   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
+3. **Deploy** — Vercel will automatically build and deploy your app
+4. **Update Supabase and Resend** — Add your production URL to their allowed domains/callback URLs
 
 ## 📝 License
 
