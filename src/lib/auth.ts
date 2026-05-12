@@ -227,14 +227,20 @@ export async function signup(
     console.error('[auth] Failed to create profile:', err)
   }
 
-  // Fire-and-forget newsletter subscription via server-side Route Handler.
-  // Never blocks the signup flow. Uses upsert on email to handle re-signups
-  // without duplicates. Errors are swallowed silently.
-  fetch('/api/newsletter/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: userEmail }),
-  }).catch(() => {})
+  // Fire-and-forget newsletter subscription — independent try/catch,
+  // never blocks the signup flow. Uses upsert on email to handle re-signups
+  // without duplicates (relies on newsletter_subscribers_email_unique uniqueness).
+  // Payload includes subscribed: true so the record is explicitly marked as active
+  // once the migration adding the column has been applied.
+  try {
+    await supabase.from('newsletter_subscribers').upsert(
+      { email: userEmail, subscribed: true },
+      { onConflict: 'email' }
+    )
+  } catch (err) {
+    // Log for diagnostics — do not propagate to avoid blocking the signup flow.
+    console.error('[newsletter upsert signup]', err)
+  }
 
   return {
     id: user.id,

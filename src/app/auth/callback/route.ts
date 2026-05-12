@@ -9,10 +9,10 @@ import { createClient } from '@/lib/supabase/server'
  *   2. This handler exchanges the code for a session cookie (via exchangeCodeForSession)
  *   3. Upserts a profiles row (role: 'user') so Google users have a profile row,
  *      matching the behaviour of the email/password signup() flow.
- *   4. Fire-and-forget POST to /api/newsletter/subscribe (never blocks the redirect).
+ *   4. Inserts the OAuth user email into newsletter_subscribers (fire-and-forget).
  *   5. Redirects to /dashboard on success, or /auth/auth-code-error on failure
  *
- * Steps 3 and 4 are non-blocking: if they fail (e.g. transient DB error),
+ * Steps 3 and 4 are non-blocking: if the upsert fails (e.g. transient DB error),
  * the redirect still proceeds — the OAuth flow must never be blocked.
  *
  * @see https://supabase.com/docs/guides/auth/server-side/nextjs
@@ -67,17 +67,22 @@ export async function GET(request: Request) {
     }
   }
 
-  // Fire-and-forget newsletter subscription via server-side Route Handler.
-  // Uses upsert on email to handle re-signups without duplicates.
-  // Payload includes subscribed: true for consistency with the email/password signup() flow.
-  // Errors are swallowed silently — the OAuth redirect must never be blocked.
+  // Fire-and-forget newsletter subscription — independent try/catch,
+  // never blocks the OAuth redirect. Uses upsert on email to handle re-signups
+  // without duplicates (relies on newsletter_subscribers_email_unique uniqueness).
+  // Payload includes subscribed: true for consistency with the email/password
+  // signup() flow, once the migration adding the column has been applied.
   const userEmail = user?.email
   if (userEmail) {
-    fetch('/api/newsletter/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: userEmail }),
-    }).catch(() => {})
+    try {
+      await supabase.from('newsletter_subscribers').upsert(
+        { email: userEmail, subscribed: true },
+        { onConflict: 'email' }
+      )
+    } catch (err) {
+      // Log for diagnostics — do not propagate to avoid blocking the OAuth redirect.
+      console.error('[newsletter upsert callback]', err)
+    }
   }
 
   // Success — redirect to the intended destination.
