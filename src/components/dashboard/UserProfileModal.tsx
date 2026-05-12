@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { X, Copy, Check, Eye, EyeOff } from 'lucide-react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -316,6 +317,16 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[var(--text-3)] whitespace-nowrap">
                         Non modifiable
                       </span>
+                    </div>
+
+                    {/* Lien désinscription newsletter — profil uniquement */}
+                    <div className="mt-0.5">
+                      <Link
+                        href="/unsubscribe"
+                        className="text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors duration-150"
+                      >
+                        Se désinscrire de la newsletter
+                      </Link>
                     </div>
                   </div>
 
