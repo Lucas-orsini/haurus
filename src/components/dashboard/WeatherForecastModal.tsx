@@ -173,24 +173,9 @@ export default function WeatherForecastModal({
                   </div>
 
                   {/*
-                   * Layout complet : [Y-axis left] + [scroll container: bars + Y-axis right]
-                   * Y-axis gauche : fixe, toujours visible
-                   * Y-axis droite : inside overflow-x-auto, reste alignée au scroll
+                   * Scroll container : bars + Y-axis right inside (stays aligned on scroll)
                    */}
                   <div className="flex items-end gap-2">
-                    {/* Y-axis gauche — fixe, hauteurs haut/milieu/bas alignées sur les barres */}
-                    <div className="flex flex-col justify-between h-[88px] w-8 shrink-0">
-                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
-                        {Math.round(maxRain)}
-                      </span>
-                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
-                        {midRain}
-                      </span>
-                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
-                        0
-                      </span>
-                    </div>
-
                     {/* Conteneur scrollable — Y-axis droite inside pour rester alignée au scroll */}
                     <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3 flex-1">
                       <div className="flex items-end gap-1 min-w-max">
