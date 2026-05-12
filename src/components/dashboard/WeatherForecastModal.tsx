@@ -48,6 +48,7 @@ export default function WeatherForecastModal({
   // ── Derived values for bar chart ───────────────────────────────────────
   const rainValues = hourlyData.map((h) => h.rain_mm_h ?? 0)
   const maxRain = Math.max(...rainValues, 0.1) // ≥ 0.1 so chart never empties
+  const midRain = Math.round(maxRain / 2)
 
   const hasRain = hourlyData.some((h) => (h.rain_mm_h ?? 0) > 0)
   const hourlyCount = hourlyData.length
@@ -76,7 +77,7 @@ export default function WeatherForecastModal({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-[var(--border-md)] bg-[var(--surface-1)] shadow-2xl overflow-hidden"
+          className="relative w-full max-w-3xl max-h-[85vh] flex flex-col rounded-xl border border-[var(--border-md)] bg-[var(--surface-1)] shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* ── Header ──────────────────────────────────────────────────── */}
@@ -171,63 +172,97 @@ export default function WeatherForecastModal({
                     )}
                   </div>
 
-                  <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
-                    <div className="flex items-end gap-1 min-w-max pb-4">
-                      {hourlyData.map((hour, idx) => {
-                        const rain = hour.rain_mm_h ?? 0
-                        const heightPct = Math.max((rain / maxRain) * 100, rain > 0 ? 4 : 0)
-                        const isNextDay = hour.dayOffset === 1
+                  {/*
+                   * Layout complet : [Y-axis left] + [scroll container: bars + Y-axis right]
+                   * Y-axis gauche : fixe, toujours visible
+                   * Y-axis droite : inside overflow-x-auto, reste alignée au scroll
+                   */}
+                  <div className="flex items-end gap-2">
+                    {/* Y-axis gauche — fixe, hauteurs haut/milieu/bas alignées sur les barres */}
+                    <div className="flex flex-col justify-between h-[88px] w-8 shrink-0">
+                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
+                        {Math.round(maxRain)}
+                      </span>
+                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
+                        {midRain}
+                      </span>
+                      <span className="text-[10px] text-[var(--text-3)] tabular-nums text-right leading-none">
+                        0
+                      </span>
+                    </div>
 
-                        return (
-                          <div
-                            key={idx}
-                            className="flex flex-col items-center gap-0.5 w-12 shrink-0"
-                            title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
-                          >
-                            {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
-                            <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
-                              {rain > 0 ? (
-                                <div
-                                  className="w-7 rounded-t-sm transition-all duration-300"
-                                  style={{
-                                    height: `${heightPct}%`,
-                                    background:
-                                      rain > maxRain * 0.7
-                                        ? 'var(--accent)'
-                                        : rain > maxRain * 0.3
-                                        ? 'var(--accent-muted)'
-                                        : 'rgba(242,203,56,0.35)',
-                                    minHeight: '4px',
-                                  }}
-                                >
-                                  {/* Label inside bar if tall enough */}
-                                  {heightPct > 25 && (
-                                    <span className="absolute inset-x-0 top-1 flex justify-center">
-                                      <span className="text-[9px] font-medium text-[var(--accent-hi)] tabular-nums leading-none">
-                                        {rain.toFixed(2)}
+                    {/* Conteneur scrollable — Y-axis droite inside pour rester alignée au scroll */}
+                    <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3 flex-1">
+                      <div className="flex items-end gap-1 min-w-max">
+                        {hourlyData.map((hour, idx) => {
+                          const rain = hour.rain_mm_h ?? 0
+                          const heightPct = Math.max((rain / maxRain) * 100, rain > 0 ? 4 : 0)
+                          const isNextDay = hour.dayOffset === 1
+
+                          return (
+                            <div
+                              key={idx}
+                              className="flex flex-col items-center gap-0.5 w-12 shrink-0"
+                              title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
+                            >
+                              {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
+                              <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
+                                {rain > 0 ? (
+                                  <div
+                                    className="w-7 rounded-t-sm transition-all duration-300"
+                                    style={{
+                                      height: `${heightPct}%`,
+                                      background:
+                                        rain > maxRain * 0.7
+                                          ? 'var(--accent)'
+                                          : rain > maxRain * 0.3
+                                          ? 'var(--accent-muted)'
+                                          : 'rgba(242,203,56,0.35)',
+                                      minHeight: '4px',
+                                    }}
+                                  >
+                                    {/* Label inside bar if tall enough */}
+                                    {heightPct > 25 && (
+                                      <span className="absolute inset-x-0 top-1 flex justify-center">
+                                        <span className="text-[9px] font-medium text-[var(--accent-hi)] tabular-nums leading-none">
+                                          {rain.toFixed(2)}
+                                        </span>
                                       </span>
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="w-7 h-[4px] rounded-sm bg-[var(--border-md)]" />
-                              )}
-                            </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="w-7 h-[4px] rounded-sm bg-[var(--border-md)]" />
+                                )}
+                              </div>
 
-                            {/* X-axis hour label + day offset badge — fixed-height container so bar baseline stays stable */}
-                            <div className="relative flex flex-col items-center justify-end h-[28px]">
-                              <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
-                                {formatHourChart(hour.hour)}
-                              </span>
-                              {isNextDay && (
-                                <span className="mt-0.5 text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none whitespace-nowrap">
-                                  +1j
+                              {/* X-axis hour label + day offset badge — flex-col justify-end forces baseline alignment */}
+                              <div className="flex flex-col items-center justify-end h-[28px]">
+                                <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
+                                  {formatHourChart(hour.hour)}
                                 </span>
-                              )}
+                                {isNextDay && (
+                                  <span className="mt-0.5 text-[8px] font-medium px-1 py-px rounded bg-[var(--yellow)]/10 text-[var(--yellow)] leading-none whitespace-nowrap">
+                                    +1j
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+
+                        {/* Y-axis droite — inside overflow-x-auto so it stays aligned on scroll */}
+                        <div className="flex flex-col justify-between h-[88px] w-8 shrink-0 pl-2">
+                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
+                            {Math.round(maxRain)}
+                          </span>
+                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
+                            {midRain}
+                          </span>
+                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
+                            0
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </section>
