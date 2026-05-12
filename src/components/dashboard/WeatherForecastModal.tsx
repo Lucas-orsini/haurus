@@ -235,18 +235,6 @@ export default function WeatherForecastModal({
                           )
                         })}
 
-                        {/* Y-axis droite — inside overflow-x-auto so it stays aligned on scroll */}
-                        <div className="flex flex-col justify-between h-[88px] w-8 shrink-0 pl-2">
-                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
-                            {Math.round(maxRain)}
-                          </span>
-                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
-                            {midRain}
-                          </span>
-                          <span className="text-[10px] text-[var(--text-3)] tabular-nums leading-none">
-                            0
-                          </span>
-                        </div>
                       </div>
                     </div>
                   </div>
