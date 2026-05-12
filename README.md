@@ -1,11 +1,10 @@
-# Haurus
+# my-app
 
 The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Statistics** — Display and format metrics in a clean stat cards layout
-- **TypeScript Types** — Type-safe dashboard data structures
+- **Weather Forecast Modal** — Interactive modal for displaying weather forecast data with smooth animations
 
 ## 🛠️ Tech Stack
 
@@ -43,22 +42,17 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and passwords. It lives on your computer only — never commit it to GitHub.
+Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+\`` (Windows/Linux) or `Cmd+\`` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+`` ` `` ` (Windows/Linux) or `` Cmd+`` ` `` ` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
 ```
 
-Open `.env.local` in your code editor and paste the following template:
+Open `.env.local` in your code editor and paste this template:
 
 ```bash
-# === Telegram Bot (optional) ===
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_BOT_SECRET=
-NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
-
 # === Supabase ===
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
@@ -76,6 +70,11 @@ RESEND_API_KEY=
 RESEND_FROM_EMAIL=hello@yourdomain.com
 RESEND_AUDIENCE_ID=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# === Telegram Bot (optional) ===
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_BOT_SECRET=
+NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
 ```
 
 ### 4. Run the development server
@@ -86,58 +85,60 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+\`` (or `Cmd+\`` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+`` ` `` ` (or `` Cmd+`` ` `` ` on Mac)
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard > Project Settings > API > Project URL | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard > Project Settings > API > anon/public key | Public API key for client-side operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard > Project Settings > API > service_role key | Server-side admin key (keep secret!) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot creation | Telegram bot authentication token |
-| `TELEGRAM_BOT_SECRET` | No | You define this yourself when setting up the webhook | Secret for verifying incoming Telegram requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username on Telegram | Public bot username |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console > APIs & Services > Credentials | For "Sign in with Google" feature |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard > Project Settings > Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog instance URL | Your PostHog server address |
-| `RESEND_API_KEY` | No | Resend Dashboard > API Keys | Email service API key |
-| `RESEND_FROM_EMAIL` | No | Resend Dashboard > Domains | Verified sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard > Audiences > Settings | Email audience identifier |
-| `NEXT_PUBLIC_APP_URL` | No | You define this | Base URL of your app for email links |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | Google OAuth client ID for Sign in with Google |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email service API key |
+| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Must be a verified domain in Resend |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for campaigns |
+| `NEXT_PUBLIC_APP_URL` | No | You define this | Base URL of your app (for email links) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather when creating your bot | Bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | You define this | Secret for HMAC-SHA256 webhook verification |
 
 ## 🧪 Running Tests
 
-Unit tests verify that individual pieces of code work correctly. They run automatically and check if your code does what it's supposed to do.
+Unit tests automatically check that specific parts of your code work correctly — like verifying that a calculation returns the right number, or that a form validation catches invalid input.
+
+Run all tests:
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
+Run a specific test file:
+
+```bash
 npx jest __tests__/auth-validators.test.ts
+```
 
-# Watch mode — re-runs tests when files change
+Run tests in watch mode (re-runs automatically when you save a file):
+
+```bash
 npx jest --watch
 ```
 
-**How to read Jest output:**
-- `PASS` — Everything works correctly
-- `FAIL` — Something broke. Jest will show which test failed and why
+**Reading Jest output**: `PASS` means all tests passed ✅. `FAIL` means something broke — Jest will show you exactly which test failed and why, with a diff of what was expected vs. what happened.
 
-**Tests included:**
-- `__tests__/auth-validators.test.ts` — Auth validation logic
-- `__tests__/auth.test.ts` — Authentication flows
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
-- `__tests__/lib/utils.test.ts` — Utility functions
-- `__tests__/utils.test.ts` — General utilities
+**What the tests cover**:
+
+- `auth-validators.test.ts` — validation logic for authentication inputs
+- `auth.test.ts` — authentication flow behavior
+- `dashboard/formatMetric.test.ts` — metric formatting logic
+- `lib/dashboard/stats.test.ts` — dashboard statistics calculations
+- `lib/utils.test.ts` — utility function tests
+- `utils.test.ts` — general utility tests
 
 ## 📁 Project Structure
 
-- `src/lib/types/dashboard.ts` — TypeScript type definitions for dashboard data
-- `src/lib/dashboard/stats.ts` — Dashboard statistics calculation and data processing
-- `src/components/dashboard/StatCardsRow.tsx` — React component for displaying stat cards
+- `src/components/dashboard` — Dashboard UI components including the Weather Forecast Modal
 
 ## 🚀 Deploy to Vercel
 
@@ -145,12 +146,12 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in Vercel Dashboard > Settings > Environment Variables:
-   - Copy each variable from your `.env.local` file
-   - Include both development and production values
-4. Click Deploy
+3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
+   - Copy every variable from your `.env.local` file
+   - Make sure to include `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, and any others you configured
+4. Click **Deploy**
 
-> ⚠️ **Important**: Don't forget to add `SUPABASE_SERVICE_ROLE_KEY` — this is a server-side secret that should never be exposed to the browser.
+> ⚠️ **Important**: All `NEXT_PUBLIC_*` variables must be added to Vercel for the app to work correctly. Without them, your app will show errors on load.
 
 ## 📝 License
 

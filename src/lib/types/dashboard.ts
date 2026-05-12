@@ -27,6 +27,37 @@ export type WeatherCardData = {
   conditions_icon: string | null
 }
 
+export type HourlyForecastEntry = {
+  /** Hour of day (0-23). */
+  hour: number
+  /** Precipitation amount in mm/h. */
+  rain_mm_h: number | null
+  /** Temperature in Celsius. */
+  temperature: number | null
+  /** Probability of precipitation (0-100). */
+  pop: number | null
+  /** OpenWeatherMap icon code (e.g. '10d'). */
+  conditions_icon: string | null
+  /** Human-readable weather condition label. */
+  conditions: string | null
+  /**
+   * Day offset from the reference date.
+   * 0 = today, 1 = tomorrow.
+   * Used by WeatherForecastModal to show a "+1j" badge for hours after midnight.
+   */
+  dayOffset: 0 | 1
+  /** Date string for this forecast entry. */
+  date?: string | null
+  /** Feels-like temperature in Celsius. */
+  feels_like?: number | null
+  /** Wind speed in km/h. */
+  wind_speed?: number | null
+  /** Relative humidity in percent. */
+  humidity?: number | null
+  /** Atmospheric pressure in hPa. */
+  pressure?: number | null
+}
+
 export type TodaysStats = {
   card1: {
     count: number
