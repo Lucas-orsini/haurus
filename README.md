@@ -98,46 +98,50 @@ Then open http://localhost:3000 in your browser.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | Google OAuth client ID for Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog Dashboard → Project Settings → Project API Key | PostHog API host URL |
-| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | API key for sending emails |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog self-hosted URL (defaults to EU cloud) | PostHog server endpoint |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email service API key |
 | `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Verified sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Audience ID for email campaigns |
-| `NEXT_PUBLIC_APP_URL` | Yes | — | Base URL of your app (for email links) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather | Telegram bot API token |
-| `TELEGRAM_BOT_SECRET` | No | — | HMAC-SHA256 secret for webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather | Telegram bot username |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience identifier |
+| `NEXT_PUBLIC_APP_URL` | Yes | Your deployed app URL or http://localhost:3000 | Base URL for email links |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string for webhook verification | HMAC-SHA256 webhook signature secret |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram bot username (without @) | Bot username for display purposes |
 
 ## 🧪 Running Tests
 
-Unit tests verify that specific parts of the code work correctly — like checking that a login function handles wrong passwords properly.
+Unit tests automatically verify that the authentication system and utility functions work correctly. No manual testing needed — just run the commands below.
 
+Run all tests:
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
+Run a specific test file:
+```bash
 npx jest __tests__/auth.test.ts
+```
 
-# Watch mode — re-runs tests automatically when files change
+Watch mode (re-runs automatically when files change):
+```bash
 npx jest --watch
 ```
 
-**Reading test output:**
-- `PASS` — all tests in that file passed ✅
-- `FAIL` — something broke, check the error message below for which test failed
+**Reading the output:**
+- `PASS` ✅ — All assertions passed, the code works as expected
+- `FAIL` ❌ — Something broke, check the error message below for which test failed and why
 
-**Tests in this project:**
-- Authentication validators (`__tests__/auth-validators.test.ts`)
-- Authentication flows (`__tests__/auth.test.ts`)
-- Dashboard formatting (`__tests__/dashboard/formatMetric.test.ts`)
-- Dashboard statistics (`__tests__/lib/dashboard/stats.test.ts`)
-- Utility functions (`__tests__/lib/utils.test.ts`, `__tests__/utils.test.ts`)
+**Tests included:**
+- `__tests__/auth-validators.test.ts` — Email and password validation logic
+- `__tests__/auth.test.ts` — Authentication flow and user session handling
+- `__tests__/dashboard/formatMetric.test.ts` — Number formatting for dashboard metrics
+- `__tests__/lib/dashboard/stats.test.ts` — Statistics calculation utilities
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Shared helper functions
 
 ## 📁 Project Structure
 
-- `src/app` — Next.js App Router pages and API routes
-- `src/components` — React components including dashboard UI
-- `src/lib` — Utility functions and Supabase client setup
+- `src/lib` — Authentication utilities and helpers
+- `src/app/auth/callback` — OAuth callback route handler
 
 ## 🚀 Deploy to Vercel
 
@@ -145,10 +149,10 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables from `.env.local` in Vercel → Settings → Environment Variables
-4. Click Deploy
+3. Add all environment variables from `.env.example` in Vercel → Settings → Environment Variables
+4. Click **Deploy**
 
-> ⚠️ **Important**: Add ALL environment variables listed in the `.env.local` section above. Missing variables will cause the app to fail.
+> ⚠️ **Important**: Make sure to add ALL environment variables in Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` — without it, server-side features will fail.
 
 ## 📝 License
 

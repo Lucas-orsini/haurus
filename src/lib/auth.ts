@@ -230,13 +230,15 @@ export async function signup(
   // Fire-and-forget newsletter subscription — independent try/catch,
   // never blocks the signup flow. Uses upsert on email to handle re-signups
   // without duplicates (relies on idx_newsletter_subscribers_email uniqueness).
+  // Payload: { email } only — newsletter_subscribers only has id, email, created_at.
   try {
     await supabase.from('newsletter_subscribers').upsert(
       { email: userEmail },
       { onConflict: 'email' }
     )
-  } catch {
-    // Silent — do not propagate, do not log.
+  } catch (err) {
+    // Log for diagnostics — do not propagate to avoid blocking the signup flow.
+    console.error('[newsletter upsert signup]', err)
   }
 
   return {

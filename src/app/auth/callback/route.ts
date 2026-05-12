@@ -70,6 +70,7 @@ export async function GET(request: Request) {
   // Fire-and-forget newsletter subscription — independent try/catch,
   // never blocks the OAuth redirect. Uses upsert on email to handle re-signups
   // without duplicates (relies on idx_newsletter_subscribers_email uniqueness).
+  // Payload: { email } only — newsletter_subscribers only has id, email, created_at.
   const userEmail = user?.email
   if (userEmail) {
     try {
@@ -77,8 +78,9 @@ export async function GET(request: Request) {
         { email: userEmail },
         { onConflict: 'email' }
       )
-    } catch {
-      // Silent — do not propagate, do not log.
+    } catch (err) {
+      // Log for diagnostics — do not propagate to avoid blocking the OAuth redirect.
+      console.error('[newsletter upsert callback]', err)
     }
   }
 
