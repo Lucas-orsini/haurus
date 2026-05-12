@@ -125,8 +125,7 @@ export async function getSession(): Promise<AuthUser | null> {
 
   // telegram_chat_id is bigint in DB — convert to string for the frontend
   const rawChatId = profile?.telegram_chat_id
-  const telegramChatId: string | null =
-    rawChatId != null ? String(rawChatId) : null
+  const telegramChatId = rawChatId != null ? String(rawChatId) : null
 
   return {
     id: user.id,
@@ -207,6 +206,7 @@ export async function signup(
   }
 
   const user = data.user
+  const userEmail = user.email ?? email.trim().toLowerCase()
 
   // Idempotent upsert — supports re-signup by updating existing row on conflict.
   // Uses the anon client; RLS policy profiles_insert_own allows INSERT when auth.uid() = id.
@@ -227,10 +227,25 @@ export async function signup(
     console.error('[auth] Failed to create profile:', err)
   }
 
+  // Fire-and-forget newsletter subscription — independent try/catch,
+  // never blocks the signup flow. Uses upsert on email to handle re-signups
+  // without duplicates (relies on newsletter_subscribers_email_unique uniqueness).
+  // Payload includes subscribed: true so the record is explicitly marked as active
+  // once the migration adding the column has been applied.
+  try {
+    await supabase.from('newsletter_subscribers').upsert(
+      { email: userEmail, subscribed: true },
+      { onConflict: 'email' }
+    )
+  } catch (err) {
+    // Log for diagnostics — do not propagate to avoid blocking the signup flow.
+    console.error('[newsletter upsert signup]', err)
+  }
+
   return {
     id: user.id,
     name: user.user_metadata?.name as string | null ?? null,
-    email: user.email ?? '',
+    email: userEmail,
     telegramToken: null,
     telegramChatId: null,
     telegramActive: false,
