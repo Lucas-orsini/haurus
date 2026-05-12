@@ -69,13 +69,14 @@ export async function GET(request: Request) {
 
   // Fire-and-forget newsletter subscription — independent try/catch,
   // never blocks the OAuth redirect. Uses upsert on email to handle re-signups
-  // without duplicates (relies on idx_newsletter_subscribers_email uniqueness).
-  // Payload: { email } only — newsletter_subscribers only has id, email, created_at.
+  // without duplicates (relies on newsletter_subscribers_email_unique uniqueness).
+  // Payload includes subscribed: true for consistency with the email/password
+  // signup() flow, once the migration adding the column has been applied.
   const userEmail = user?.email
   if (userEmail) {
     try {
       await supabase.from('newsletter_subscribers').upsert(
-        { email: userEmail },
+        { email: userEmail, subscribed: true },
         { onConflict: 'email' }
       )
     } catch (err) {
