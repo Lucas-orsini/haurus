@@ -153,7 +153,11 @@ export async function POST(request: Request): Promise<Response> {
     )
   }
 
-  // ── 4. Récupérer les abonnés via service_role (bypass RLS) ───────────────
+  // ── 4. Récupérer les abonnés actifs via service_role (bypass RLS) ──────────
+  // Filter on subscribed = true to exclude:
+  //   - users who manually unsubscribed (row deleted by unsubscribe route)
+  //   - legacy rows with subscribed = NULL (before migration was applied)
+  // NULL does not match eq(true) in PostgreSQL, so legacy rows are safely excluded.
   const admin = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -163,6 +167,7 @@ export async function POST(request: Request): Promise<Response> {
   const { data: subscribers, error: subscribersError } = await admin
     .from('newsletter_subscribers')
     .select('email')
+    .eq('subscribed', true)
 
   if (subscribersError) {
     console.error('[newsletter] failed to fetch subscribers:', subscribersError)

@@ -14,6 +14,10 @@ const UnsubscribeBody = z.object({
  * Route PUBLIQUE — aucun token ni session requis.
  * Accessible depuis le lien "Se désabonner" dans chaque email newsletter.
  *
+ * Uses DELETE (not UPDATE) to fully remove the subscriber row, aligning with
+ * the pattern already proven in src/app/unsubscribe/actions.ts.
+ * DELETE is idempotent: deleting a non-existent row is a no-op.
+ *
  * 200 : désabonnement confirmé
  * 400 : validation échouée (email manquant ou invalide)
  * 404 : abonné non trouvé
@@ -49,36 +53,17 @@ export async function POST(request: Request): Promise<Response> {
     { auth: { persistSession: false } }
   )
 
-  // ── 3. Vérifier que l'abonné existe ────────────────────────────────────
-  const { data: subscriber, error: findError } = await supabase
+  // ── 3. Supprimer le subscriber par email ───────────────────────────────
+  // DELETE est idempotent : si la ligne n'existe pas, c'est un no-op qui
+  // retourne 0 rows affected — on ne retourne pas 404 dans ce cas (le
+  // résultat est le même : l'email n'est plus abonné).
+  const { error: deleteError } = await supabase
     .from('newsletter_subscribers')
-    .select('id, subscribed')
+    .delete()
     .eq('email', email.toLowerCase().trim())
-    .maybeSingle()
 
-  if (findError) {
-    console.error('[unsubscribe] failed to find subscriber:', findError)
-    return NextResponse.json(
-      { error: 'Erreur serveur interne' },
-      { status: 500 }
-    )
-  }
-
-  if (!subscriber) {
-    return NextResponse.json(
-      { error: 'Abonné non trouvé' },
-      { status: 404 }
-    )
-  }
-
-  // ── 4. Mettre à jour le statut subscribed ──────────────────────────────
-  const { error: updateError } = await supabase
-    .from('newsletter_subscribers')
-    .update({ subscribed: false })
-    .eq('id', subscriber.id)
-
-  if (updateError) {
-    console.error('[unsubscribe] failed to update subscriber:', updateError)
+  if (deleteError) {
+    console.error('[unsubscribe] failed to delete subscriber:', deleteError)
     return NextResponse.json(
       { error: 'Erreur serveur interne' },
       { status: 500 }

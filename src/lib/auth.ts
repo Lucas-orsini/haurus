@@ -229,11 +229,12 @@ export async function signup(
 
   // Fire-and-forget newsletter subscription — independent try/catch,
   // never blocks the signup flow. Uses upsert on email to handle re-signups
-  // without duplicates (relies on idx_newsletter_subscribers_email uniqueness).
-  // Payload: { email } only — newsletter_subscribers only has id, email, created_at.
+  // without duplicates (relies on newsletter_subscribers_email_unique uniqueness).
+  // Payload includes subscribed: true so the record is explicitly marked as active
+  // once the migration adding the column has been applied.
   try {
     await supabase.from('newsletter_subscribers').upsert(
-      { email: userEmail },
+      { email: userEmail, subscribed: true },
       { onConflict: 'email' }
     )
   } catch (err) {
