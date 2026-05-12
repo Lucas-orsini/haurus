@@ -4,10 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Weather Forecast Modal** — Interactive modal for displaying weather forecast data with animations
-- **Dashboard Components** — Reusable UI components with Tailwind styling
-- **Real-time Analytics** — PostHog integration for tracking user behavior
-- **Email Notifications** — Resend integration for transactional emails
+- **Weather Forecast Modal** — Interactive modal for displaying weather forecast data with smooth animations
 
 ## 🛠️ Tech Stack
 
@@ -98,66 +95,79 @@ Then open http://localhost:3000 in your browser.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog Dashboard → Project Settings | Analytics host URL |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys | API key for sending emails |
-| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains | Verified sender email domain |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot creation | Telegram bot authentication token |
-| `TELEGRAM_BOT_SECRET` | No | Your own generated secret | HMAC secret for webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram bot profile | Your bot's username |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → Credentials | Google OAuth client ID |
-| `NEXT_PUBLIC_APP_URL` | Yes | Local: http://localhost:3000 / Production: your deployment URL | Base URL for email links |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Provided in your PostHog project settings | PostHog instance URL |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | API key for sending emails |
+| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains → verify your domain | Sender email address |
+| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → Settings | Email audience ID for contacts |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set manually (use `http://localhost:3000` for local dev) | Base URL of your application |
+| `TELEGRAM_BOT_TOKEN` | Optional | Telegram BotFather → /newbot | Bot API token for Telegram integration |
+| `TELEGRAM_BOT_SECRET` | Optional | Set manually — random secret for webhook HMAC verification | HMAC secret for Telegram webhooks |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Optional | Your Telegram bot's username (ends with bot) | Public bot username |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | Google Cloud Console → APIs & Services → Credentials | OAuth client ID for Google Sign-In |
 
 ## 🧪 Running Tests
 
-Tests automatically verify that core functionality works correctly — they run small checks on your code to make sure nothing broke when you made changes.
+Unit tests automatically check that individual pieces of your app work correctly. If all tests pass, your code is working as expected.
 
-**Run all tests:**
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-**Run a specific test file:**
+Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-**Run tests in watch mode (re-runs automatically when files change):**
+Watch mode — re-runs tests automatically when you save a file:
 
 ```bash
 npx jest --watch
 ```
 
-**Reading test output:**
-- `PASS` means everything worked — all checks passed
-- `FAIL` means something broke — look at the error message below for details on what went wrong
+**Understanding the output:**
+- `PASS` — All tests in that file passed ✅
+- `FAIL` — Something broke, you'll see which test failed and why ❌
 
-**Test coverage:**
-- Auth validators (email/password validation logic)
-- Auth flow (authentication functions)
-- Dashboard formatting (metric display formatting)
-- Dashboard stats (statistics calculations)
-- Utility functions (helper functions)
+**What the tests cover:**
+- `auth-validators.test.ts` — Authentication validation logic
+- `auth.test.ts` — Authentication flows and behavior
+- `dashboard/formatMetric.test.ts` — Metric formatting in dashboard components
+- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `lib/utils.test.ts` — Utility functions
+- `utils.test.ts` — General utility functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including the Weather Forecast modal
+- `src/components/dashboard/` — Dashboard UI components including WeatherForecastModal
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the button above or go to https://vercel.com/new
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings → Environment Variables**
-4. Add all variables from your `.env.local` file (copy each key-value pair)
-5. Click **Deploy**
+3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
 
-Make sure to add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `NEXT_PUBLIC_APP_URL` in Vercel's environment variables.
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_POSTHOG_KEY`
+   - `NEXT_PUBLIC_POSTHOG_HOST`
+   - `RESEND_API_KEY`
+   - `RESEND_FROM_EMAIL`
+   - `RESEND_AUDIENCE_ID`
+   - `NEXT_PUBLIC_APP_URL`
+   - `TELEGRAM_BOT_TOKEN` (if using Telegram)
+   - `TELEGRAM_BOT_SECRET` (if using Telegram)
+   - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` (if using Telegram)
+   - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (if using Google OAuth)
+
+4. Click **Deploy**
+
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 
