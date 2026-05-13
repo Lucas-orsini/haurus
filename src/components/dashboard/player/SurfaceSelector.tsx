@@ -1,6 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 interface SurfaceSelectorProps {
   selectedSurface: 'Hard' | 'Clay' | 'Grass'
@@ -9,13 +11,10 @@ interface SurfaceSelectorProps {
 
 const SURFACES = ['Hard', 'Clay', 'Grass'] as const
 
-const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
-  Hard: 'Dur',
-  Clay: 'Terre battue',
-  Grass: 'Gazon',
-}
-
 export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: SurfaceSelectorProps) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   return (
     <div className="w-full md:w-auto flex items-center gap-1">
       {SURFACES.map((surface) => {
@@ -32,7 +31,7 @@ export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: Su
                 : 'border border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
             )}
           >
-            {LABEL_MAP[surface]}
+            {t.dashboard.player.surfaces[surface.toLowerCase() as 'hard' | 'clay' | 'grass']}
           </button>
         )
       })}

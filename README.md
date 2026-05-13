@@ -4,8 +4,12 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Overview** — Centralized dashboard view with header and shell components for structured layout
-- **Internationalization (i18n)** — Multi-language support with locale switching via LanguageSwitcher component and LocaleProvider
+- **Dashboard Overview** — Centralized dashboard with structured shell layout, stat cards, and overview components
+- **Player Tracking** — Search, track, and analyze player performance with detailed profiles, match history, and statistics charts
+- **Surface Selection** — Filter player metrics by playing surface (hard court, clay, grass)
+- **Metrics Education** — Learn about key metrics and their impact on player analysis
+- **Newsletter Management** — Admin interface for sending email newsletters via Resend
+- **Internationalization (i18n)** — Multi-language support with locale switching and provider context
 
 ## 🛠️ Tech Stack
 
@@ -45,7 +49,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` `` (Windows/Linux) or `Cmd+`` ` `` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -59,7 +63,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# === Google OAuth (optional) ===
+# === Google OAuth (optional — for Sign in with Google) ===
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 
 # === PostHog Analytics ===
@@ -86,7 +90,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` `` (or `Cmd+`` ` `` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -97,60 +101,50 @@ Then open http://localhost:3000 in your browser.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key — never expose to browsers |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave default | PostHog host URL |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog → Project Settings | Analytics host URL (default: https://eu.i.posthog.com) |
 | `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email sending API key |
-| `RESEND_FROM_EMAIL` | No | Must match a verified domain in Resend Dashboard → Domains | Sender email address |
+| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Verified sender email address |
 | `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
-| `NEXT_PUBLIC_APP_URL` | No | Your deployment URL or localhost:3000 for dev | Base URL for email links |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Bot API token |
-| `TELEGRAM_BOT_SECRET` | No | HMAC-SHA256 secret for webhook verification | Bot webhook secret |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username | Public bot username |
+| `NEXT_PUBLIC_APP_URL` | Yes | You decide | Your app's base URL |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather | Bot API token |
+| `TELEGRAM_BOT_SECRET` | No | You decide | HMAC-SHA256 secret for webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram @BotFather | Your bot's username |
 
 ## 🧪 Running Tests
 
-Tests automatically check that parts of the app work correctly. When all tests pass, your code is functioning as expected.
+Unit tests check that small pieces of code (like functions or components) work correctly on their own — no database or internet needed.
 
-### Run all tests
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-### Run a specific test file
+Run a specific test file:
 
 ```bash
 npx jest __tests__/auth.test.ts
-npx jest __tests__/utils.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+Watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-### Understanding test output
+**Reading the output**: `PASS` means all tests passed ✅. `FAIL` means something broke ❌ — check the error message below to see which test failed and why.
 
-- **PASS** ✅ — All assertions in the test passed
-- **FAIL** ❌ — Something broke; check the error message below for which test failed and why
-
-### What the tests cover
-
-| Test File | What it tests |
-|-----------|---------------|
-| `__tests__/auth.test.ts` | Authentication flow and validation |
-| `__tests__/auth-validators.test.ts` | Auth input validation rules |
-| `__tests__/utils.test.ts` | General utility functions |
-| `__tests__/lib/utils.test.ts` | Library utility functions |
-| `__tests__/lib/dashboard/stats.test.ts` | Dashboard statistics calculations |
-| `__tests__/dashboard/formatMetric.test.ts` | Metric formatting in dashboard |
+These tests cover: authentication validators, auth utilities, dashboard metrics formatting, stats calculations, utility functions, and general app utilities.
 
 ## 📁 Project Structure
 
-- `src/lib` — Core utilities including i18n configuration
-- `src/components/dashboard` — Dashboard-specific components (Header, Overview, Shell)
-- `src/components/layout` — Shared layout components (LanguageSwitcher)
+- `src/app` — Next.js App Router pages and layouts
+- `src/components/dashboard` — Dashboard-specific components (player, metrics, admin, UI)
+- `src/components/layout` — Layout components (LanguageSwitcher)
+- `src/components/ui` — Reusable UI components (ConfirmDialog)
+- `src/lib` — Utility functions and i18n configuration
 - `src/providers` — React context providers (LocaleProvider)
+- `__tests__` — Jest unit tests
 
 ## 🚀 Deploy to Vercel
 
@@ -158,12 +152,10 @@ npx jest --watch
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables from `.env.local`:
-   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-   - Copy each variable name and value from your `.env.local` file
+3. Add all environment variables from your `.env.local` in **Vercel > Settings > Environment Variables**
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to add ALL environment variables listed in the `.env.local` template above, especially `SUPABASE_SERVICE_ROLE_KEY` (keep it as a server-side variable only).
+> ⚠️ **Important**: Make sure to add ALL environment variables from the `.env.local` file to Vercel, otherwise the app will crash on startup.
 
 ## 📝 License
 
