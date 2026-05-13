@@ -6,7 +6,6 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { cn } from '@/lib/utils'
-import { useLocale } from '@/providers/LocaleProvider'
 import type { Database } from '@/lib/supabase/database.types'
 import type { StatsHistoryPoint } from '@/lib/types/player'
 
@@ -72,7 +71,11 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
   const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
 
   if (validData.length < 3) {
-    return null
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+      </div>
+    )
   }
 
   return (
@@ -126,13 +129,14 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
 }
 
 export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps) {
-  const { t } = useLocale()
   const [selectedMetric, setSelectedMetric] = useState(METRICS[0].key)
 
   const parsedData = useMemo(
     () => parseStatsHistory(statsHistory, selectedMetric),
     [statsHistory, selectedMetric]
   )
+
+  const activeLabel = formatMetricLabel(selectedMetric)
 
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
@@ -142,7 +146,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
           htmlFor="metric-select"
           className="text-xs font-medium text-[var(--text-2)] shrink-0"
         >
-          {t('player.chart.metric')}
+          Métrique
         </label>
 
         <div className="relative flex-1 max-w-full md:max-w-[220px]">
@@ -192,7 +196,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
       <div className="h-[250px] md:h-[200px]">
         {parsedData.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-sm text-[var(--text-3)]">{t('player.chart.insufficientHistory')}</p>
+            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
           </div>
         ) : (
           <>

@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import { useLocale } from '@/providers/LocaleProvider'
 import type { AuthUser } from '@/lib/auth'
 import { validateName } from '@/lib/auth'
 import { updateProfile, signOut } from '@/lib/auth'
@@ -53,7 +52,6 @@ function getDisplayToken(token: string | null | undefined, revealed: boolean): s
 
 export default function UserProfileModal({ user, onClose, onUpdateSuccess }: UserProfileModalProps) {
   const router = useRouter()
-  const { t } = useLocale()
   const [name, setName] = useState(user.name ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '')
   const [saveState, setSaveState] = useState<SaveState>('idle')
@@ -76,6 +74,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
   }, [activeSection])
 
   // ── Logique d'état Telegram ──
+  // Priorité : rôle → chatId → active
   const telegramTab: TelegramTabState =
     !ELIGIBLE_ROLES.includes(user.role as typeof ELIGIBLE_ROLES[number])
       ? 'not-eligible'
@@ -131,8 +130,9 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
       const res = await fetch('/api/telegram/disconnect', { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error ?? 'Erreur de déconnexion')
+        throw new Error(data.error ?? 'Erreur de deconnexion')
       }
+      // Refresh local state to reflect disconnected status
       const updatedUser: AuthUser = {
         ...user,
         telegramChatId: null,
@@ -207,7 +207,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
             <h2 id="profile-modal-title" className="text-sm font-semibold text-[var(--text-1)]">
-              {t('dashboard.userProfile.editProfile')}
+              Modifier le profil
             </h2>
             <button
               onClick={onClose}
@@ -215,7 +215,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
               className="w-7 h-7 flex items-center justify-center rounded-md
                          hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                          transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label={t('dashboard.userProfile.close')}
+              aria-label="Fermer"
             >
               <X size={14} />
             </button>
@@ -232,7 +232,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
               )}
             >
-              {t('dashboard.userProfile.profile')}
+              Profil
             </button>
             <button
               onClick={() => setActiveSection('telegram')}
@@ -243,7 +243,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
               )}
             >
-              {t('dashboard.userProfile.telegram')}
+              Telegram
             </button>
           </div>
 
@@ -269,12 +269,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[var(--text-3)]">{t('dashboard.userProfile.avatar')}</p>
+                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par defaut</p>
                   </div>
 
                   {/* Photo URL */}
                   <Input
-                    label={t('dashboard.userProfile.profilePhotoUrl')}
+                    label="Photo de profil (URL)"
                     type="url"
                     placeholder="https://example.com/avatar.jpg"
                     value={avatarUrl}
@@ -284,9 +284,9 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
 
                   {/* Nom */}
                   <Input
-                    label={t('dashboard.userProfile.name')}
+                    label="Nom"
                     type="text"
-                    placeholder={t('dashboard.userProfile.yourName')}
+                    placeholder="Votre nom"
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value)
@@ -300,7 +300,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Email — lecture seule */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium select-none text-[var(--text-3)]">
-                      {t('dashboard.userProfile.email')}
+                      Email
                     </label>
                     <div className="relative">
                       <input
@@ -315,7 +315,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         )}
                       />
                       <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[var(--text-3)] whitespace-nowrap">
-                        {t('dashboard.userProfile.notModifiable')}
+                        Non modifiable
                       </span>
                     </div>
 
@@ -325,7 +325,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         href="/unsubscribe"
                         className="text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors duration-150"
                       >
-                        {t('dashboard.userProfile.unsubscribeNewsletter')}
+                        Se désinscrire de la newsletter
                       </Link>
                     </div>
                   </div>
@@ -333,7 +333,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Erreur persistante */}
                   {saveState === 'error' && (
                     <p className="text-xs text-[var(--red)] leading-tight">
-                      {t('dashboard.userProfile.saveError')}
+                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez reessayer.
                     </p>
                   )}
                 </div>
@@ -350,12 +350,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--text-3)]/10 text-[var(--text-3)] border border-[var(--text-3)]/20">
-                        &#128274;&nbsp;{t('dashboard.userProfile.featureUnavailable')}
+                        &#128274;&nbsp;Fonctionnalite non disponible
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      {t('dashboard.userProfile.betaNoTelegramAccess')}
+                      Les notifications Telegram sont disponibles a partir du plan Analyse.
                     </p>
 
                     <div className="flex items-center gap-2">
@@ -364,7 +364,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         size="sm"
                         href="/pricing"
                       >
-                        {t('dashboard.userProfile.upgrade')}
+                        Mettre a niveau
                       </Button>
                     </div>
                   </div>
@@ -376,12 +376,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
-                        &#10004;&#65039;&nbsp;{t('dashboard.userProfile.telegramConnected')}
+                        &#10004;&#65039;&nbsp;Telegram connecte
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      {t('dashboard.userProfile.telegramNotificationsDesc')}
+                      Vous recevrez une notification a chaque nouveau match ajoute.
                     </p>
 
                     <div className="flex items-center gap-2">
@@ -405,10 +405,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             >
                               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                             </svg>
-                            {t('dashboard.userProfile.disconnecting')}
+                            Deconnexion...
                           </>
                         ) : (
-                          t('dashboard.userProfile.disconnect')
+                          'Deconnecter'
                         )}
                       </Button>
                     </div>
@@ -425,17 +425,18 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
-                        &#9888;&nbsp;{t('dashboard.userProfile.notificationsSuspended')}
+                        &#9888;&nbsp;Notifications suspendues
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      {t('dashboard.userProfile.currentPlanNoAccess')}
+                      Votre plan actuel ne donne pas acces aux notifications Telegram.
+                      Mettez a jour votre abonnement pour les reactiver.
                     </p>
 
                     {user.telegramToken && (
                       <div className="flex flex-col gap-1.5">
-                        <p className="text-xs font-medium text-[var(--text-3)]">{t('dashboard.userProfile.connectionToken')}</p>
+                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
@@ -443,7 +444,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                           </code>
                           <button
                             onClick={() => setTokenRevealed((r: boolean) => !r)}
-                            title={tokenRevealed ? t('dashboard.userProfile.hideToken') : t('dashboard.userProfile.revealToken')}
+                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
                             className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
                                        text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
                                        transition-colors duration-150"
@@ -466,7 +467,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copied ? t('dashboard.userProfile.copied') : t('dashboard.userProfile.copyToken')}
+                            {copied ? 'Copie !' : 'Copier'}
                           </Button>
                         </div>
                       </div>
@@ -478,15 +479,15 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                 {telegramTab === 'not-connected' && (
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <h3 className="text-sm font-semibold text-[var(--text-1)]">{t('dashboard.userProfile.connectTelegram')}</h3>
+                      <h3 className="text-sm font-semibold text-[var(--text-1)]">Connecter Telegram</h3>
                       <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                        {t('dashboard.userProfile.telegramNotificationsDesc')}
+                        Recevez une notification a chaque nouveau match ajoute.
                       </p>
                     </div>
 
                     {user.telegramToken ? (
                       <div className="flex flex-col gap-1.5">
-                        <p className="text-xs font-medium text-[var(--text-3)]">{t('dashboard.userProfile.connectionToken')}</p>
+                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
@@ -494,7 +495,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                           </code>
                           <button
                             onClick={() => setTokenRevealed((r: boolean) => !r)}
-                            title={tokenRevealed ? t('dashboard.userProfile.hideToken') : t('dashboard.userProfile.revealToken')}
+                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
                             className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
                                        text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
                                        transition-colors duration-150"
@@ -517,7 +518,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copied ? t('dashboard.userProfile.copied') : t('dashboard.userProfile.copyToken')}
+                            {copied ? 'Copie !' : 'Copier'}
                           </Button>
                         </div>
                       </div>
@@ -527,11 +528,13 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
 
                     <div className="flex flex-col gap-1">
                       <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                        {t('dashboard.userProfile.sendToBot').replace('{bot}', telegramBotUsername)}
+                        Ouvrez{' '}
+                        <span className="font-mono text-[var(--text-2)]">@{telegramBotUsername}</span>{' '}
+                        sur Telegram et envoyez&nbsp;:
                       </p>
-                      <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)])
+                      <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
-                        /connect {user.telegramToken ?? '[your_key]'}
+                        /connect [votre_cle]
                       </code>
                     </div>
 
@@ -544,7 +547,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                                    bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium
                                    transition-colors duration-150"
                       >
-                        {t('dashboard.userProfile.openBot')}
+                        Ouvrir le bot
                       </a>
                     </div>
                   </div>
@@ -564,7 +567,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     onClick={() => setShowDeleteConfirm(true)}
                     className="text-xs text-[var(--red)] hover:text-[var(--red)]/80 transition-colors duration-150"
                   >
-                    {t('dashboard.userProfile.deleteAccount')}
+                    Supprimer mon compte
                   </button>
                 </div>
               </div>
@@ -578,7 +581,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   onClick={onClose}
                   disabled={isSaving}
                 >
-                  {t('dashboard.userProfile.cancel')}
+                  Annuler
                 </Button>
                 <Button
                   type="submit"
@@ -600,10 +603,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       >
                         <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                       </svg>
-                      {t('dashboard.userProfile.saving')}
+                      Enregistrement...
                     </>
                   ) : (
-                    t('dashboard.userProfile.save')
+                    'Enregistrer'
                   )}
                 </Button>
               </div>
@@ -616,9 +619,9 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
       <AnimatePresence>
         {showDeleteConfirm && (
           <ConfirmDialog
-            title={t('dashboard.userProfile.deleteAccountConfirmTitle')}
-            message={t('dashboard.userProfile.deleteAccountConfirmMessage')}
-            confirmLabel={t('dashboard.userProfile.confirmDelete')}
+            title="Supprimer votre compte"
+            message="Cette action est irréversible. Toutes vos données seront définitivement supprimées."
+            confirmLabel="Supprimer"
             loading={deleteLoading}
             onConfirm={handleDeleteAccount}
             onCancel={() => setShowDeleteConfirm(false)}

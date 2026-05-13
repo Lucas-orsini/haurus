@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useLocale } from '@/providers/LocaleProvider'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -15,11 +14,11 @@ interface PlayerSearchBarProps {
 
 type SearchState = 'idle' | 'searching' | 'success' | 'empty' | 'error'
 
+const MAX_RESULTS = 8
 const MIN_CHARS = 2
 const DEBOUNCE_MS = 300
 
 export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps) {
-  const { t } = useLocale()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<PlayerStats[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
@@ -52,10 +51,10 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         if (!res.ok) {
           if (res.status === 401) {
             setSearchState('error')
-            setErrorMessage(t('player.search.error.sessionExpired'))
+            setErrorMessage('Session expirée. Veuillez vous reconnecter.')
           } else {
             setSearchState('error')
-            setErrorMessage(t('player.search.error.fetchFailed'))
+            setErrorMessage('Échec de la recherche. Veuillez réessayer.')
           }
           setResults([])
           setOpen(true)
@@ -72,7 +71,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         if (err instanceof Error && err.name === 'AbortError') return
 
         setSearchState('error')
-        setErrorMessage(t('player.search.error.fetchFailed'))
+        setErrorMessage('Échec de la recherche. Veuillez réessayer.')
         setResults([])
         setOpen(true)
       }
@@ -82,7 +81,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
       clearTimeout(debounceRef.current)
       controller.abort()
     }
-  }, [query, t])
+  }, [query])
 
   // Close on outside click
   useEffect(() => {
@@ -141,7 +140,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={t('player.search.placeholder')}
+          placeholder="Rechercher un joueur ATP..."
           className={cn(
             'w-full h-9 pl-9 pr-9 rounded-md text-sm',
             'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -202,8 +201,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
             ))
           ) : searchState === 'empty' ? (
             <div className="px-3 py-4 text-center">
-              <p className="text-sm text-[var(--text-3)]">{t('player.search.noResults')}</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">{t('player.search.noResultsHint')}</p>
+              <p className="text-sm text-[var(--text-3)]">Aucun joueur trouvé</p>
             </div>
           ) : null}
         </div>
