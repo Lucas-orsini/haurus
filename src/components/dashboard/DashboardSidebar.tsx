@@ -379,7 +379,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-                      {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                      {signingOut ? 'Signing out...' : 'Sign out'}
                     </button>
                   </motion.div>
                 )}

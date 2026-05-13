@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Changer de langue"
+        aria-label="Change language"
         className={cn(
           'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-full',
           'border border-[var(--border-md)]',

@@ -265,10 +265,10 @@ export default function MetricsEducationClient() {
             <Search size={18} strokeWidth={1.5} className="text-[var(--text-3)]" />
           </div>
           <p className="text-sm font-medium text-[var(--text-2)] mb-1">
-            Aucune métrique ne correspond à votre recherche
+            No metrics match your search
           </p>
           <p className="text-xs text-[var(--text-3)]">
-            Essayez un autre terme — nom, description ou surface.
+            Try another term — name, description, or surface.
           </p>
         </div>
       )}

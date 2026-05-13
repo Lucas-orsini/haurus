@@ -40,22 +40,22 @@ export const METRIC_DEFS: MetricDef[] = [
 ]
 
 export const METRIC_TOOLTIPS: Record<string, string> = {
-  'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
-  'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
-  'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
-  'P-Return': 'Probabilité derióupérer un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
-  'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
-  'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
-  'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
-  'MAP': 'Probabilité théorique derióupérer le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
-  'Win Rate TD': 'Pourcentage de victoires du joueur sur la période récente, toutes surfaces confondues. Les matchs récents ont plus de poids que les anciens.',
-  'Win Rate Surface TD': 'Pourcentage de victoires du joueur sur la surface de ce tournoi, calculé sur la période récente. Capture la spécialisation sur cette surface.',
-  'Momentum TD': 'Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu\'il surperforme en ce moment, négative qu\'il est en dessous de son niveau habituel.',
-  'Breaks Won TD': 'Nombre moyen de breaks de service réalisés par match sur cette surface récemment. Mesure la capacité à concrétiser les opportunités sur le service adverse.',
-  'Breaks Lost TD': 'Nombre moyen de breaks concédés par match sur cette surface récemment. Plus la valeur est basse, mieux le joueur tient son service sous pression.',
-  'Fatigue 72H': 'Cumul des minutes jouées dans ce tournoi et dans les 72 heures précédant le match. Plus cette valeur est haute, plus le joueur aborde ce match avec une charge physique importante.',
-  'Jours de repos': 'Nombre de jours depuis le dernier match joué. Reflète la fraîcheur physique du joueur à l\'approche du match.',
-  'Forme': "Résultats des 5 derniers matchs joués. V = victoire, D = défaite. Le match le plus récent est affiché en dernier.",
+  'ATP Ranking': "Official ATP ranking of the player. The lower the number, the better the player.",
+  'Rank change 6 months': "Change in ATP ranking over the last 6 months. A negative value means the player has improved in the rankings.",
+  'P-Serve': "Probability of winning a point when the player serves, calculated from recent matches. The higher the value, the more effective they are on serve.",
+  'P-Return': "Probability of winning a point when returning serve. The higher the value, the more they trouble opponents on their serve.",
+  'Glicko Rating': "Surface-specific rating system, more precise than ATP ranking. Recalculated after each match and includes uncertainty about the player's level. The higher the value, the better the player on this surface.",
+  'TSD': "Measures how much the player dominates on serve compared to the ATP average on this surface. A positive value means they are above average, negative means they are below.",
+  'BPPI': "Measures whether the player resists break points better or worse than expected. A positive value means they save more break points than their stats suggest.",
+  'MAP': "Theoretical match win probability, calculated point by point from both players' serve and return statistics. Independent of odds.",
+  'Win Rate TD': "Win percentage of the player over the recent period, all surfaces combined. Recent matches carry more weight than older ones.",
+  'Win Rate Surface TD': "Win percentage of the player on this tournament's surface, calculated over the recent period. Captures surface specialization.",
+  'Momentum TD': "Compares the player's very recent form to their usual form on this surface. A positive value means they are overperforming right now, negative means they are below their usual level.",
+  'Breaks Won TD': "Average number of service breaks per match on this surface recently. Measures the ability to capitalize on return opportunities.",
+  'Breaks Lost TD': "Average number of breaks conceded per match on this surface recently. The lower the value, the better the player holds serve under pressure.",
+  'Fatigue 72H': "Cumulative minutes played in this tournament and in the 72 hours before the match. The higher this value, the more physically demanding the approach to this match.",
+  'Rest days': "Number of days since the last match played. Reflects the player's physical freshness approaching the match.",
+  'Form': "Results of the last 5 matches played. W = win, L = loss. The most recent match is shown last.",
 }
 
 export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }: MatchRowProps) {
