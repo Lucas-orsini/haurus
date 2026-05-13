@@ -187,6 +187,42 @@ const fr = {
       errorGeneric: 'Une erreur est survenue.',
     },
   },
+  dashboard: {
+    header: {
+      openMenu: 'Ouvrir le menu',
+      overview: {
+        title: 'Aperçu',
+        subtitle: 'Statistiques des matchs ATP',
+      },
+      player: {
+        title: 'Joueur',
+        subtitle: 'Profil et suivi des joueurs',
+      },
+      metrics: {
+        title: 'Métriques',
+        subtitle: 'Définitions des métriques',
+      },
+    },
+    overview: {
+      errorFetch: 'Échec du chargement des matchs. Veuillez réessayer.',
+      retry: 'Réessayer',
+      searchPlaceholder: 'Rechercher un joueur...',
+      filterToday: "Aujourd'hui",
+      filterFavorites: 'Favoris',
+      filterClear: 'Effacer',
+      filterClearAll: 'Effacer les filtres',
+      tableDate: 'Date',
+      tableTournament: 'Tournoi',
+      tablePlayers: 'Joueurs',
+      tableSurface: 'Surface',
+      tableNoResults: 'Aucun match trouvé',
+      tableNoResultsHint: 'Modifiez vos critères de recherche ou filtres.',
+      tableNoFavorites: 'Aucun favori',
+      tableNoFavoritesHint: 'Ajoutez des matchs en estrella.',
+      matchCount: 'match',
+      matchesCount: 'matchs',
+    },
+  },
 }
 
 const en = {
@@ -374,6 +410,42 @@ const en = {
       linkToLogin: 'Already have an account?',
       linkToLoginAction: 'Sign in',
       errorGeneric: 'Something went wrong.',
+    },
+  },
+  dashboard: {
+    header: {
+      openMenu: 'Open menu',
+      overview: {
+        title: 'Overview',
+        subtitle: 'ATP match statistics',
+      },
+      player: {
+        title: 'Player',
+        subtitle: 'Player profile and tracking',
+      },
+      metrics: {
+        title: 'Metrics',
+        subtitle: 'Metric definitions',
+      },
+    },
+    overview: {
+      errorFetch: 'Failed to load matches. Please try again.',
+      retry: 'Retry',
+      searchPlaceholder: 'Search a player...',
+      filterToday: 'Today',
+      filterFavorites: 'Favorites',
+      filterClear: 'Clear',
+      filterClearAll: 'Clear filters',
+      tableDate: 'Date',
+      tableTournament: 'Tournament',
+      tablePlayers: 'Players',
+      tableSurface: 'Surface',
+      tableNoResults: 'No matches found',
+      tableNoResultsHint: 'Adjust your search criteria or filters.',
+      tableNoFavorites: 'No favorites',
+      tableNoFavoritesHint: 'Star matches to add them here.',
+      matchCount: 'match',
+      matchesCount: 'matches',
     },
   },
 }
