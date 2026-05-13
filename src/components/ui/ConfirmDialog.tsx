@@ -7,8 +7,6 @@ interface ConfirmDialogProps {
   title: string
   message: string
   confirmLabel: string
-  cancelLabel?: string
-  cancelLabelDeleting?: string
   onConfirm: () => Promise<void>
   onCancel: () => void
   loading: boolean
@@ -30,15 +28,10 @@ export default function ConfirmDialog({
   title,
   message,
   confirmLabel,
-  cancelLabel,
-  cancelLabelDeleting,
   onConfirm,
   onCancel,
   loading,
 }: ConfirmDialogProps) {
-  const defaultCancelLabel = cancelLabel ?? 'Annuler'
-  const defaultDeletingLabel = cancelLabelDeleting ?? 'Suppression...'
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -92,7 +85,7 @@ export default function ConfirmDialog({
                   'disabled:opacity-40 disabled:cursor-not-allowed',
                 )}
               >
-                {defaultCancelLabel}
+                Annuler
               </button>
 
               <button
@@ -120,7 +113,7 @@ export default function ConfirmDialog({
                     >
                       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                     </svg>
-                    {defaultDeletingLabel}
+                    Suppression...
                   </>
                 ) : (
                   confirmLabel

@@ -52,9 +52,10 @@ export default function DashboardOverview({
     try {
       const supabase = createClient()
       if (!supabase) {
-        throw new Error(t.dashboard.common.supabaseUnavailable)
+        throw new Error('Client Supabase non disponible')
       }
 
+      // Compute Paris date + hour for rolling 24h window
       const formatter = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'Europe/Paris',
         year: 'numeric',
@@ -67,10 +68,12 @@ export default function DashboardOverview({
       const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
       const today = `${get('year')}-${get('month')}-${get('day')}`
 
+      // Compute tomorrow date
       const tomorrowDate = new Date()
       tomorrowDate.setDate(tomorrowDate.getDate() + 1)
       const tomorrow = tomorrowDate.toISOString().slice(0, 10)
 
+      // Fetch both today and tomorrow weather entries for this tournament
       const { data, error } = await supabase
         .from('tournament_weather')
         .select(
@@ -83,6 +86,7 @@ export default function DashboardOverview({
 
       if (error) throw error
 
+      // Build entries with dayOffset: 0 = today, 1 = tomorrow
       const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
         hour: row.hour as number,
         rain_mm_h: (row.rain_mm_h as number) ?? null,
@@ -97,6 +101,7 @@ export default function DashboardOverview({
         feels_like: (row.feels_like as number) ?? null,
       }))
 
+      // Build the rolling 24h window starting from current hour today
       const now = new Date()
       const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
@@ -213,7 +218,7 @@ export default function DashboardOverview({
         </div>
       )}
 
-      {/* Search + filter bar */}
+      {/* Search + filter bar — flex-col on mobile */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           {/* Search input */}
@@ -244,7 +249,7 @@ export default function DashboardOverview({
             )}
           </div>
 
-          {/* Filter buttons */}
+          {/* Filter buttons — wrap on mobile */}
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => toggleFilter(TODAY_FILTER_KEY)}

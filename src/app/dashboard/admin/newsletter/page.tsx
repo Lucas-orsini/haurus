@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useLocale } from '@/providers/LocaleProvider'
-import { getTranslations } from '@/lib/i18n'
 import NewsletterSendForm from '@/components/dashboard/admin/NewsletterSendForm'
 import NewsletterEmailPreview from '@/components/dashboard/admin/NewsletterEmailPreview'
 
@@ -13,9 +11,6 @@ export default function NewsletterAdminPage() {
   const [body, setBody] = useState('')
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
   const [checked, setChecked] = useState(false)
-
-  const { locale } = useLocale()
-  const t = getTranslations(locale)
 
   useEffect(() => {
     async function init() {
@@ -58,22 +53,6 @@ export default function NewsletterAdminPage() {
     )
   }
 
-  // Build subscriber count label with proper pluralisation
-  const subscriberLabel =
-    subscriberCount !== null && subscriberCount > 0
-      ? `${subscriberCount} ${
-          subscriberCount !== 1
-            ? locale === 'fr'
-              ? 'abonnés'
-              : 'subscribers'
-            : locale === 'fr'
-            ? 'abonné'
-            : 'subscriber'
-        } ${
-          locale === 'fr' ? 'inscrits à la newsletter' : 'subscribed to the newsletter'
-        }`
-      : t.dashboard.admin.newsletter.noSubscribers
-
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-6 min-w-0">
       {/* Left column — form */}
@@ -81,10 +60,12 @@ export default function NewsletterAdminPage() {
         {/* Page header */}
         <div className="mb-6">
           <h1 className="text-base font-semibold text-[var(--text-1)] tracking-tight">
-            {t.dashboard.admin.newsletter.title}
+            Newsletter
           </h1>
           <p className="text-sm text-[var(--text-3)] mt-1">
-            {subscriberLabel}
+            {subscriberCount !== null && subscriberCount > 0
+              ? `${subscriberCount} abonné${subscriberCount !== 1 ? 's' : ''} inscrit${subscriberCount !== 1 ? 's' : ''} à la newsletter`
+              : 'Aucun abonné inscrit pour le moment'}
           </p>
         </div>
 
