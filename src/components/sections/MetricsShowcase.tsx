@@ -91,9 +91,8 @@ function CircularProgress({ value, label, color }: { value: number; label: strin
   )
 }
 
-function Sparkline() {
+function Sparkline({ vsAvgLabel = '+0.72 vs ATP average' }: { vsAvgLabel?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const progressRef = useRef(0)
   const [displayed, setDisplayed] = useState(0)
 
   useAnimationFrame((t) => {
@@ -172,15 +171,15 @@ function Sparkline() {
   })
 
   const lastVal = (() => {
-    const points = [-0.42, -0.68, -0.18, -0.89, 0.05, -0.55, 0.32, -0.22, -0.68, 0.08, -0.98, -0.42, 0.22, 0.08, -0.62, -0.35, -0.75, 0.05, -0.42, 0.72]
-    const idx = Math.min(displayed - 1, points.length - 1)
-    return points[Math.max(0, idx)]
+    const pts = [-0.42, -0.68, -0.18, -0.89, 0.05, -0.55, 0.32, -0.22, -0.68, 0.08, -0.98, -0.42, 0.22, 0.08, -0.62, -0.35, -0.75, 0.05, -0.42, 0.72]
+    const idx = Math.min(displayed - 1, pts.length - 1)
+    return pts[Math.max(0, idx)]
   })()
 
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[10px] text-[var(--text-3)]">+0.72 vs moyenne ATP</span>
+        <span className="text-[10px] text-[var(--text-3)]">{vsAvgLabel}</span>
         <span className="text-xs font-mono font-semibold text-[var(--accent)]">{lastVal}</span>
       </div>
       <canvas ref={canvasRef} width={240} height={64} className="w-full" />
@@ -208,7 +207,7 @@ function AnimatedCounter({ target, duration = 1500 }: { target: number; duration
   return <>{count}</>
 }
 
-function TrendLine() {
+function TrendLine({ momentumLabel = 'Momentum over 30 days' }: { momentumLabel?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useAnimationFrame((t) => {
@@ -271,7 +270,7 @@ function TrendLine() {
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[10px] text-[var(--text-3)]">Momentum sur 30 jours</span>
+        <span className="text-[10px] text-[var(--text-3)]">{momentumLabel}</span>
         <span className="flex items-center gap-0.5 text-xs font-semibold text-[var(--green)]">+0.08 <TrendingUp size={10} /></span>
       </div>
       <canvas ref={canvasRef} width={240} height={56} className="w-full" />
@@ -399,7 +398,7 @@ export default function MetricsShowcase() {
                 <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.tsd.subtitle}</p>
               </div>
             </div>
-            <Sparkline />
+            <Sparkline vsAvgLabel={t.metricsShowcase.tsd.vsAvg} />
           </BentoCard>
 
           <BentoCard glowColor="#F2CB38">
@@ -430,7 +429,7 @@ export default function MetricsShowcase() {
                 <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.momentum.subtitle}</p>
               </div>
             </div>
-            <TrendLine />
+            <TrendLine momentumLabel={t.metricsShowcase.momentum.label} />
           </BentoCard>
         </motion.div>
       </div>
