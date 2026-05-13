@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Star, Loader2 } from 'lucide-react'
+import { useLocale } from '@/providers/LocaleProvider'
 import type { FavoriteButtonProps } from '@/lib/types/favorite'
 
 /**
@@ -11,12 +12,12 @@ import type { FavoriteButtonProps } from '@/lib/types/favorite'
  */
 export default function FavoriteButton({ matchId, isFavorite, onToggle }: FavoriteButtonProps) {
   const [loading, setLoading] = useState(false)
+  const { t } = useLocale()
 
   async function handleToggle(e: React.MouseEvent) {
     e.stopPropagation()
     if (loading) return
 
-    const previousFavorite = isFavorite
     setLoading(true)
 
     try {
@@ -43,9 +44,9 @@ export default function FavoriteButton({ matchId, isFavorite, onToggle }: Favori
     <button
       onClick={handleToggle}
       disabled={loading}
-      title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      title={isFavorite ? t('dashboard.favoriteButton.remove') : t('dashboard.favoriteButton.add')}
       className="w-7 h-7 flex items-center justify-center rounded-md transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-white/[0.06]"
-      aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      aria-label={isFavorite ? t('dashboard.favoriteButton.remove') : t('dashboard.favoriteButton.add')}
     >
       {loading ? (
         <Loader2 size={13} className="animate-spin text-[var(--text-3)]" strokeWidth={1.5} />
