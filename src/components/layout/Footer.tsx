@@ -1,12 +1,12 @@
+'use client'
 import Link from 'next/link'
-
-const footerLinks = {
-  Produit: ['Métriques', 'Tarifs', 'Docs API', 'Changelog'],
-  ['Mentions_légales']: ['Confidentialité', 'CGU', 'Avertissement'],
-  Entreprise: ['À propos', 'Contact', 'Blog'],
-}
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 export default function Footer() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   return (
     <footer className="border-t border-[var(--border-md)] bg-[var(--bg)] pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">
@@ -35,40 +35,73 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-[var(--text-3)] max-w-xs leading-relaxed mb-6">
-              Des métriques ATP conçues pour analyser le jeu. Pas de prédictions. Pas de biais.
+              {t.footer.description}
             </p>
-            {/* Tagline */}
             <p className="text-base font-semibold tracking-tight text-[var(--accent)]">
-              Pas de prédiction. Des données.
+              {t.footer.tagline}
             </p>
           </div>
 
           {/* Link columns */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h4 className="text-xs font-semibold text-[var(--text-2)] uppercase tracking-wider mb-4">
-                {title}
-              </h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors duration-150"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div>
+            <h4 className="text-xs font-semibold text-[var(--text-2)] uppercase tracking-wider mb-4">
+              {t.footer.product}
+            </h4>
+            <ul className="space-y-3">
+              {t.footer.productLinks.map((link) => (
+                <li key={link}>
+                  <a
+                    href="#"
+                    className="text-sm text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors duration-150"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-semibold text-[var(--text-2)] uppercase tracking-wider mb-4">
+              {t.footer.legal}
+            </h4>
+            <ul className="space-y-3">
+              {t.footer.legalLinks.map((link) => (
+                <li key={link}>
+                  <a
+                    href="#"
+                    className="text-sm text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors duration-150"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-semibold text-[var(--text-2)] uppercase tracking-wider mb-4">
+              {t.footer.company}
+            </h4>
+            <ul className="space-y-3">
+              {t.footer.companyLinks.map((link) => (
+                <li key={link}>
+                  <a
+                    href="#"
+                    className="text-sm text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors duration-150"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row justify-between items-center border-t border-[var(--border-md)] pt-8 gap-4">
           <p className="text-xs text-[var(--text-3)]">
-            © 2026 Haurus. Tous droits réservés.
+            {t.footer.copyright}
           </p>
 
           {/* Social links */}
@@ -98,7 +131,7 @@ export default function Footer() {
 
         {/* Legal disclaimer */}
         <p className="text-xs text-[var(--text-3)] mt-6 leading-relaxed max-w-2xl">
-          Haurus fournit uniquement des données statistiques. Pas de predictions ni de conseils de pari. Toutes les données sont à titre informatif uniquement.
+          {t.footer.disclaimer}
         </p>
       </div>
     </footer>
