@@ -4,6 +4,7 @@ import Script from 'next/script'
 import { Suspense } from 'react'
 import { PostHogProvider } from '@/providers/PostHogProvider'
 import { PostHogPageView } from '@/providers/PostHogPageView'
+import { LocaleProvider } from '@/providers/LocaleProvider'
 import './globals.css'
 
 const tektur = Tektur({
@@ -23,14 +24,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth antialiased">
+    <html lang="fr" className="scroll-smooth antialiased">
       <body className={`${tektur.variable} bg-[var(--bg)] text-[var(--text-1)] min-h-screen`}>
-        <PostHogProvider>
-          <Suspense fallback={null}>
-            <PostHogPageView />
-          </Suspense>
-          {children}
-        </PostHogProvider>
+        <LocaleProvider>
+          <PostHogProvider>
+            <Suspense fallback={null}>
+              <PostHogPageView />
+            </Suspense>
+            {children}
+          </PostHogProvider>
+        </LocaleProvider>
 
         {/* Tailwind CDN for template compatibility */}
         <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />

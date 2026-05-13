@@ -4,6 +4,8 @@ import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { Activity, BarChart3, TrendingUp, Zap } from 'lucide-react'
 import MetricCard from '@/components/ui/MetricCard'
 import Link from 'next/link'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -33,20 +35,18 @@ function AnimatedBarChart() {
           }}
         />
       ))}
-      {/* Peak label — positioned over heights[5] (88%, the max of the heights array).
-          With 7 bars in a flex container (gap-2, px-4), the centre of bar index 5 falls at ~74%
-          of the container width — not at (5/6)*100 ≈ 83.3%, which places the label beyond the bar.
-          If the number of bars changes, recalculate manually by visually centering the label. */}
       <div className="absolute top-8 left-[78.6%] -translate-x-1/2 px-2 py-1 bg-[var(--accent)] text-black text-[10px] font-semibold rounded">
         Pic
       </div>
-      {/* Fade overlay */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#111113] to-transparent pointer-events-none" />
     </div>
   )
 }
 
 export default function Hero() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   const cardRef = useRef<HTMLDivElement>(null)
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -93,7 +93,7 @@ export default function Hero() {
           >
             <span className="flex h-2 w-2 rounded-full bg-[var(--accent)] animate-pulse" />
             <span className="text-xs font-medium text-[var(--accent-hi)] tracking-wide uppercase">
-              BÊTA DISPONIBLE
+              {t.hero.badge}
             </span>
           </motion.div>
 
@@ -103,10 +103,10 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-5xl md:text-7xl font-medium tracking-tighter text-[var(--text-1)] mb-6 leading-[1.1]"
           >
-            Les métriques{' '}
-            <span className="text-[var(--accent)]">des bookmakers</span>
+            {t.hero.headline1}{' '}
+            <span className="text-[var(--accent)]">{t.hero.headline2}</span>
             <br />
-            <span className="text-[var(--text-2)]">Enfin accessibles.</span>
+            <span className="text-[var(--text-2)]">{t.hero.headline3}</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -115,8 +115,7 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-lg text-[var(--text-2)] max-w-xl font-light mb-10 leading-relaxed"
           >
-            Accédez aux données qui structurent les cotes ATP.
-            Aucune prédiction. Uniquement des métriques fiables et exploitables.
+            {t.hero.subtitle}
           </motion.p>
 
           {/* CTAs */}
@@ -129,13 +128,13 @@ export default function Hero() {
               href="#pricing"
               className="h-10 px-6 rounded-lg bg-[var(--accent)] text-black text-sm font-medium hover:bg-[var(--accent-hi)] hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(242,203,56,0.25)]"
             >
-              Commencer
+              {t.hero.ctaPrimary}
             </Link>
             <a
               href="#metrics"
               className="h-10 px-6 rounded-lg bg-transparent border border-[var(--border-md)] text-[var(--text-2)] text-sm font-medium hover:text-[var(--text-1)] hover:bg-white/[0.03] transition-colors duration-150 flex items-center justify-center gap-2"
             >
-              Voir les métriques
+              {t.hero.ctaSecondary}
             </a>
           </motion.div>
 
@@ -145,7 +144,7 @@ export default function Hero() {
             variants={fadeInUp}
             className="text-sm text-[var(--text-3)] mt-8"
           >
-            Analyse quantitative · Avantage informationnel · Données sans biais
+            {t.hero.socialProof}
           </motion.p>
         </motion.div>
 

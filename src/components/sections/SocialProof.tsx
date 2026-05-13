@@ -1,5 +1,7 @@
 'use client'
 import { motion, type Variants } from 'framer-motion'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 const fadeIn: Variants = {
   hidden: { opacity: 0 },
@@ -7,12 +9,15 @@ const fadeIn: Variants = {
 }
 
 const stats = [
-  { value: '250k', label: 'matchs analysés' },
-  { value: '1 033', label: 'joueurs suivis' },
-  { value: '2x/jour', label: 'mise à jour' },
+  { value: '250k', key: 'stat1Label' as const },
+  { value: '1 033', key: 'stat2Label' as const },
+  { value: '2x/jour', key: 'stat3Label' as const },
 ]
 
 export default function SocialProof() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   return (
     <section className="py-12 px-6 border-y border-[var(--border-md)] bg-[var(--surface-1)]">
       <motion.div
@@ -24,12 +29,12 @@ export default function SocialProof() {
       >
         <div className="flex flex-wrap justify-center items-center gap-0">
           {stats.map((stat, i) => (
-            <div key={stat.label} className="flex items-center gap-3 px-8 py-3">
+            <div key={stat.key} className="flex items-center gap-3 px-8 py-3">
               {i > 0 && (
                 <div className="w-px h-8 bg-[var(--border-md)] mr-2 hidden sm:block" />
               )}
               <span className="text-base font-semibold text-[var(--accent)] font-mono">{stat.value}</span>
-              <span className="text-sm text-[var(--text-3)]">{stat.label}</span>
+              <span className="text-sm text-[var(--text-3)]">{t.socialProof[stat.key]}</span>
             </div>
           ))}
         </div>

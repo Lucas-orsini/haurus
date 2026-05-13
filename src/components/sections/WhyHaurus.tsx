@@ -2,6 +2,8 @@
 import { motion, type Variants } from 'framer-motion'
 import { Shield, Layers, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -13,37 +15,40 @@ const staggerContainer: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
 }
 
-const points = [
-  {
-    icon: Shield,
-    iconColor: 'text-[var(--accent)]',
-    iconBg: 'bg-[rgba(242,203,56,0.08)]',
-    iconBorder: 'border-[rgba(242,203,56,0.15)]',
-    glowColor: '#F2CB38',
-    title: 'Les données derrière les décisions du marché',
-    desc: 'Des modèles comme Glicko-2 aux métriques de performance point par point, Haurus rassemble les indicateurs essentiels en un seul endroit.',
-  },
-  {
-    icon: Eye,
-    iconColor: 'text-blue-400',
-    iconBg: 'bg-[rgba(59,130,246,0.08)]',
-    iconBorder: 'border-[rgba(59,130,246,0.15)]',
-    glowColor: '#3b82f6',
-    title: 'Pas de prédictions. Pas de conseils.',
-    desc: 'Nous ne donnons pas d’avis. Nous exposons les métriques pour que vous construisiez votre propre analyse.',
-  },
-  {
-    icon: Layers,
-    iconColor: 'text-purple-400',
-    iconBg: 'bg-[rgba(168,85,247,0.08)]',
-    iconBorder: 'border-[rgba(168,85,247,0.15)]',
-    glowColor: '#a855f7',
-    title: 'Le contexte plutôt que l’intuition',
-    desc: 'Surface, fatigue, dynamique. Haurus structure les facteurs clés pour lire un match avec des données, pas du ressenti.',
-  },
-]
-
 export default function WhyHaurus() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
+  const points = [
+    {
+      icon: Shield,
+      iconColor: 'text-[var(--accent)]',
+      iconBg: 'bg-[rgba(242,203,56,0.08)]',
+      iconBorder: 'border-[rgba(242,203,56,0.15)]',
+      glowColor: '#F2CB38',
+      title: t.whyHaurus.points.data.title,
+      desc: t.whyHaurus.points.data.description,
+    },
+    {
+      icon: Eye,
+      iconColor: 'text-blue-400',
+      iconBg: 'bg-[rgba(59,130,246,0.08)]',
+      iconBorder: 'border-[rgba(59,130,246,0.15)]',
+      glowColor: '#3b82f6',
+      title: t.whyHaurus.points.noPredictions.title,
+      desc: t.whyHaurus.points.noPredictions.description,
+    },
+    {
+      icon: Layers,
+      iconColor: 'text-purple-400',
+      iconBg: 'bg-[rgba(168,85,247,0.08)]',
+      iconBorder: 'border-[rgba(168,85,247,0.15)]',
+      glowColor: '#a855f7',
+      title: t.whyHaurus.points.context.title,
+      desc: t.whyHaurus.points.context.description,
+    },
+  ]
+
   return (
     <section className="py-24 px-6 bg-[var(--surface-1)] border-y border-[var(--border-md)]">
       <div className="max-w-5xl mx-auto">
@@ -56,13 +61,13 @@ export default function WhyHaurus() {
           className="text-center mb-16"
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border-md)] bg-[var(--surface-2)] mb-6">
-            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Plateforme de données</span>
+            <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">{t.whyHaurus.sectionTag}</span>
           </span>
           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-            Pensé pour l’analyse
+            {t.whyHaurus.sectionTitle}
           </h2>
           <p className="text-[var(--text-2)] max-w-xl mx-auto text-sm leading-relaxed">
-           Haurus fournit les données pour faciliter votre analyse, en transformant chaque match en informations exploitables.
+            {t.whyHaurus.sectionSubtitle}
           </p>
         </motion.div>
 
