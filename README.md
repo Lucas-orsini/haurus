@@ -5,12 +5,7 @@ The metrics bookmakers use. Now yours.
 ## ✨ Features
 
 - **Internationalization (i18n)** — Multi-language support with locale switching
-- **Hero Landing Section** — Engaging hero component for the landing page
-- **Metrics Showcase** — Display metrics with visual components
-- **Smooth Animations** — Framer Motion powered transitions and interactions
-- **Analytics Integration** — PostHog tracking for user behavior insights
-- **Email Notifications** — Resend-powered transactional emails with unsubscribe management
-- **Telegram Bot Integration** — Optional bot for notifications and webhook support
+- **Authentication** — Sign up and login pages with Supabase integration
 
 ## 🛠️ Tech Stack
 
@@ -50,7 +45,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -91,7 +86,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (or `Cmd+`` ` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -99,21 +94,21 @@ Then open http://localhost:3000 in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key — never expose to browsers |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` (EU) or `https://app.posthog.com` (US) | PostHog server URL |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email service API key |
-| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains → verify a domain | Sender email (must be verified) |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → select audience → Settings | Audience ID for email lists |
-| `NEXT_PUBLIC_APP_URL` | Yes | Use `http://localhost:3000` for local dev | Base URL for email links |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Bot API token |
-| `TELEGRAM_BOT_SECRET` | No | Create your own secret string (min 32 chars) | HMAC secret for webhook verification |
-| `NEXT_PUBLIC_TEGRAM_BOT_USERNAME` | No | Your bot's username from BotFather | Bot username for client-side use |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave default | PostHog server URL |
+| `RESEND_API_KEY` | No | Resend → API Keys | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Resend → Domains | Verified sender email (or use onboarding@resend.dev for testing) |
+| `RESEND_AUDIENCE_ID` | No | Resend → Audiences → Settings | Email audience ID for newsletters |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set manually | Your app's base URL (http://localhost:3000 in dev) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather | Bot token for Telegram integration |
+| `TELEGRAM_BOT_SECRET` | No | Set manually | HMAC secret for webhook signature verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather | Your bot's username for display purposes |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual parts of the code work correctly without needing the whole app running.
+Unit tests check that individual pieces of code work correctly — they run automatically to make sure nothing broke when you make changes.
 
 Run all tests:
 
@@ -124,41 +119,42 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/lib/utils.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when you save a file):
+Watch mode (re-runs tests automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading Jest output**: `PASS` means the test passed — your code works. `FAIL` means something broke — Jest will show you exactly which test failed and why.
+**How to read the output:**
+- `PASS` — all tests passed, everything works ✅
+- `FAIL` — something broke, look at the error message below for details 🔴
 
-Test coverage based on test files found:
-- Auth validators and authentication logic
-- Dashboard formatting utilities
-- Dashboard statistics
-- General utilities
-- Common utils
+**Tests included:**
+- `__tests__/auth-validators.test.ts` — auth validation logic
+- `__tests__/auth.test.ts` — authentication flow tests
+- `__tests__/dashboard/formatMetric.test.ts` — metric formatting
+- `__tests__/lib/dashboard/stats.test.ts` — dashboard statistics
+- `__tests__/lib/utils.test.ts` — utility functions
+- `__tests__/utils.test.ts` — general utilities
 
 ## 📁 Project Structure
 
-- `src/lib` — Core utilities including internationalization (i18n)
-- `src/components` — Reusable UI components including Hero and MetricsShowcase sections
+- `src/lib` — i18n internationalization setup
+- `src/app/(auth)` — authentication pages (login, signup)
 
 ## 🚀 Deploy to Vercel
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to https://vercel.com/new
 2. Import your GitHub repository
-3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
-   - Copy every variable from your `.env.local` file
-   - For local development variables (like `NEXT_PUBLIC_APP_URL`), you may want a different value for production
+3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local`
 4. Click Deploy
 
-> ⚠️ **Important**: Make sure to add all environment variables listed in the 🔑 Environment Variables section above, especially `SUPABASE_SERVICE_ROLE_KEY` which must be kept secret.
+Make sure to add **all** environment variables in Vercel — especially `SUPABASE_SERVICE_ROLE_KEY` which is required for server-side operations.
 
 ## 📝 License
 

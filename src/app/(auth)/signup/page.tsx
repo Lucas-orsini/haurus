@@ -9,11 +9,15 @@ import { UserPlus } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { validateName, validateEmail, validatePassword, signup, signupWithGoogle, getSession } from '@/lib/auth'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 type FormState = 'idle' | 'loading' | 'error' | 'redirecting'
 
 export default function SignupPage() {
   const router = useRouter()
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -61,7 +65,7 @@ export default function SignupPage() {
     let confirmError: string | undefined
 
     if (password !== confirmPassword) {
-      confirmError = 'Les mots de passe ne correspondent pas.'
+      confirmError = locale === 'fr' ? 'Les mots de passe ne correspondent pas.' : 'Passwords do not match.'
     }
 
     if (nameError || emailError || passwordError || confirmError) {
@@ -83,7 +87,7 @@ export default function SignupPage() {
     } catch (err) {
       setFormState('idle')
       setGlobalError(
-        err instanceof Error ? err.message : 'Une erreur est survenue.'
+        err instanceof Error ? err.message : t.auth.signup.errorGeneric
       )
     }
   }
@@ -99,7 +103,7 @@ export default function SignupPage() {
       }
       // On success, Supabase redirects the browser — loading state is never cleared
     } catch (err) {
-      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+      setGlobalError(err instanceof Error ? err.message : t.auth.signup.errorGeneric)
       setGoogleLoading(false)
     }
   }
@@ -118,19 +122,19 @@ export default function SignupPage() {
             <UserPlus size={20} className="text-[var(--accent)]" strokeWidth={1.5} />
           </div>
           <h1 className="text-2xl font-semibold text-[var(--text-1)] tracking-tight">
-            Créer un compte
+            {t.auth.signup.title}
           </h1>
           <p className="mt-2 text-sm text-[var(--text-2)]">
-            Rejoignez Haurus et accédez à vos métriques
+            {t.auth.signup.subtitle}
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <Input
-            label="Nom"
+            label={t.auth.signup.nameLabel}
             type="text"
-            placeholder="Alex Dupont"
+            placeholder={t.auth.signup.namePlaceholder}
             value={name}
             onChange={(e) => setName(e.target.value)}
             error={errors.name}
@@ -139,9 +143,9 @@ export default function SignupPage() {
           />
 
           <Input
-            label="Adresse email"
+            label={t.auth.signup.emailLabel}
             type="email"
-            placeholder="alex@example.com"
+            placeholder={t.auth.signup.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={errors.email}
@@ -150,9 +154,9 @@ export default function SignupPage() {
           />
 
           <Input
-            label="Mot de passe"
+            label={t.auth.signup.passwordLabel}
             type="password"
-            placeholder="••••••••"
+            placeholder={t.auth.signup.passwordPlaceholder}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={errors.password}
@@ -161,9 +165,9 @@ export default function SignupPage() {
           />
 
           <Input
-            label="Confirmer le mot de passe"
+            label={t.auth.signup.confirmPasswordLabel}
             type="password"
-            placeholder="••••••••"
+            placeholder={t.auth.signup.confirmPasswordPlaceholder}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             error={errors.confirmPassword}
@@ -187,15 +191,15 @@ export default function SignupPage() {
             {formState === 'loading' ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
-                Création...
+                {t.auth.signup.submitButtonLoading}
               </span>
             ) : formState === 'redirecting' ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
-                Redirection...
+                {t.auth.signup.submitButtonRedirecting}
               </span>
             ) : (
-              'Créer mon compte'
+              t.auth.signup.submitButton
             )}
           </Button>
         </form>
@@ -203,7 +207,7 @@ export default function SignupPage() {
         {/* Divider */}
         <div className="flex items-center gap-3 my-5">
           <hr className="flex-1 border-t border-[var(--border-md)]" />
-          <span className="text-xs text-[var(--text-2)] select-none">ou</span>
+          <span className="text-xs text-[var(--text-2)] select-none">{t.auth.signup.separator}</span>
           <hr className="flex-1 border-t border-[var(--border-md)]" />
         </div>
 
@@ -218,7 +222,7 @@ export default function SignupPage() {
           {googleLoading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full border-2 border-[var(--text-3)] border-t-[var(--text-1)] animate-spin" />
-              Redirection...
+              {t.auth.signup.googleButtonLoading}
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
@@ -228,19 +232,19 @@ export default function SignupPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              Créer un compte avec Google
+              {t.auth.signup.googleButton}
             </span>
           )}
         </Button>
 
         {/* Footer link */}
         <p className="text-center text-sm text-[var(--text-2)] mt-6">
-          Déjà un compte ?{' '}
+          {t.auth.signup.linkToLogin}{' '}
           <Link
             href="/login"
             className="text-[var(--accent)] hover:text-[var(--accent-hi)] transition-colors duration-150 font-medium"
           >
-            Se connecter
+            {t.auth.signup.linkToLoginAction}
           </Link>
         </p>
       </motion.div>
