@@ -23,6 +23,26 @@ const fr = {
     ctaPrimary: 'Commencer',
     ctaSecondary: 'Voir les métriques',
     socialProof: 'Analyse quantitative · Avantage informationnel · Données sans biais',
+    mockup: {
+      tabTitle: 'Stats ATP',
+      nav: {
+        overview: 'Aperçu',
+        analytics: 'Analytique',
+        players: 'Joueurs',
+        metrics: 'Métriques',
+      },
+      dataStatus: 'État des données',
+      live: 'En direct',
+      period: '30 derniers jours',
+      overview: 'Aperçu',
+      overviewSubtitle: 'Métriques en temps réel des joueurs ATP.',
+      metrics: {
+        glickoDifferential: 'Différentiel Glicko-2',
+        winRate: 'Taux de victoire (Terre battue)',
+        servicePoints: 'Points gagnés au service',
+      },
+      peak: 'Pic',
+    },
   },
   ctaBanner: {
     title: 'Prêt à analyser comme un PRO',
@@ -152,6 +172,26 @@ const en = {
     ctaPrimary: 'Get started',
     ctaSecondary: 'View metrics',
     socialProof: 'Quantitative analysis · Informational edge · Unbiased data',
+    mockup: {
+      tabTitle: 'ATP Stats',
+      nav: {
+        overview: 'Overview',
+        analytics: 'Analytics',
+        players: 'Players',
+        metrics: 'Metrics',
+      },
+      dataStatus: 'Data status',
+      live: 'Live',
+      period: 'Last 30 days',
+      overview: 'Overview',
+      overviewSubtitle: 'Real-time ATP player metrics.',
+      metrics: {
+        glickoDifferential: 'Glicko-2 differential',
+        winRate: 'Win rate (Clay)',
+        servicePoints: 'Service points won',
+      },
+      peak: 'Peak',
+    },
   },
   ctaBanner: {
     title: 'Ready to analyse like a PRO',
