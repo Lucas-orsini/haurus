@@ -1,8 +1,14 @@
 import Link from 'next/link'
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      {/* Language switcher — fixed top-right, overlays all auth pages */}
+      <div className="fixed top-4 right-4 z-10">
+        <LanguageSwitcher />
+      </div>
+
       {/* Logo — fixed top-left, visible across all auth pages */}
       <Link
         href="/"
