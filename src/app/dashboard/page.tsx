@@ -2,8 +2,11 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import type { MatchStats } from '@/lib/types/match'
 import { computeTodaysStats } from '@/lib/dashboard/stats'
+import { getTranslations } from '@/lib/i18n'
+import type { Locale } from '@/lib/i18n'
 import DashboardOverview from '@/components/dashboard/DashboardOverview'
 
 /**
@@ -25,6 +28,11 @@ export default async function DashboardPage() {
   if (!user) {
     redirect('/login')
   }
+
+  // Resolve locale from cookie (set by middleware)
+  const cookieStore = await cookies()
+  const locale = (cookieStore.get('NEXT_LOCALE')?.value ?? 'fr') as Locale
+  const t = getTranslations(locale)
 
   const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD in server timezone
 
@@ -60,12 +68,10 @@ export default async function DashboardPage() {
   }
 
   if (error) {
-    // Propagate a clean error state to the client component
-    // so it can render the error UI instead of crashing
     return (
       <DashboardOverview
         matches={[]}
-        fetchError="Échec du chargement des matchs. Veuillez réessayer."
+        fetchError={t.dashboard.overview.errorFetch}
         favoriteMatchIds={favoriteMatchIds}
         todaysStats={todaysStats}
       />

@@ -8,6 +8,8 @@ import {
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 import type { StatsHistoryPoint } from '@/lib/types/player'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 type Json = Database['public']['Tables']['player_stats']['Row']['stats_history'] extends infer T ? T : never
 
@@ -67,13 +69,13 @@ function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoi
     .slice(-60)
 }
 
-function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number }) {
+function MetricChart({ data, color, chartHeight = 250, insufficientText = '' }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number; insufficientText?: string }) {
   const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
 
   if (validData.length < 3) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+        <p className="text-sm text-[var(--text-3)]">{insufficientText}</p>
       </div>
     )
   }
@@ -129,6 +131,10 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
 }
 
 export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+  const chartT = t.dashboard.metrics.chart
+
   const [selectedMetric, setSelectedMetric] = useState(METRICS[0].key)
 
   const parsedData = useMemo(
@@ -146,7 +152,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
           htmlFor="metric-select"
           className="text-xs font-medium text-[var(--text-2)] shrink-0"
         >
-          Métrique
+          {t.dashboard.player.metrics.title}
         </label>
 
         <div className="relative flex-1 max-w-full md:max-w-[220px]">
@@ -187,7 +193,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
         {/* Label actif */}
         {parsedData.length > 0 && (
           <span className="text-xs text-[var(--text-3)] font-mono tabular-nums md:ml-auto">
-            {parsedData.length} pts
+            {parsedData.length} {chartT.pts}
           </span>
         )}
       </div>
@@ -196,17 +202,27 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
       <div className="h-[250px] md:h-[200px]">
         {parsedData.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+            <p className="text-sm text-[var(--text-3)]">{chartT.insufficientHistory}</p>
           </div>
         ) : (
           <>
             {/* Desktop chart — hidden on mobile */}
             <div className="hidden md:block h-full">
-              <MetricChart data={parsedData} color="var(--accent)" chartHeight={200} />
+              <MetricChart
+                data={parsedData}
+                color="var(--accent)"
+                chartHeight={200}
+                insufficientText={chartT.insufficientHistory}
+              />
             </div>
             {/* Mobile chart — hidden on desktop */}
             <div className="md:hidden h-full">
-              <MetricChart data={parsedData} color="var(--accent)" chartHeight={250} />
+              <MetricChart
+                data={parsedData}
+                color="var(--accent)"
+                chartHeight={250}
+                insufficientText={chartT.insufficientHistory}
+              />
             </div>
           </>
         )}

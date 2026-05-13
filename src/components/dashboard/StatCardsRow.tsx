@@ -1,9 +1,11 @@
 'use client'
 
-import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
@@ -26,16 +28,19 @@ export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsR
 }
 
 function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   if (!card1 || card1.count === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Matchs du jour
+            {t.dashboard.stats.matchesToday}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Aucun match prévu</p>
+        <p className="text-sm text-[var(--text-3)]">{t.dashboard.stats.noMatches}</p>
       </div>
     )
   }
@@ -45,18 +50,18 @@ function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
       <div className="flex items-center gap-2 mb-2">
         <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Matchs du jour
+          {t.dashboard.stats.matchesTodayShort}
         </p>
       </div>
       <p className="text-2xl font-medium text-[var(--text-1)] font-mono tabular-nums tracking-tight mb-1">
         {card1.count}
       </p>
       <div className="flex flex-col gap-0.5 mt-1">
-        {card1.tournaments.map((t, i) => (
+        {card1.tournaments.map((tourney, i) => (
           <p key={i} className="text-[11px] text-[var(--text-3)]">
-            {t.name}
-            {t.surface ? (
-              <span className="ml-1 text-[var(--text-3)]">· {t.surface}</span>
+            {tourney.name}
+            {tourney.surface ? (
+              <span className="ml-1 text-[var(--text-3)]">· {tourney.surface}</span>
             ) : null}
           </p>
         ))}
@@ -77,6 +82,9 @@ type WeatherCardData = {
 type Card2Entry = { name: string; weather: WeatherCardData }
 
 function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -84,10 +92,10 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Météo
+            {t.dashboard.stats.weather}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+        <p className="text-sm text-[var(--text-3)]">{t.dashboard.stats.weatherUnavailable}</p>
       </div>
     )
   }
@@ -99,11 +107,11 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Météo
+            {t.dashboard.stats.weather}
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
-        <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
+        <p className="text-[11px] text-[var(--text-3)] mt-0.5">{t.dashboard.stats.noTournaments}</p>
       </div>
     )
   }
@@ -114,15 +122,15 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
       <div className="flex items-center gap-2 mb-3">
         <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Météo
+          {t.dashboard.stats.weather}
         </p>
         {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
           onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
-          title="Voir les prévisions horaires"
+          title={t.dashboard.weather.title}
           className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
-          Prévision
+          {t.dashboard.weather.hourlyForecast}
         </button>
       </div>
 
@@ -159,25 +167,25 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
                 {/* Right zone — 4 stacked metrics */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
-                    label="Température"
+                    label={t.dashboard.weather.feelsLike}
                     value={w.temperature !== null && w.temperature !== undefined
                       ? `${w.temperature}°C`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="Humidité"
+                    label={t.dashboard.weather.humidity}
                     value={w.humidity !== null && w.humidity !== undefined
                       ? `${w.humidity}%`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="Vent"
+                    label={t.dashboard.weather.wind}
                     value={w.wind_speed !== null && w.wind_speed !== undefined
                       ? `${w.wind_speed} km/h`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="POP"
+                    label={t.dashboard.weather.precipitation}
                     value={w.pop !== null && w.pop !== undefined
                       ? `${w.pop}%`
                       : '—'}
@@ -208,16 +216,19 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
 type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
 function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Vitesse de surface
+            {t.dashboard.stats.paceIndex}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+        <p className="text-sm text-[var(--text-3)]">{t.dashboard.stats.weatherUnavailable}</p>
       </div>
     )
   }
@@ -228,7 +239,7 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Vitesse de surface
+            {t.dashboard.stats.paceIndex}
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
@@ -241,12 +252,12 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
       <div className="flex items-center gap-2 mb-3">
         <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Vitesse de surface
+          {t.dashboard.stats.paceIndex}
         </p>
       </div>
       <div className="flex flex-col gap-4">
         {card3.map((entry, i) => (
-          <GaugeEntry key={i} entry={entry} index={i} />
+          <GaugeEntry key={i} entry={entry} index={i} locale={locale} />
         ))}
       </div>
     </div>
@@ -260,11 +271,24 @@ const PACE_COLOR_HEX: Record<string, string> = {
   red:    '#f87171',
 }
 
-function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
+function getPaceColor(paceIndex: number | null): 'blue' | 'yellow' | 'red' {
+  if (paceIndex === null || paceIndex < 0.80) return 'blue'
+  if (paceIndex <= 1.10) return 'yellow'
+  return 'red'
+}
+
+function getPaceCategory(paceIndex: number | null, locale: string): string {
+  if (paceIndex === null || paceIndex < 0.80) return locale === 'fr' ? 'Lent' : 'Slow'
+  if (paceIndex <= 1.10) return locale === 'fr' ? 'Moyen' : 'Medium'
+  return locale === 'fr' ? 'Rapide' : 'Fast'
+}
+
+function GaugeEntry({ entry, index, locale }: { entry: Card3Entry; index: number; locale: string }) {
   const paceIndex = entry.paceIndex
   const displayValue = paceIndex !== null ? paceIndex.toFixed(2) : '—'
-  const paceColor   = paceIndex !== null ? getPaceColor(paceIndex) : 'blue'
-  const paceCategory = getPaceCategory(paceIndex)
+
+  const paceColor = getPaceColor(paceIndex)
+  const paceCategory = getPaceCategory(paceIndex, locale)
   const colorHex = PACE_COLOR_HEX[paceColor]
 
   const normalizedPace = Math.min(Math.max(paceIndex ?? 0, 0), 2) / 2

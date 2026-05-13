@@ -6,7 +6,6 @@ import LanguageSwitcher from '@/components/layout/LanguageSwitcher'
 import { useLocale } from '@/providers/LocaleProvider'
 import { getTranslations } from '@/lib/i18n'
 
-// Flat map: route → direct translation key paths inside t.dashboard.header
 const ROUTE_META: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': {
     title: 'overview.title',
@@ -40,7 +39,7 @@ export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) 
 
   return (
     <header className="shrink-0 flex items-center justify-between h-14 px-4 md:px-6 border-b border-[var(--border)] bg-[var(--bg)]">
-      {/* Mobile hamburger — visible only < md */}
+      {/* Mobile hamburger */}
       <button
         onClick={onMenuToggle}
         aria-label={t.dashboard.header.openMenu}
