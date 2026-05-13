@@ -43,11 +43,11 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
   'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
   'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
-  'P-Return': 'Probabilité de remporté un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
+  'P-Return': 'Probabilité derióupérer un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
   'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
   'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
   'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
-  'MAP': 'Probabilité théorique de remporté le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
+  'MAP': 'Probabilité théorique derióupérer le match, calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes.',
   'Win Rate TD': 'Pourcentage de victoires du joueur sur la période récente, toutes surfaces confondues. Les matchs récents ont plus de poids que les anciens.',
   'Win Rate Surface TD': 'Pourcentage de victoires du joueur sur la surface de ce tournoi, calculé sur la période récente. Capture la spécialisation sur cette surface.',
   'Momentum TD': 'Compare la forme très récente du joueur à sa forme habituelle sur cette surface. Une valeur positive signifie qu\'il surperforme en ce moment, négative qu\'il est en dessous de son niveau habituel.',
@@ -153,7 +153,7 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
                   {METRIC_DEFS.map(({ label, p1Key, p2Key, mode }, idx) => {
                     const val1 = match[p1Key] as number | null
                     const val2 = match[p2Key] as number | null
-                    const [classA, classB] = getMetricColor(val1, val2, mode)
+                    const [classA, classB] = getMetricColor(val1, val2, mode as 'higher' | 'lower' | 'neutral')
                     const isGlickoP1 = p1Key === 'glicko_rating_p1'
                     const isGlickoP2 = p2Key === 'glicko_rating_p2'
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
+import { useLocale } from '@/providers/LocaleProvider'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -49,6 +50,7 @@ interface TrackedPlayersResponse {
 }
 
 export default function PlayerProfileClient() {
+  const { t } = useLocale()
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
@@ -314,7 +316,7 @@ export default function PlayerProfileClient() {
               aria-label="Ouvrir ou fermer le panneau Mes joueurs"
             >
               <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">Mes joueurs</span>
+              <span className="whitespace-nowrap">{t('player.tracked.title')}</span>
             </button>
 
             {/* Barre de recherche — pleine largeur mobile */}
@@ -399,8 +401,8 @@ export default function PlayerProfileClient() {
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
+              <p className="text-sm font-medium text-[var(--text-2)]">{t('player.profile.searchHint')}</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">{t('player.profile.searchMinChars')}</p>
             </div>
           )}
         </div>

@@ -4,6 +4,7 @@ import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useLocale } from '@/providers/LocaleProvider'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
@@ -11,31 +12,33 @@ interface StatCardsRowProps {
 }
 
 export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsRowProps) {
+  const { t } = useLocale()
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
-      <Card1 card1={todaysStats?.card1} />
+      <Card1 card1={todaysStats?.card1} t={t} />
 
       {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
+      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} t={t} />
 
       {/* Card 3 — Vitesse de surface */}
-      <Card3 card3={todaysStats?.card3 ?? null} />
+      <Card3 card3={todaysStats?.card3 ?? null} t={t} />
     </div>
   )
 }
 
-function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
+function Card1({ card1, t }: { card1?: TodaysStats['card1']; t: (key: string) => string }) {
   if (!card1 || card1.count === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Matchs du jour
+            {t('dashboard.statCards.matchesToday')}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Aucun match prévu</p>
+        <p className="text-sm text-[var(--text-3)]">{t('dashboard.statCards.noMatchesToday')}</p>
       </div>
     )
   }
@@ -45,18 +48,18 @@ function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
       <div className="flex items-center gap-2 mb-2">
         <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Matchs du jour
+          {t('dashboard.statCards.matchesToday')}
         </p>
       </div>
       <p className="text-2xl font-medium text-[var(--text-1)] font-mono tabular-nums tracking-tight mb-1">
         {card1.count}
       </p>
       <div className="flex flex-col gap-0.5 mt-1">
-        {card1.tournaments.map((t, i) => (
+        {card1.tournaments.map((tournoi, i) => (
           <p key={i} className="text-[11px] text-[var(--text-3)]">
-            {t.name}
-            {t.surface ? (
-              <span className="ml-1 text-[var(--text-3)]">· {t.surface}</span>
+            {tournoi.name}
+            {tournoi.surface ? (
+              <span className="ml-1 text-[var(--text-3)]">· {tournoi.surface}</span>
             ) : null}
           </p>
         ))}
@@ -76,7 +79,7 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
+function Card2({ card2, onWeatherClick, t }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void; t: (key: string) => string }) {
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -84,10 +87,10 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Météo
+            {t('dashboard.statCards.weather')}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+        <p className="text-sm text-[var(--text-3)]">{t('dashboard.statCards.dataUnavailable')}</p>
       </div>
     )
   }
@@ -99,11 +102,11 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Météo
+            {t('dashboard.statCards.weather')}
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
-        <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
+        <p className="text-[11px] text-[var(--text-3)] mt-0.5">{t('dashboard.statCards.noActiveTournament')}</p>
       </div>
     )
   }
@@ -114,15 +117,15 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
       <div className="flex items-center gap-2 mb-3">
         <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Météo
+          {t('dashboard.statCards.weather')}
         </p>
         {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
           onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
-          title="Voir les prévisions horaires"
+          title={t('dashboard.statCards.seeHourlyForecast')}
           className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
-          Prévision
+          {t('dashboard.statCards.forecast')}
         </button>
       </div>
 
@@ -159,25 +162,25 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
                 {/* Right zone — 4 stacked metrics */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
-                    label="Température"
+                    label={t('dashboard.statCards.temperature')}
                     value={w.temperature !== null && w.temperature !== undefined
                       ? `${w.temperature}°C`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="Humidité"
+                    label={t('dashboard.statCards.humidity')}
                     value={w.humidity !== null && w.humidity !== undefined
                       ? `${w.humidity}%`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="Vent"
+                    label={t('dashboard.statCards.wind')}
                     value={w.wind_speed !== null && w.wind_speed !== undefined
                       ? `${w.wind_speed} km/h`
                       : '—'}
                   />
                   <WeatherMetric
-                    label="POP"
+                    label={t('dashboard.statCards.pop')}
                     value={w.pop !== null && w.pop !== undefined
                       ? `${w.pop}%`
                       : '—'}
@@ -207,17 +210,17 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
 
 type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
-function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
+function Card3({ card3, t }: { card3?: Card3Entry[] | null; t: (key: string) => string }) {
   if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Vitesse de surface
+            {t('dashboard.statCards.surfaceSpeed')}
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+        <p className="text-sm text-[var(--text-3)]">{t('dashboard.statCards.dataUnavailable')}</p>
       </div>
     )
   }
@@ -228,7 +231,7 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Vitesse de surface
+            {t('dashboard.statCards.surfaceSpeed')}
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
@@ -241,7 +244,7 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
       <div className="flex items-center gap-2 mb-3">
         <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Vitesse de surface
+          {t('dashboard.statCards.surfaceSpeed')}
         </p>
       </div>
       <div className="flex flex-col gap-4">
