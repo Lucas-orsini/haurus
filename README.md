@@ -46,7 +46,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -87,7 +87,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (or `Cmd+`` ` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -98,18 +98,18 @@ Then open http://localhost:3000 in your browser.
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key — never expose to browsers |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog Dashboard → Project Settings | Analytics host URL |
-| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email service API key |
-| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Verified sender email domain |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave as `https://eu.i.posthog.com` unless using US instance | PostHog server URL |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
 | `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
-| `NEXT_PUBLIC_APP_URL` | Yes | Manual | Your app's base URL (http://localhost:3000 for dev) |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL for email links |
 | `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot authentication token |
-| `TELEGRAM_BOT_SECRET` | No | Manual | Secret for HMAC-SHA256 webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username | Public bot username |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string for webhook verification | HMAC-SHA256 secret for webhook security |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username from Telegram BotFather | Bot username for display |
 
 ## 🧪 Running Tests
 
-Tests automatically check that key parts of the app work correctly. When you see PASS, everything is good. When you see FAIL, something needs fixing.
+Unit tests automatically check that individual pieces of code work correctly. Run them to make sure nothing broke after changes.
 
 Run all tests:
 
@@ -120,25 +120,27 @@ npx jest
 Run a specific test file:
 
 ```bash
+npx jest __tests__/auth-validators.test.ts
 npx jest __tests__/auth.test.ts
+npx jest __tests__/dashboard/formatMetric.test.ts
+npx jest __tests__/lib/dashboard/stats.test.ts
+npx jest __tests__/lib/utils.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
-Watch mode (re-runs automatically when you save changes):
+Watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-These tests cover:
-- Authentication validation logic
-- Authentication flows
-- Dashboard metric formatting
-- Dashboard statistics calculations
-- Utility functions
+**Reading the output**: `PASS` means all tests in that file passed. `FAIL` means something broke — look for the error message below the failure to see which test failed and why.
+
+The test suite covers: auth validation logic, auth functionality, dashboard metric formatting, dashboard stats utilities, general utilities, and common utils.
 
 ## 📁 Project Structure
 
-src/lib/metrics — metric definitions and calculations
+- `src/app` — Next.js App Router pages and layouts
 
 ## 🚀 Deploy to Vercel
 
@@ -146,12 +148,10 @@ src/lib/metrics — metric definitions and calculations
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in Vercel → Settings → Environment Variables:
-   - Copy every variable from your `.env.local` file
-   - Include `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and all others
+3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local` file
 4. Click Deploy
 
-> ⚠️ **Important**: Make sure all environment variables are added in Vercel before deploying. Your app won't work without them.
+> ⚠️ **Important**: Make sure to add ALL environment variables from `.env.local` to Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` which are server-side only.
 
 ## 📝 License
 
