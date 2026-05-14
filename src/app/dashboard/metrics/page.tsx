@@ -2,14 +2,16 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import DashboardShell from '@/components/dashboard/DashboardShell'
 import MetricsEducationClient from '@/components/dashboard/metrics/MetricsEducationClient'
 
 /**
  * Metrics education page.
  *
  * Server Component — verifies the user session and renders the
- * MetricsEducationClient (all metric definitions are imported statically
- * client-side from src/lib/metrics/definitions.ts).
+ * MetricsEducationClient wrapped in DashboardShell for consistent layout.
+ * The shell provides sidebar, header, and page container consistent
+ * with all other dashboard pages (dashboard/page.tsx, dashboard/player/page.tsx).
  */
 export default async function MetricsPage() {
   const supabase = await createClient()
@@ -22,5 +24,9 @@ export default async function MetricsPage() {
     redirect('/login')
   }
 
-  return <MetricsEducationClient />
+  return (
+    <DashboardShell>
+      <MetricsEducationClient />
+    </DashboardShell>
+  )
 }
