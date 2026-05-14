@@ -196,15 +196,15 @@ export const METRIC_SECTIONS: MetricSection[] = [
 ]
 
 /**
- * Flat list of all 16 metric definitions.
+ * Flat list of all metric definitions.
  * Useful for search/filter operations that don't need section context.
  */
 export const ALL_METRICS: MetricDefinition[] = METRIC_SECTIONS.flatMap((s) => s.metrics)
 
-// Count verification: 4 + 3 + 6 + 2 = 15
+// Count verification: 5 + 3 + 6 + 2 = 16
 const METRIC_COUNT = ALL_METRICS.length
-if (METRIC_COUNT !== 15) {
+if (METRIC_COUNT !== 16) {
   throw new Error(
-    `[MetricDefinitions] Expected 15 metrics, got ${METRIC_COUNT}. Fix the section arrays.`
+    `[MetricDefinitions] Expected 16 metrics, got ${METRIC_COUNT}. Fix the section arrays.`
   )
 }
