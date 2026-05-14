@@ -4,8 +4,7 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Metrics** — View and analyze match data with real-time metrics
-- **Match Analysis** — Display match information with formatted statistics
+- **Dashboard Metrics** — View and analyze match data with real-time metrics displayed on a metrics page
 - **Responsive UI** — Tailwind-powered responsive interface
 - **Charts & Visualization** — Recharts integration for data visualization
 
@@ -98,19 +97,21 @@ Then open http://localhost:3000 in your browser.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key — never expose to browsers |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave default | PostHog server URL |
-| `RESEND_API_KEY` | No | Resend → API Keys | Email sending API key |
-| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend | Sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend → Audiences → Settings | Email audience ID |
-| `NEXT_PUBLIC_APP_URL` | Yes | Local: http://localhost:3000 | Application base URL |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather | Bot authentication token |
-| `TELEGRAM_BOT_SECRET` | No | Your webhook secret | HMAC-SHA256 verification secret |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram bot username | Public bot identifier |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Leave as `https://eu.i.posthog.com` unless using US instance | PostHog server URL |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL for email links |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string for webhook verification | HMAC-SHA256 secret for webhook security |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username from Telegram BotFather | Bot username for display |
 
 ## 🧪 Running Tests
 
-Unit tests check that individual parts of the code work correctly. Run all tests:
+Unit tests automatically check that individual pieces of code work correctly. Run them to make sure nothing broke after changes.
+
+Run all tests:
 
 ```bash
 npx jest
@@ -120,37 +121,37 @@ Run a specific test file:
 
 ```bash
 npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
+npx jest __tests__/dashboard/formatMetric.test.ts
+npx jest __tests__/lib/dashboard/stats.test.ts
+npx jest __tests__/lib/utils.test.ts
+npx jest __tests__/utils.test.ts
 ```
 
-Run tests in watch mode (re-runs automatically when files change):
+Watch mode (re-runs automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-**Reading Jest output**: `PASS` means all tests passed, `FAIL` means something broke — Jest will show which test failed and why.
+**Reading the output**: `PASS` means all tests in that file passed. `FAIL` means something broke — look for the error message below the failure to see which test failed and why.
 
-Test coverage includes: auth validators, authentication flows, metric formatting, dashboard statistics, and utility functions.
+The test suite covers: auth validation logic, auth functionality, dashboard metric formatting, dashboard stats utilities, general utilities, and common utils.
 
 ## 📁 Project Structure
 
-- `src/lib` — Shared utilities and metric definitions
-- `src/components` — Reusable UI components including dashboard elements
-- `src/app` — Next.js App Router pages including dashboard metrics
+- `src/app` — Next.js App Router pages and layouts
 
 ## 🚀 Deploy to Vercel
 
-One-click deploy:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local` file
+4. Click Deploy
 
-Or manual deploy:
-
-1. Import your GitHub repository in Vercel Dashboard
-2. Add all environment variables from `.env.local` in Vercel → Settings → Environment Variables
-3. Click Deploy
-
-> ⚠️ **Important**: Don't forget to add all variables from `.env.local` to Vercel before deploying!
+> ⚠️ **Important**: Make sure to add ALL environment variables from `.env.local` to Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` which are server-side only.
 
 ## 📝 License
 
