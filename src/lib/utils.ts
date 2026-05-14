@@ -265,7 +265,7 @@ export function formatMetricValue(
     return `${sign}${Math.abs(value).toFixed(2)}`
   }
 
-  // MAP, Win Rate TD, Win Rate Surface TD : ×100, Math.round, %
+  // Win Rate TD, Win Rate Surface TD : ×100, Math.round, %
   if (PERCENT_ROUNDED_KEYS.has(metricKey)) {
     return `${Math.round(value * 100)}%`
   }
