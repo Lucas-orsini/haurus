@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { LocaleProvider } from '@/providers/LocaleProvider'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 
 export const metadata: Metadata = {
@@ -11,5 +12,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <DashboardShell>{children}</DashboardShell>
+  return (
+    <LocaleProvider>
+      <DashboardShell>{children}</DashboardShell>
+    </LocaleProvider>
+  )
 }

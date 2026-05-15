@@ -102,12 +102,14 @@ export default function MatchRow({ match, isEven, isFavorite, onToggleFavorite }
         </td>
 
         {/* Favoris — touch target 44px */}
-        <td className="px-2 md:px-4 py-3.5 min-h-[44px] flex items-center">
-          <FavoriteButton
-            matchId={match.id}
-            isFavorite={isFavorite}
-            onToggle={onToggleFavorite}
-          />
+        <td className="px-2 md:px-4 py-3.5 min-h-[44px]">
+          <div className="flex items-center justify-center">
+            <FavoriteButton
+              matchId={match.id}
+              isFavorite={isFavorite}
+              onToggle={onToggleFavorite}
+            />
+          </div>
         </td>
       </tr>
 

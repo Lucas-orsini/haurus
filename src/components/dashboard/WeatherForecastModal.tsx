@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { X, AlertCircle, CloudOff, Droplets, Thermometer, Wind } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { HourlyForecastEntry } from '@/lib/types/dashboard'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 interface WeatherForecastModalProps {
   tourneyName: string
@@ -36,6 +38,9 @@ export default function WeatherForecastModal({
   error,
   onClose,
 }: WeatherForecastModalProps) {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   // ── Keyboard close: Escape ──────────────────────────────────────────────
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -65,7 +70,7 @@ export default function WeatherForecastModal({
         onClick={onClose}
         aria-modal="true"
         role="dialog"
-        aria-label={`Prévisions météo pour ${tourneyName}`}
+        aria-label={`Weather forecast for ${tourneyName}`}
       >
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -87,13 +92,13 @@ export default function WeatherForecastModal({
                 {tourneyName}
               </h2>
               <p className="text-[11px] text-[var(--text-3)] mt-0.5">
-                Prévisions horaires · aujourd&apos;hui
+                {t.weather.modalLabel}
               </p>
             </div>
             <button
               onClick={onClose}
               className="w-7 h-7 flex items-center justify-center rounded-md text-[var(--text-3)] hover:text-[var(--text-1)] hover:bg-white/[0.06] transition-colors duration-150 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
-              aria-label="Fermer"
+              aria-label={t.weather.close}
             >
               <X size={15} strokeWidth={1.5} />
             </button>
@@ -135,7 +140,7 @@ export default function WeatherForecastModal({
                 </div>
                 <p className="text-sm font-medium text-[var(--text-2)]">{error}</p>
                 <p className="text-xs text-[var(--text-3)]">
-                  Réessayez en cliquant à nouveau sur le tournoi.
+                  {t.weather.errorRetry}
                 </p>
               </div>
             )}
@@ -147,10 +152,10 @@ export default function WeatherForecastModal({
                   <CloudOff size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
                 </div>
                 <p className="text-sm font-medium text-[var(--text-2)]">
-                  Aucune donnée disponible
+                  {t.weather.emptyTitle}
                 </p>
                 <p className="text-xs text-[var(--text-3)]">
-                  Les prévisions horaires ne sont pas encore disponibles pour ce tournoi.
+                  {t.weather.emptySubtitle}
                 </p>
               </div>
             )}
@@ -163,7 +168,7 @@ export default function WeatherForecastModal({
                   <div className="flex items-center gap-2 mb-3">
                     <Droplets size={13} strokeWidth={1.5} className="text-[var(--accent-hi)] shrink-0" />
                     <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-                      Précipitations ({hourlyCount}h)
+                      {t.weather.precipitation} ({hourlyCount}h)
                     </p>
                     {hasRain && (
                       <span className="ml-auto text-[11px] text-[var(--text-3)] tabular-nums">
@@ -245,7 +250,7 @@ export default function WeatherForecastModal({
                   <div className="flex items-center gap-2 mb-3">
                     <Thermometer size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
                     <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-                      Prévision 24h
+                      {t.weather.hourlySubtitle}
                     </p>
                   </div>
 
@@ -291,6 +296,18 @@ export default function WeatherForecastModal({
                                 : '—'}
                             </span>
                           </div>
+
+                          {/* Feels like temperature */}
+                          {hour.feels_like !== undefined && hour.feels_like !== null && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-[var(--text-3)] shrink-0">
+                                {t.weather.feelsLike}
+                              </span>
+                              <span className="text-[10px] text-[var(--text-2)] tabular-nums">
+                                {`${Math.round(hour.feels_like)}°`}
+                              </span>
+                            </div>
+                          )}
 
                           {/* Wind speed */}
                           {hour.wind_speed !== undefined && hour.wind_speed !== null && (

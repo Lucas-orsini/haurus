@@ -187,6 +187,98 @@ const fr = {
       errorGeneric: 'Une erreur est survenue.',
     },
   },
+  dashboard: {
+    header: {
+      overview: 'Aperçu',
+      overviewSubtitle: 'Statistiques des matchs ATP',
+      player: 'Joueur',
+      playerSubtitle: 'Profil et suivi des joueurs',
+      metrics: 'Métriques',
+      metricsSubtitle: 'Définitions des métriques',
+      openMenu: 'Ouvrir le menu',
+    },
+    sidebar: {
+      nav: {
+        overview: 'Aperçu',
+        player: 'Joueur',
+        metrics: 'Métriques',
+      },
+      sessionUnavailable: 'Session indisponible',
+      profile: 'Profil',
+      settings: 'Réglages',
+      signOut: 'Se déconnecter',
+      signingOut: 'Déconnexion...',
+    },
+    overview: {
+      matchCount_one: 'match',
+      matchCount_other: 'matchs',
+      retryButton: 'Réessayer',
+      searchPlaceholder: 'Rechercher un joueur...',
+      filterToday: "Aujourd'hui",
+      filterFavorites: 'Favoris',
+      filterFavoritesWithCount: 'Favoris ({{count}})',
+      clearFilters: 'Effacer',
+      clearButton: 'Effacer les filtres',
+      table: {
+        date: 'Date',
+        tournament: 'Tournoi',
+        players: 'Joueurs',
+        surface: 'Surface',
+      },
+      empty: {
+        noFavorites: {
+          title: 'Aucun favori',
+          description: 'Ajoutez des matchs en étoile.',
+        },
+        noResults: {
+          title: 'Aucun match trouvé',
+          description: 'Modifiez vos critères de recherche ou filtres.',
+        },
+      },
+      fetchError: "Échec du chargement des matchs. Veuillez réessayer.",
+    },
+    statCards: {
+      card1: {
+        title: "Matchs du jour",
+        noMatch: 'Aucun match prévu',
+      },
+      card2: {
+        title: 'Météo',
+        unavailable: 'Données indisponibles',
+        noTournament: 'Aucun tournoi actif',
+        forecast: 'Prévision',
+        forecastTooltip: 'Voir les prévisions horaires',
+        temperature: 'Température',
+        humidity: 'Humidité',
+        wind: 'Vent',
+        pop: 'POP',
+      },
+      card3: {
+        title: 'Vitesse de surface',
+        unavailable: 'Données indisponibles',
+      },
+    },
+  },
+  weather: {
+    close: 'Fermer',
+    forecast24h: 'Prévision 24h',
+    precipitations: 'Précipitations',
+    noData: 'Aucune donnée disponible',
+    noDataDescription:
+      'Les prévisions horaires ne sont pas encore disponibles pour ce tournoi.',
+    retryHint: 'Réessayez en cliquant à nouveau sur le tournoi.',
+    modalLabel: "Prévisions horaires · aujourd'hui",
+    hourlySubtitle: 'Prévisions horaires',
+    precipitation: 'Précipitations',
+    feelsLike: 'Ressenti',
+    errorRetry: 'Réessayez en cliquant à nouveau sur le tournoi.',
+    emptyTitle: 'Aucune donnée disponible',
+    emptySubtitle:
+      'Les prévisions horaires ne sont pas encore disponibles pour ce tournoi.',
+  },
+  common: {
+    close: 'Fermer',
+  },
 }
 
 const en = {
@@ -375,6 +467,98 @@ const en = {
       linkToLoginAction: 'Sign in',
       errorGeneric: 'Something went wrong.',
     },
+  },
+  dashboard: {
+    header: {
+      overview: 'Overview',
+      overviewSubtitle: 'ATP match statistics',
+      player: 'Player',
+      playerSubtitle: 'Player profile and tracking',
+      metrics: 'Metrics',
+      metricsSubtitle: 'Metric definitions',
+      openMenu: 'Open menu',
+    },
+    sidebar: {
+      nav: {
+        overview: 'Overview',
+        player: 'Player',
+        metrics: 'Metrics',
+      },
+      sessionUnavailable: 'Session unavailable',
+      profile: 'Profile',
+      settings: 'Settings',
+      signOut: 'Sign out',
+      signingOut: 'Signing out...',
+    },
+    overview: {
+      matchCount_one: 'match',
+      matchCount_other: 'matches',
+      retryButton: 'Retry',
+      searchPlaceholder: 'Search a player...',
+      filterToday: 'Today',
+      filterFavorites: 'Favorites',
+      filterFavoritesWithCount: 'Favorites ({{count}})',
+      clearFilters: 'Clear',
+      clearButton: 'Clear filters',
+      table: {
+        date: 'Date',
+        tournament: 'Tournament',
+        players: 'Players',
+        surface: 'Surface',
+      },
+      empty: {
+        noFavorites: {
+          title: 'No favorites',
+          description: 'Star matches to add them here.',
+        },
+        noResults: {
+          title: 'No matches found',
+          description: 'Update your search or filters.',
+        },
+      },
+      fetchError: 'Failed to load matches. Please try again.',
+    },
+    statCards: {
+      card1: {
+        title: "Today's matches",
+        noMatch: 'No matches scheduled',
+      },
+      card2: {
+        title: 'Weather',
+        unavailable: 'Data unavailable',
+        noTournament: 'No active tournament',
+        forecast: 'Forecast',
+        forecastTooltip: 'View hourly forecasts',
+        temperature: 'Temperature',
+        humidity: 'Humidity',
+        wind: 'Wind',
+        pop: 'POP',
+      },
+      card3: {
+        title: 'Surface speed',
+        unavailable: 'Data unavailable',
+      },
+    },
+  },
+  weather: {
+    close: 'Close',
+    forecast24h: '24h forecast',
+    precipitations: 'Precipitations',
+    noData: 'No data available',
+    noDataDescription:
+      'Hourly forecasts are not yet available for this tournament.',
+    retryHint: 'Try again by clicking on the tournament.',
+    modalLabel: 'Hourly forecasts · today',
+    hourlySubtitle: 'Hourly forecasts',
+    precipitation: 'Precipitations',
+    feelsLike: 'Feels like',
+    errorRetry: 'Try again by clicking on the tournament.',
+    emptyTitle: 'No data available',
+    emptySubtitle:
+      'Hourly forecasts are not yet available for this tournament.',
+  },
+  common: {
+    close: 'Close',
   },
 }
 
