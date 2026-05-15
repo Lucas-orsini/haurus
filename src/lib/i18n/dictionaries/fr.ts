@@ -125,4 +125,17 @@ export const fr: Dictionary = {
     precipitations: 'Précipitations',
     forecast24h: 'Prévision 24h',
   },
+  metrics: {
+    pageTitle: 'Comprendre les métriques',
+    pageDescription:
+      'Chaque métrique expliquée simplement — descriptions courtes pour tous, contenus experts pour approfondir.',
+    searchPlaceholder: 'Rechercher une métrique...',
+    metricCount: 'métriques',
+    metricCountSingular: 'métrique',
+    emptyStateTitle: 'Aucune métrique ne correspond à votre recherche',
+    emptyStateHint: 'Essayez un autre terme — nom, description ou surface.',
+    badgeBeta: 'Beta',
+    closeDetails: 'Fermer',
+    openDetails: 'Ouvrir les détails de {name}',
+  },
 }

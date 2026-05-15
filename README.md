@@ -9,7 +9,7 @@ The metrics bookmakers use. Now yours.
 - **Newsletter System** — Email newsletter distribution via Resend with unsubscribe management
 - **Telegram Bot Integration** — Optional bot for notifications and webhook support
 - **Internationalization** — Multi-language support with English and French
-- **Dashboard** — Weather forecast and user profile management
+- **Dashboard** — User profile management with metrics visualization
 
 ## 🛠️ Tech Stack
 
@@ -49,7 +49,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` ` (Windows/Linux) or `Cmd+`` ` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -90,7 +90,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` ` (or `Cmd+`` ` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -98,64 +98,54 @@ Then open http://localhost:3000 in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
-| `GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | OAuth client ID for Sign in with Google |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side API key (keep secret!) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Google OAuth sign-in |
 | `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | Analytics tracking key |
-| `RESEND_API_KEY` | No | Resend → API Keys | Email service API key |
-| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend → Domains | Sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend → Audiences → Settings | Email audience ID for newsletters |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather → Create bot | Bot token for Telegram integration |
-| `TELEGRAM_BOT_SECRET` | No | Your own secret string | HMAC-SHA256 secret for webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram @BotFather | Your bot's username (without @) |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog → Project Settings (EU hosting) | PostHog API endpoint |
+| `RESEND_API_KEY` | No | Resend → API Keys | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Resend Dashboard → Domains | Verified sender email domain |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | Your choice | Base URL for email links |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather chat | Bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string | HMAC-SHA256 webhook verification secret |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather | Your bot's username |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code work correctly. When you run tests, the system tells you if everything passes (PASS) or if something broke (FAIL with details).
+Unit tests automatically check that individual pieces of code (like functions and components) work correctly without needing to run the whole app.
 
-### Run all tests
-
+Run all tests:
 ```bash
-npm test
+npx jest
 ```
 
-### Run a specific test file
-
+Run a specific test file:
 ```bash
-npm test -- __tests__/auth.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-### Run tests in watch mode (re-runs automatically when files change)
-
+Run tests in watch mode (re-runs automatically when files change):
 ```bash
-npm test -- --watch
+npx jest --watch
 ```
 
-### Run tests with coverage report
+**Understanding the output:**
+- `PASS` — All tests passed, the code works correctly
+- `FAIL` — Something broke, check the error message above the failure
 
-```bash
-npm test -- --coverage
-```
-
-### What the tests cover
-
-- **auth.test.ts** — Authentication flow and user sessions
-- **auth-validators.test.ts** — Input validation for auth-related data
-- **dashboard/formatMetric.test.ts** — Metric formatting in the dashboard
-- **lib/dashboard/stats.test.ts** — Dashboard statistics calculations
-- **lib/utils.test.ts** — General utility functions
-- **utils.test.ts** — Common helper functions
+**Tests included:**
+- `__tests__/auth.test.ts` — Authentication flow tests
+- `__tests__/auth-validators.test.ts` — Auth validation logic tests
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard formatting tests
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics tests
+- `__tests__/lib/utils.test.ts` — Utility function tests
+- `__tests__/utils.test.ts` — General utility tests
 
 ## 📁 Project Structure
 
-- `src/lib/i18n` — Internationalization configuration, types, and dictionaries (English/French)
-- `src/app/dashboard` — Dashboard pages and layouts
-- `src/app/api/locale` — API route for locale management
-- `src/app` — Root layout and main pages
-- `src/components/dashboard` — Dashboard UI components (sidebar, header, modals)
-- `src/components/providers` — React context providers (locale)
-- `src/components/layout` — Layout components (language switcher)
-- `src/middleware.ts` — Request middleware (auth, localization)
-- `__tests__` — Jest test files
+- `src/lib/i18n` — Internationalization system with English and French dictionaries
+- `src/components/dashboard/metrics` — Dashboard metrics components
+- `__tests__` — Jest test files for the application
 
 ## 🚀 Deploy to Vercel
 
@@ -163,14 +153,10 @@ npm test -- --coverage
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables in Vercel Dashboard → Settings → Environment Variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - All other variables from your `.env.local`
-4. Click **Deploy**
+3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local`
+4. Click Deploy
 
-Your app will be live at `https://your-project.vercel.app` within seconds.
+> ⚠️ **Important**: Don't forget to add ALL environment variables listed above in Vercel, including `SUPABASE_SERVICE_ROLE_KEY` which is marked as "Keep secret".
 
 ## 📝 License
 

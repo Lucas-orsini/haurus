@@ -131,4 +131,16 @@ export interface Dictionary {
     precipitations: string
     forecast24h: string
   }
+  metrics: {
+    pageTitle: string
+    pageDescription: string
+    searchPlaceholder: string
+    metricCount: string
+    metricCountSingular: string
+    emptyStateTitle: string
+    emptyStateHint: string
+    badgeBeta: string
+    closeDetails: string
+    openDetails: string
+  }
 }
