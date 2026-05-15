@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
+import { useDictionary } from '@/components/providers/locale-provider'
 import PlayerSearchBar from './PlayerSearchBar'
 import SurfaceSelector from './SurfaceSelector'
 import PlayerMetricCards from './PlayerMetricCards'
@@ -49,6 +50,7 @@ interface TrackedPlayersResponse {
 }
 
 export default function PlayerProfileClient() {
+  const dict = useDictionary()
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
@@ -304,7 +306,7 @@ export default function PlayerProfileClient() {
         {/* Colonne droite — recherche + profil (flexible) */}
         <div className="flex-1 min-w-0 space-y-5">
 
-          {/* Bouton toggle "Mes joueurs" + barre de recherche — stack mobile, row desktop */}
+          {/* Bouton toggle "Mes joueurs" + barre de recherche */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <button
               onClick={() => setPanelOpen(!panelOpen)}
@@ -314,16 +316,16 @@ export default function PlayerProfileClient() {
               aria-label="Ouvrir ou fermer le panneau Mes joueurs"
             >
               <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">Mes joueurs</span>
+              <span className="whitespace-nowrap">{dict.player.panelButton}</span>
             </button>
 
-            {/* Barre de recherche — pleine largeur mobile */}
+            {/* Barre de recherche */}
             <div className="w-full md:w-auto md:flex-1">
               <PlayerSearchBar onSelectPlayer={handleSelectFromSearch} />
             </div>
           </div>
 
-          {/* Backdrop — ferme le volet au clic sur mobile */}
+          {/* Backdrop */}
           {panelOpen && (
             <div
               className="fixed inset-0 z-40 cursor-default md:hidden"
@@ -332,17 +334,17 @@ export default function PlayerProfileClient() {
             />
           )}
 
-          {/* Contenu profil — apparaît après sélection */}
+          {/* Contenu profil */}
           {selectedPlayer && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              {/* Header nom joueur + SurfaceSelector — stack mobile, row desktop */}
+              {/* Header nom joueur + SurfaceSelector */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div>
                     <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
                     {selectedPlayer.rank && (
                       <p className="text-xs text-[var(--text-3)] mt-0.5">
-                        ATP #{selectedPlayer.rank}
+                        {dict.player.atpRank.replace('{rank}', String(selectedPlayer.rank))}
                       </p>
                     )}
                   </div>
@@ -388,7 +390,7 @@ export default function PlayerProfileClient() {
             </div>
           )}
 
-          {/* État initial — rien n'est sélectionné */}
+          {/* État initial */}
           {!selectedPlayer && (
             <div
               className={`flex flex-col items-center justify-center py-20 text-center${!selectedPlayer && !panelOpen ? ' min-h-[60vh]' : ''}`}
@@ -399,8 +401,8 @@ export default function PlayerProfileClient() {
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
+              <p className="text-sm font-medium text-[var(--text-2)]">{dict.player.searchBar.placeholder.replace('...', '')}</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">{dict.player.panelSearchHint}</p>
             </div>
           )}
         </div>

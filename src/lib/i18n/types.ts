@@ -143,4 +143,90 @@ export interface Dictionary {
     closeDetails: string
     openDetails: string
   }
+  player: {
+    surface: {
+      hard: string
+      clay: string
+      grass: string
+    }
+    metricCards: {
+      glicko2: string
+      pServe: string
+      momentumTd: string
+      vsAtp: string
+      days30: string
+    }
+    matchHistory: {
+      title: string
+      colDate: string
+      colOpponent: string
+      colTournament: string
+      colSurface: string
+      colScore: string
+      colResult: string
+      colMetrics: string
+      resultWin: string
+      resultLoss: string
+      emptyTitle: string
+      emptyHint: string
+    }
+    matchMetricsModal: {
+      title: string
+      close: string
+      unavailable: string
+      advantage: string
+      disadvantage: string
+    }
+    searchBar: {
+      placeholder: string
+      noResults: string
+      sessionExpired: string
+      searchFailed: string
+    }
+    trackModal: {
+      title: string
+      body: string
+      bodyNoteUserPlan: string
+      cancel: string
+      confirm: string
+    }
+    trackedList: {
+      title: string
+      emptyTitle: string
+      emptyHint: string
+      lockedUntil: string
+      unlocked: string
+      removeTooltip: string
+      removeLockedTooltip: string
+    }
+    statsChart: {
+      metricLabel: string
+      insufficientHistory: string
+      pts: string
+      bppi: string
+      rank: string
+      pServePct: string
+      pReturnPct: string
+      tsdClay: string
+      tsdHard: string
+      tsdGrass: string
+      glickoClay: string
+      glickoHard: string
+      glickoGrass: string
+      momentum: string
+      winRate: string
+      winRateClay: string
+      winRateHard: string
+      winRateGrass: string
+      breaksWon: string
+      breaksLost: string
+      deltaRank6m: string
+    }
+    panelButton: string
+    panelSearchHint: string
+    atpRank: string
+    unlocked: string
+    removeTooltip: string
+    removeLockedTooltip: string
+  }
 }
