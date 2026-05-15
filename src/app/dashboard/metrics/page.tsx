@@ -9,9 +9,8 @@ import MetricsEducationClient from '@/components/dashboard/metrics/MetricsEducat
  * Metrics education page.
  *
  * Server Component — verifies the user session and renders the
- * MetricsEducationClient wrapped in DashboardShell for consistent layout.
- * The shell provides sidebar, header, and page container consistent
- * with all other dashboard pages (dashboard/page.tsx, dashboard/player/page.tsx).
+ * MetricsEducationClient. The app shell (Sidebar, header) is provided
+ * by the parent layout (src/app/dashboard/layout.tsx) via DashboardShell.
  */
 export default async function MetricsPage() {
   const supabase = await createClient()
@@ -24,9 +23,5 @@ export default async function MetricsPage() {
     redirect('/login')
   }
 
-  return (
-    <DashboardShell>
-      <MetricsEducationClient />
-    </DashboardShell>
-  )
+  return <MetricsEducationClient />
 }
