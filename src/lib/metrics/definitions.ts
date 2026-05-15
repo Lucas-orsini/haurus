@@ -73,14 +73,6 @@ const SERVICE_RETOUR_METRICS: MetricDefinition[] = [
     expertDescription:
       "Un score positif indique qu'il sauve plus de balles de break que ce que ses statistiques de service laissent attendre — signe de solidité mentale sur les moments clés.",
   },
-  {
-    id: 'map',
-    name: 'MAP',
-    plan: 'Free',
-    shortDescription: 'Probabilité théorique de remporter le match.',
-    expertDescription:
-      'Calculée point par point à partir des statistiques de service et retour des deux joueurs. Indépendante des cotes — reflète uniquement le niveau de jeu récent.',
-  },
 ]
 
 // ── Section 2: Rating & Niveau ─────────────────────────────────────────────────
