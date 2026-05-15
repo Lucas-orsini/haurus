@@ -12,6 +12,7 @@ import MatchHistoryTable from './MatchHistoryTable'
 import MatchMetricsModal from './MatchMetricsModal'
 import TrackedPlayersList from './TrackedPlayersList'
 import TrackPlayerModal from './TrackPlayerModal'
+import { useLocale } from '@/hooks/useLocale'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
 
@@ -49,6 +50,7 @@ interface TrackedPlayersResponse {
 }
 
 export default function PlayerProfileClient() {
+  const { t } = useLocale()
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
@@ -144,7 +146,7 @@ export default function PlayerProfileClient() {
   useEffect(() => {
     if (!selectedPlayer) return
     loadPlayerProfile(selectedPlayer, selectedSurface)
-  }, [selectedSurface]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedSurface, loadPlayerProfile])
 
   // Charge la liste des joueurs suivis au montage
   useEffect(() => {
@@ -311,10 +313,10 @@ export default function PlayerProfileClient() {
               className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto
                          border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
                          text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-              aria-label="Ouvrir ou fermer le panneau Mes joueurs"
+              aria-label={t.player.openMyPlayersAria}
             >
               <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">Mes joueurs</span>
+              <span className="whitespace-nowrap">{t.player.myPlayersButton}</span>
             </button>
 
             {/* Barre de recherche — pleine largeur mobile */}
@@ -399,8 +401,8 @@ export default function PlayerProfileClient() {
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
+              <p className="text-sm font-medium text-[var(--text-2)]">{t.player.profileEmptyTitle}</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">{t.player.profileEmptyHint}</p>
             </div>
           )}
         </div>

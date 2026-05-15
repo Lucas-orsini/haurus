@@ -4,8 +4,11 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
+- **Dashboard Overview** — Central hub displaying key metrics, statistics, and match data
+- **Player Tracking** — Search, track, and analyze individual player performance over time
+- **Statistics Charts** — Visual representation of player stats with interactive charts
+- **Multi-language Support** — Built-in internationalization with language switching capability
 - **Authentication** — Secure login system powered by Supabase with OAuth support
-- **OAuth Integration** — Seamless authentication callback handling for external providers
 - **Newsletter System** — Email newsletter distribution via Resend with unsubscribe management
 - **Telegram Bot Integration** — Optional bot for notifications and webhook support
 
@@ -97,72 +100,77 @@ Then open http://localhost:3000 in your browser.
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public API key for client-side operations |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side admin key (keep secret!) |
-| `GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | Google OAuth client ID for Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | PostHog (EU) defaults to `https://eu.i.posthog.com` | PostHog instance URL |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | API key for sending emails |
-| `RESEND_FROM_EMAIL` | Yes | Resend Dashboard → Domains → add a verified domain | Sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Audience ID for email list management |
-| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL for unsubscribe links in emails |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather → create bot → copy token | Bot API token for sending messages |
-| `TELEGRAM_BOT_SECRET` | No | Telegram → @BotSupport or custom HMAC secret | Secret for webhook signature verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram → @your_bot → set username | Bot username for display purposes |
-
-**To find your Supabase keys:**
-1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Select your project
-3. Navigate to **Project Settings** → **API**
-4. Copy **Project URL**, **anon/public key**, and **service_role key** (the service role key should never be exposed client-side)
+| `GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | For "Sign in with Google" feature |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog URL (defaults to `https://eu.i.posthog.com`) | PostHog server endpoint |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Must match a verified domain in Resend Dashboard → Domains | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletter |
+| `NEXT_PUBLIC_APP_URL` | Yes | Local: `http://localhost:3000` / Production: your deployed URL | Base URL for email links |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather → /newbot command | Telegram bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | You define this yourself | Secret for HMAC-SHA256 webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (from BotFather) | Bot username for display purposes |
 
 ## 🧪 Running Tests
 
-Tests automatically verify that your authentication logic, utility functions, and API routes are working correctly.
+Tests verify that individual pieces of code work correctly without needing the whole app running.
+
+### Run all tests
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
-npx jest __tests__/auth.test.ts
+### Run a specific test file
 
-# Watch mode — re-runs tests automatically when files change
+```bash
+npx jest __tests__/lib/utils.test.ts
+```
+
+### Watch mode (re-runs automatically when files change)
+
+```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- **PASS** — All assertions in the test passed ✅
-- **FAIL** — Something broke ❌, the error message shows which test failed and why
+### Understanding test output
 
-**What the tests cover:**
-- `__tests__/auth.test.ts` — Authentication flow and user sessions
-- `__tests__/auth-validators.test.ts` — Input validation for auth forms
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Statistics calculation logic
-- `__tests__/lib/utils.test.ts` — General utility functions
-- `__tests__/utils.test.ts` — Shared helper functions
+- **PASS** — All assertions passed, the code works as expected
+- **FAIL** — Something broke; look at the error message below for details on what failed
+
+### What the tests cover
+
+- **auth-validators.test.ts** — Authentication validation logic
+- **auth.test.ts** — Authentication flow and user session handling
+- **formatMetric.test.ts** — Metric formatting utilities for the dashboard
+- **stats.test.ts** — Statistics calculation and processing
+- **utils.test.ts** — General utility functions used throughout the app
 
 ## 📁 Project Structure
 
-- `src/lib` — Shared libraries including authentication logic
-- `src/app/api` — API routes handling newsletter unsubscribe, admin newsletter sending, and auth callbacks
+- **src/app/dashboard** — Dashboard pages and layouts (App Router)
+- **src/components/dashboard** — Dashboard UI components (overview, sidebar, header, stat cards, match rows)
+- **src/components/dashboard/player** — Player tracking components (search, stats chart, tracked list, player profile)
+- **src/components/ui** — Reusable UI components (language switcher)
+- **src/providers** — React context providers (locale provider)
+- **src/hooks** — Custom React hooks (useLocale)
+- **src/lib** — Core utilities and library code (i18n setup)
+- **__tests__** — Jest test files for components and utilities
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-**Step by step:**
-
-1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, go to **Settings** → **Environment Variables**
-4. Add each variable from your `.env.local` file one by one:
-   - Copy the variable name (e.g., `NEXT_PUBLIC_SUPABASE_URL`)
-   - Paste the value
-   - Click **Save**
-5. Go to **Deployments** → click **Redeploy** on your latest deployment
-6. Wait for the build to complete — your app will be live at `https://your-project.vercel.app`
+3. Add all environment variables from your `.env.local`:
+   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Copy each variable name and value from `.env.local`
+4. Click **Deploy**
 
-> ⚠️ **Important**: All `NEXT_PUBLIC_*` variables must be added to Vercel, otherwise the app will fail to build. The `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` are server-side only — never prefix them with `NEXT_PUBLIC_`.
+Your app will be live at `https://your-project.vercel.app` (you can customize the domain later).
+
+> ⚠️ **Important**: Make sure all environment variables are added to Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` which must remain secret.
 
 ## 📝 License
 

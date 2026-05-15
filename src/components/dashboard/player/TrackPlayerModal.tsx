@@ -1,6 +1,6 @@
 'use client'
 
-import { X, AlertTriangle, Loader2 } from 'lucide-react'
+import { X, AlertTriangle } from 'lucide-react'
 
 interface TrackPlayerModalProps {
   isOpen: boolean
@@ -53,7 +53,6 @@ export default function TrackPlayerModal({
             Vous ne pourrez pas le retirer de vos suivis avant cette date.
           </p>
 
-          {/* Note pour le rôle user */}
           {role === 'user' && (
             <p className="text-[11px] text-[var(--text-3)] mt-2 leading-relaxed">
               Note : aucune restriction ne s&apos;applique pour le moment sur votre plan.

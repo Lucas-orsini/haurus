@@ -16,7 +16,6 @@ export default function FavoriteButton({ matchId, isFavorite, onToggle }: Favori
     e.stopPropagation()
     if (loading) return
 
-    const previousFavorite = isFavorite
     setLoading(true)
 
     try {

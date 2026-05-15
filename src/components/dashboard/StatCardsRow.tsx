@@ -77,7 +77,6 @@ type WeatherCardData = {
 type Card2Entry = { name: string; weather: WeatherCardData }
 
 function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
-  // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
@@ -92,7 +91,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
     )
   }
 
-  // State: empty — no active tournament today (card2 is null or [])
   if (!card2 || card2.length === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
@@ -108,7 +106,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
     )
   }
 
-  // State: success — render one weather block per tournament entry
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-3">
@@ -116,7 +113,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
           Météo
         </p>
-        {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
           onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
           title="Voir les prévisions horaires"
@@ -131,14 +127,11 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
-              {/* Tournament name — non cliquable */}
               <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
                 {name}
               </p>
 
-              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">
-                {/* Left zone — conditions label + OpenWeatherMap icon */}
                 <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
                   {w.conditions_icon ? (
                     <img
@@ -156,7 +149,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
                   </p>
                 </div>
 
-                {/* Right zone — 4 stacked metrics */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
                     label="Température"
@@ -253,7 +245,6 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
   )
 }
 
-/** Palette hex pour la jauge — indexée par PaceColor */
 const PACE_COLOR_HEX: Record<string, string> = {
   blue:   '#3b82f6',
   yellow: '#facc15',

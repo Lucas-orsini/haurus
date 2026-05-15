@@ -130,6 +130,7 @@ export default function TrackedPlayersList({
         {trackedPlayers.map((player) => {
           const locked = lockDays && isLocked(player.locked_until)
           const removing = removingName === player.player_name
+          const lockDate = formatLockDate(player.locked_until)
 
           return (
             <div
@@ -142,11 +143,10 @@ export default function TrackedPlayersList({
                 <p className="text-sm text-[var(--text-1)] truncate leading-tight">
                   {player.player_name}
                 </p>
-                {/* Lock info */}
                 {lockDays && locked && (
                   <p className="text-[11px] text-[var(--text-3)] flex items-center gap-1 mt-0.5">
                     <Lock size={9} strokeWidth={1.5} className="shrink-0" />
-                    Verrouillé jusqu&apos;au {formatLockDate(player.locked_until)}
+                    Verrouillé jusqu&apos;au {lockDate}
                   </p>
                 )}
                 {lockDays && !locked && (
@@ -160,7 +160,7 @@ export default function TrackedPlayersList({
               <button
                 onClick={(e) => handleRemove(e, player.player_name)}
                 disabled={locked || removing}
-                title={locked ? `Joueur verrouillé jusqu'au ${formatLockDate(player.locked_until)}` : 'Retirer des suivis'}
+                title={locked ? `Joueur verrouillé jusqu'au ${lockDate}` : 'Retirer des suivis'}
                 className={cn(
                   'w-6 h-6 shrink-0 rounded flex items-center justify-center transition-all duration-150',
                   locked
