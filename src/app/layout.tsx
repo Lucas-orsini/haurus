@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { Tektur } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { cookies } from 'next/headers'
 import { PostHogProvider } from '@/providers/PostHogProvider'
 import { PostHogPageView } from '@/providers/PostHogPageView'
+import { LOCALE_COOKIE_NAME } from '@/lib/i18n/config'
 import './globals.css'
 
 const tektur = Tektur({
@@ -21,9 +23,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Read locale from cookie server-side to set the HTML lang attribute correctly.
+  // This avoids a hydration mismatch since the attribute must match on server and client.
+  const cookieStore = await cookies()
+  const localeCookie = cookieStore.get(LOCALE_COOKIE_NAME)
+  const locale: string = localeCookie?.value === 'fr' ? 'fr' : 'en'
+
   return (
-    <html lang="en" className="scroll-smooth antialiased">
+    <html lang={locale} className="scroll-smooth antialiased">
       <body className={`${tektur.variable} bg-[var(--bg)] text-[var(--text-1)] min-h-screen`}>
         <PostHogProvider>
           <Suspense fallback={null}>
