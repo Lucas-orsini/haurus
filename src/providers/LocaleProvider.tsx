@@ -12,7 +12,23 @@ const LocaleContext = createContext<LocaleContextValue>({
   setLocale: () => {},
 })
 
-const STORAGE_KEY = 'haurus-locale'
+const COOKIE_NAME = 'locale'
+const COOKIE_MAX_AGE = 31536000 // 1 year in seconds
+
+/** Reads the locale cookie value from document.cookie. Returns null if not set or invalid. */
+function readCookie(): Locale | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`))
+  const value = match?.[1]
+  if (value === 'fr' || value === 'en') return value as Locale
+  return null
+}
+
+/** Writes the locale to a cookie with a 1-year expiry. */
+function writeCookie(locale: Locale) {
+  if (typeof document === 'undefined') return
+  document.cookie = `${COOKIE_NAME}=${locale}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`
+}
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   // Default to 'fr' to avoid hydration mismatch — avoids flash on first SSR render
@@ -23,17 +39,17 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = locale
   }, [locale])
 
-  // Load persisted locale from localStorage on mount
+  // Load persisted locale from cookie on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'fr' || stored === 'en') {
-      setLocaleState(stored as Locale)
+    const stored = readCookie()
+    if (stored) {
+      setLocaleState(stored)
     }
   }, [])
 
   function setLocale(newLocale: Locale) {
     setLocaleState(newLocale)
-    localStorage.setItem(STORAGE_KEY, newLocale)
+    writeCookie(newLocale)
   }
 
   return (
