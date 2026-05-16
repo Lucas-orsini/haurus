@@ -66,6 +66,20 @@ export const frDict: Dictionary = {
     noHistory: 'Aucun match disponible',
     noHistoryDesc: "L'historique de ce joueur est vide",
   },
+  metrics: {
+    pageTitle: 'Comprendre les métriques',
+    pageDescription:
+      'Chaque métrique expliquée simplement — descriptions courtes pour tous, contenus experts pour approfondir.',
+    searchPlaceholder: 'Rechercher une métrique…',
+    badgeBeta: 'Bêta',
+    modalClose: 'Fermer',
+    openMetricDetails: 'Ouvrir les détails de {metric}',
+    metricCount: 'métriques',
+    metricCountSingular: 'métrique',
+    metricCountPlural: 'métriques',
+    emptyStateTitle: 'Aucune métrique ne correspond à votre recherche',
+    emptyStateDescription: 'Essayez un autre terme — nom, description ou surface.',
+  },
   common: {
     date: 'Date',
     tournament: 'Tournoi',

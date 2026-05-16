@@ -74,6 +74,19 @@ export type Dictionary = {
     noHistory: string
     noHistoryDesc: string
   }
+  metrics: {
+    pageTitle: string
+    pageDescription: string
+    searchPlaceholder: string
+    badgeBeta: string
+    modalClose: string
+    openMetricDetails: string
+    metricCount: string
+    metricCountSingular: string
+    metricCountPlural: string
+    emptyStateTitle: string
+    emptyStateDescription: string
+  }
   common: {
     date: string
     tournament: string

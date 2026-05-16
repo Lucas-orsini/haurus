@@ -66,6 +66,21 @@ export const enDict: Dictionary = {
     noHistory: 'No match available',
     noHistoryDesc: 'This player has no match history',
   },
+  metrics: {
+    pageTitle: 'Understanding metrics',
+    pageDescription:
+      'Each metric explained simply — short descriptions for everyone, expert content to go deeper.',
+    searchPlaceholder: 'Search a metric…',
+    badgeBeta: 'Beta',
+    modalClose: 'Close',
+    openMetricDetails: 'Open details for {metric}',
+    metricCount: 'metrics',
+    metricCountSingular: 'metric',
+    metricCountPlural: 'metrics',
+    emptyStateTitle: 'No metric matches your search',
+    emptyStateDescription:
+      'Try another term — name, description or surface.',
+  },
   common: {
     date: 'Date',
     tournament: 'Tournament',
