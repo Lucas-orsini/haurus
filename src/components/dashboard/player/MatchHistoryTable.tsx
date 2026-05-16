@@ -17,24 +17,14 @@ function formatDate(isoDate: string): string {
   return `${day}/${month}/${year}`
 }
 
-/** Safe dictionary access with bracket fallback */
-function t(dict: Record<string, unknown>, path: string): string {
-  const value = path.split('.').reduce<unknown>((acc, key) => {
-    if (acc && typeof acc === 'object') return (acc as Record<string, unknown>)[key]
-    return undefined
-  }, dict as unknown)
-  return typeof value === 'string' ? value : `[${path}]`
-}
-
 export default function MatchHistoryTable({
   matchHistory,
   selectedPlayerName,
   onOpenMetrics,
 }: MatchHistoryTableProps) {
-  const { locale } = useLocale()
-  const dict = locale === 'en'
-    ? EN_MATCH_HISTORY
-    : FR_MATCH_HISTORY
+  const { dict } = useLocale()
+  const t = dict.player
+  const common = dict.common
 
   if (matchHistory.length === 0) {
     return (
@@ -49,8 +39,8 @@ export default function MatchHistoryTable({
               <path d="M15 3v18" />
             </svg>
           </div>
-          <p className="text-sm text-[var(--text-2)]">{dict.empty}</p>
-          <p className="text-xs text-[var(--text-3)] mt-1">{dict.emptySubtitle}</p>
+          <p className="text-sm text-[var(--text-2)]">{t.noHistory}</p>
+          <p className="text-xs text-[var(--text-3)] mt-1">{t.noHistoryDesc}</p>
         </div>
       </div>
     )
@@ -59,19 +49,19 @@ export default function MatchHistoryTable({
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-[var(--border-md)]">
-        <h3 className="text-sm font-medium text-[var(--text-1)]">{dict.title}</h3>
+        <h3 className="text-sm font-medium text-[var(--text-1)]">{t.lastMatches}</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-md)]">
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.date}</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.opponent}</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.tournament}</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.surface}</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.score}</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.result}</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide w-24">{dict.metrics}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.date}</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.opponent}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.tournament}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.surface}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.score}</th>
+              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{common.result}</th>
+              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide w-24">{t.metrics}</th>
             </tr>
           </thead>
           <tbody>
@@ -103,12 +93,12 @@ export default function MatchHistoryTable({
                   <td className="px-4 py-3 text-center">
                     {isWin === true && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-[var(--green)]/10 text-[var(--green)] text-xs font-semibold">
-                        V
+                        {common.win}
                       </span>
                     )}
                     {isWin === false && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-[var(--red)]/10 text-[var(--red)] text-xs font-semibold">
-                        D
+                        {common.loss}
                       </span>
                     )}
                     {isWin === null && (
@@ -122,7 +112,7 @@ export default function MatchHistoryTable({
                       onClick={() => onOpenMetrics(match.date_match, match.player1, match.player2)}
                       className="inline-flex items-center justify-center h-7 px-3 rounded text-xs font-medium bg-white/[0.04] hover:bg-white/[0.08] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border-md)] hover:border-[var(--border)] transition-all duration-150"
                     >
-                      {dict.metricsBtn}
+                      {t.metrics}
                     </button>
                   </td>
                 </tr>
@@ -133,32 +123,4 @@ export default function MatchHistoryTable({
       </div>
     </div>
   )
-}
-
-const FR_MATCH_HISTORY = {
-  empty: "Aucun match disponible",
-  emptySubtitle: "L'historique de ce joueur est vide",
-  title: 'Derniers matchs',
-  date: 'Date',
-  opponent: 'Adversaire',
-  tournament: 'Tournoi',
-  surface: 'Surface',
-  score: 'Score',
-  result: 'Résultat',
-  metrics: 'Métriques',
-  metricsBtn: 'Métriques',
-}
-
-const EN_MATCH_HISTORY = {
-  empty: 'No matches available',
-  emptySubtitle: 'This player has no match history',
-  title: 'Recent matches',
-  date: 'Date',
-  opponent: 'Opponent',
-  tournament: 'Tournament',
-  surface: 'Surface',
-  score: 'Score',
-  result: 'Result',
-  metrics: 'Metrics',
-  metricsBtn: 'Metrics',
 }

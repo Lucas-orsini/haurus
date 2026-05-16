@@ -66,13 +66,38 @@ export type Dictionary = {
   }
   player: {
     myPlayers: string
-    searchPlayerHint: string
-    searchPlayerDesc: string
+    atpRank: string
+    searchPlaceholder: string
+    searchHint: string
     noMatchAvailable: string
     lastMatches: string
     metrics: string
     noHistory: string
     noHistoryDesc: string
+    chart: {
+      insufficientHistory: string
+    }
+    search: {
+      placeholder: string
+      noResults: string
+      errorGeneric: string
+      errorUnauthorized: string
+    }
+    tracking: {
+      title: string
+      bodyLock: string
+      bodyUserNote: string
+      cancel: string
+      confirm: string
+    }
+    tracked: {
+      headerLabel: string
+      emptyTitle: string
+      emptyDesc: string
+      lockedUntil: string
+      unlocked: string
+      removeTooltip: string
+    }
   }
   metrics: {
     pageTitle: string

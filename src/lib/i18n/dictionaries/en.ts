@@ -58,13 +58,39 @@ export const enDict: Dictionary = {
   },
   player: {
     myPlayers: 'My players',
-    searchPlayerHint: 'Search an ATP player',
-    searchPlayerDesc: 'Type at least 2 characters to start',
+    atpRank: 'ATP #',
+    searchPlaceholder: 'Search an ATP player',
+    searchHint: 'Type at least 2 characters to start',
     noMatchAvailable: 'No matches available',
-    lastMatches: 'Last matches',
+    lastMatches: 'Recent matches',
     metrics: 'Metrics',
-    noHistory: 'No match available',
+    noHistory: 'No matches available',
     noHistoryDesc: 'This player has no match history',
+    chart: {
+      insufficientHistory: 'Insufficient history — check back in a few days',
+    },
+    search: {
+      placeholder: 'Search an ATP player...',
+      noResults: 'No player found',
+      errorGeneric: 'Search failed. Please try again.',
+      errorUnauthorized: 'Session expired. Please sign in again.',
+    },
+    tracking: {
+      title: 'Track {playerName}',
+      bodyLock:
+        'Once added to your tracked players, this player will be locked until the first day of the following month. You will not be able to remove them before that date.',
+      bodyUserNote: 'Note: no restriction applies at this time on your plan.',
+      cancel: 'Cancel',
+      confirm: 'Track & view',
+    },
+    tracked: {
+      headerLabel: 'Tracked',
+      emptyTitle: 'No tracked players',
+      emptyDesc: 'Search for a player and add them to your tracked list',
+      lockedUntil: 'Locked until {date}',
+      unlocked: 'Unlocked',
+      removeTooltip: 'Remove from tracked',
+    },
   },
   metrics: {
     pageTitle: 'Understanding metrics',

@@ -4,11 +4,16 @@ The metrics bookmakers use. Now yours.
 
 ## ✨ Features
 
-- **Dashboard Metrics** — View and analyze match data with real-time metrics displayed on a metrics page
-- **Responsive UI** — Tailwind-powered responsive interface
-- **Charts & Visualization** — Recharts integration for data visualization
-- **Internationalization** — Multi-language support (English, French) with language switcher
-- **Analytics Integration** — PostHog-powered analytics tracking
+- **Player Search & Tracking** — Search for tennis players and track your favorite athletes
+- **Match History** — View detailed match history with surface-specific statistics
+- **Interactive Metrics Dashboard** — Real-time metrics cards displaying key performance indicators
+- **Statistical Charts** — Visual data representation using Recharts for trends and comparisons
+- **Surface Filtering** — Filter statistics by playing surface (hard, clay, grass)
+- **Responsive Dashboard UI** — Tailwind-powered responsive interface optimized for all devices
+- **Multi-language Support** — English and French localization with automatic language detection
+- **Email Notifications** — Resend-powered transactional emails for tracked player updates
+- **Analytics Integration** — PostHog-powered analytics tracking for user insights
+- **Telegram Integration** — Optional bot for real-time match notifications
 
 ## 🛠️ Tech Stack
 
@@ -97,71 +102,68 @@ Then open http://localhost:3000 in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key in the "Project API keys" section | Public API key for client-side operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key (keep this secret — never expose to client) | Server-side only key for admin operations |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | For Sign in with Google feature |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Your PostHog project key for analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Provided in template — use `https://eu.i.posthog.com` for EU hosting | PostHog server endpoint |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | API key for sending emails |
-| `RESEND_FROM_EMAIL` | Yes | Must be a domain verified in Resend Dashboard → Domains | Sender email address (e.g., `hello@yourdomain.com`) |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → your audience → Settings | Audience ID for email marketing |
-| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL of your app (for unsubscribe links) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather — [follow this guide](https://core.telegram.org/bots/tutorial#creating-your-first-bot) | Telegram bot token for notifications |
-| `TELEGRAM_BOT_SECRET` | No | Your own secret string for HMAC-SHA256 webhook verification | Webhook signature secret |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (without @) | Used to identify the bot in your app |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key (⚠️ keep this secret, never expose to client) | Admin key for server-side operations |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Required only if using Sign in with Google |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Defaults to `https://eu.i.posthog.com` | PostHog server URL |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletters |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set manually | Base URL of your app (use `http://localhost:3000` for local dev) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather after creating your bot | Bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Set manually — any random secret string | HMAC secret for webhook verification |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username (e.g., `MyTennisBot`) | Telegram bot username |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual parts of the code work correctly without needing the full app running.
+Unit tests check that specific parts of the code work correctly — think of them as automated quality checks for individual features.
 
-### Run all tests
+Run all tests:
 
 ```bash
 npx jest
 ```
 
-### Run a specific test file
+Run a specific test file:
 
 ```bash
-npx jest __tests__/auth.test.ts
+npx jest __tests__/auth-validators.test.ts
 ```
 
-### Watch mode (re-runs on file change)
+Watch mode (re-runs tests automatically when files change):
 
 ```bash
 npx jest --watch
 ```
 
-### Reading the output
+**Reading the output:**
+- **PASS** ✅ — All assertions passed, the code works as expected
+- **FAIL** ❌ — Something broke, check the error message below to see which test failed and why
 
-- **PASS** ✅ — All assertions in that test passed
-- **FAIL** ❌ — Something broke; read the error message below to see which test failed and why
-- **Test Suites** — A group of related tests; each can pass or fail independently
-
-### What the tests cover
-
-- `auth.test.ts`, `auth-validators.test.ts` — Authentication logic and validation
-- `dashboard/formatMetric.test.ts` — Metric formatting for the dashboard
-- `lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `lib/utils.test.ts`, `utils.test.ts` — General utility functions
+The test suite covers:
+- Authentication validation logic
+- Dashboard metric formatting utilities
+- Statistical calculation helpers
+- General utility functions
 
 ## 📁 Project Structure
 
-- `src/lib/i18n/` — Internationalization: type definitions and language dictionaries (English, French)
-- `src/components/dashboard/metrics/` — Dashboard metrics UI components
-- `src/app/dashboard/metrics/` — Metrics page (Next.js App Router)
-- `__tests__/` — Jest test suites for auth, dashboard utilities, and shared utilities
+- `src/lib/i18n` — Internationalization setup with English and French dictionaries
+- `src/components/dashboard/player` — Player dashboard components (metrics cards, search, charts, match history, tracking modals)
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-### Step by step
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. In the Vercel dashboard, add all your environment variables:
+   - Go to **Settings** → **Environment Variables**
+   - Add each variable from your `.env.local` file (copy the key and value pairs)
+   - Make sure to set them for **Production**, **Preview**, and **Development** environments
+4. Click **Deploy**
 
-1. **Import your repository** — Click "Import Project" on Vercel, select your GitHub repo
-2. **Add environment variables** — Go to your project → Settings → Environment Variables. Add every variable from your `.env.local` file (copy-paste the key-value pairs)
-3. **Deploy** — Click "Deploy". Vercel will automatically detect Next.js and run the build
-
-> ⚠️ **Important**: Make sure all environment variables from `.env.local` are also added in Vercel, especially `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` — these are server-only and should remain hidden.
+Your app will be live at `https://your-project.vercel.app` within seconds.
 
 ## 📝 License
 

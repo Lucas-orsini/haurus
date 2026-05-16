@@ -58,13 +58,41 @@ export const frDict: Dictionary = {
   },
   player: {
     myPlayers: 'Mes joueurs',
-    searchPlayerHint: 'Recherchez un joueur ATP',
-    searchPlayerDesc: "Tapez au moins 2 caractères pour démarrer",
+    atpRank: 'ATP #',
+    searchPlaceholder: 'Recherchez un joueur ATP',
+    searchHint: "Tapez au moins 2 caractères pour démarrer",
     noMatchAvailable: 'Aucun match disponible',
     lastMatches: 'Derniers matchs',
     metrics: 'Métriques',
     noHistory: 'Aucun match disponible',
     noHistoryDesc: "L'historique de ce joueur est vide",
+    chart: {
+      insufficientHistory: "Historique insuffisant — revenez dans quelques jours",
+    },
+    search: {
+      placeholder: 'Rechercher un joueur ATP...',
+      noResults: 'Aucun joueur trouvé',
+      errorGeneric: 'Échec de la recherche. Veuillez réessayer.',
+      errorUnauthorized: 'Session expirée. Veuillez vous reconnecter.',
+    },
+    tracking: {
+      title: 'Suivre {playerName}',
+      bodyLock:
+        "Une fois ajouté à vos suivis, ce joueur sera verrouillé jusqu'au premier jour du mois suivant. Vous ne pourrez pas le retirer de vos suivis avant cette date.",
+      bodyUserNote:
+        "Note : aucune restriction ne s'applique pour le moment sur votre plan.",
+      cancel: 'Annuler',
+      confirm: 'Suivre et consulter',
+    },
+    tracked: {
+      headerLabel: 'Suivis',
+      emptyTitle: 'Aucun joueur suivi',
+      emptyDesc:
+        'Recherchez un joueur et ajoutez-le à vos suivis',
+      lockedUntil: "Verrouillé jusqu'au {date}",
+      unlocked: 'Débloqué',
+      removeTooltip: 'Retirer des suivis',
+    },
   },
   metrics: {
     pageTitle: 'Comprendre les métriques',

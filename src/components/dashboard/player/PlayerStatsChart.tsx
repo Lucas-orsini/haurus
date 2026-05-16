@@ -8,6 +8,7 @@ import {
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 import type { StatsHistoryPoint } from '@/lib/types/player'
+import { useLocale } from '@/providers/LocaleProvider'
 
 type Json = Database['public']['Tables']['player_stats']['Row']['stats_history'] extends infer T ? T : never
 
@@ -68,12 +69,15 @@ function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoi
 }
 
 function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number }) {
+  const { dict } = useLocale()
+  const insufficientText = dict.player.chart.insufficientHistory
+
   const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
 
   if (validData.length < 3) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+        <p className="text-sm text-[var(--text-3)]">{insufficientText}</p>
       </div>
     )
   }
@@ -130,6 +134,8 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
 
 export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps) {
   const [selectedMetric, setSelectedMetric] = useState(METRICS[0].key)
+  const { dict } = useLocale()
+  const insufficientText = dict.player.chart.insufficientHistory
 
   const parsedData = useMemo(
     () => parseStatsHistory(statsHistory, selectedMetric),
@@ -196,7 +202,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
       <div className="h-[250px] md:h-[200px]">
         {parsedData.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+            <p className="text-sm text-[var(--text-3)]">{insufficientText}</p>
           </div>
         ) : (
           <>
