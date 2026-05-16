@@ -20,6 +20,7 @@ export const frDict: Dictionary = {
     signOut: 'Se déconnecter',
     signOutLoading: 'Déconnexion…',
     sessionUnavailable: 'Session indisponible',
+    openMenu: 'Ouvrir le menu',
   },
   dashboard: {
     title: 'Aperçu',

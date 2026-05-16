@@ -53,7 +53,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -94,29 +94,29 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (or `Cmd+`` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
 
 ## 🔑 Environment Variables
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key in the "Project API keys" section | Public API key for client-side operations |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key (⚠️ keep this secret, never expose to client) | Admin key for server-side operations |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Required only if using Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | Defaults to `https://eu.i.posthog.com` | PostHog server URL |
-| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → Project URL | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → anon/public key | Public key for Supabase client |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → service_role key | Server-side only key with admin privileges |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials | For Google Sign-In functionality |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog → Project Settings → Project API Key | PostHog analytics public key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Default: `https://eu.i.posthog.com` | PostHog server host |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending service API key |
 | `RESEND_FROM_EMAIL` | No | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletters |
-| `NEXT_PUBLIC_APP_URL` | Yes | Set manually | Base URL of your app (use `http://localhost:3000` for local dev) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather after creating your bot | Bot API token |
-| `TELEGRAM_BOT_SECRET` | No | Set manually — any random secret string | HMAC secret for webhook verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username (e.g., `MyTennisBot`) | Telegram bot username |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience identifier |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for dev | Base URL of your application |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather → Create bot | Telegram bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | You define this — used for HMAC-SHA256 webhook verification | Secret for validating incoming requests |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your bot's username (e.g., `mytennisbot`) | Telegram bot username |
 
 ## 🧪 Running Tests
 
-Unit tests check that specific parts of the code work correctly — think of them as automated quality checks for individual features.
+Unit tests automatically check that individual parts of the code work correctly. When you run them, the console shows PASS (all good) or FAIL (something broke).
 
 Run all tests:
 
@@ -127,29 +127,29 @@ npx jest
 Run a specific test file:
 
 ```bash
-npx jest __tests__/auth-validators.test.ts
+npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
+Watch mode — automatically re-runs tests when you save a file:
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- **PASS** ✅ — All assertions passed, the code works as expected
-- **FAIL** ❌ — Something broke, check the error message below to see which test failed and why
+**What the tests cover:**
 
-The test suite covers:
-- Authentication validation logic
-- Dashboard metric formatting utilities
-- Statistical calculation helpers
-- General utility functions
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows and user sessions
+- `__tests__/dashboard/formatMetric.test.ts` — Dashboard metric formatting utilities
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `__tests__/lib/utils.test.ts` — General utility functions
+- `__tests__/utils.test.ts` — Common utilities used across the app
 
 ## 📁 Project Structure
 
+- `src/app/dashboard` — Dashboard page and route
+- `src/components/dashboard` — Dashboard UI components (header, stat cards, overview)
 - `src/lib/i18n` — Internationalization setup with English and French dictionaries
-- `src/components/dashboard/player` — Player dashboard components (metrics cards, search, charts, match history, tracking modals)
 
 ## 🚀 Deploy to Vercel
 
@@ -157,13 +157,10 @@ The test suite covers:
 
 1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In the Vercel dashboard, add all your environment variables:
-   - Go to **Settings** → **Environment Variables**
-   - Add each variable from your `.env.local` file (copy the key and value pairs)
-   - Make sure to set them for **Production**, **Preview**, and **Development** environments
+3. Add all environment variables from your `.env.local` file in Vercel → Settings → Environment Variables
 4. Click **Deploy**
 
-Your app will be live at `https://your-project.vercel.app` within seconds.
+> ⚠️ **Important**: Make sure to add all environment variables listed in the [Environment Variables](#-environment-variables) section above, especially `SUPABASE_SERVICE_ROLE_KEY` which should be set as a **Server-side only** variable.
 
 ## 📝 License
 

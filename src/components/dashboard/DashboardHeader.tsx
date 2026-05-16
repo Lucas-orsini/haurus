@@ -36,7 +36,7 @@ export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) 
       {/* Mobile hamburger — visible only < md */}
       <button
         onClick={onMenuToggle}
-        aria-label="Ouvrir le menu"
+        aria-label={dict.sidebar.openMenu}
         className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg hover:bg-[var(--surface-1)] transition-colors duration-150 shrink-0"
       >
         <Menu size={20} strokeWidth={1.5} className="text-[var(--text-2)]" />

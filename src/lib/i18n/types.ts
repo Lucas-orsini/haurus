@@ -28,6 +28,7 @@ export type Dictionary = {
     signOut: string
     signOutLoading: string
     sessionUnavailable: string
+    openMenu: string
   }
   dashboard: {
     title: string

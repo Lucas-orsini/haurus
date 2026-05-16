@@ -20,6 +20,7 @@ export const enDict: Dictionary = {
     signOut: 'Sign out',
     signOutLoading: 'Signing out…',
     sessionUnavailable: 'Session unavailable',
+    openMenu: 'Open menu',
   },
   dashboard: {
     title: 'Overview',
