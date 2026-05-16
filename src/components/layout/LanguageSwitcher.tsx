@@ -1,11 +1,18 @@
 'use client'
+import { useRouter } from 'next/navigation'
 import { useLocale } from '@/providers/LocaleProvider'
 
 export default function LanguageSwitcher() {
   const { locale, setLocale } = useLocale()
+  const router = useRouter()
 
   function handleToggle() {
-    setLocale(locale === 'fr' ? 'en' : 'fr')
+    const next = locale === 'fr' ? 'en' : 'fr'
+    // Write cookie so Server Components re-render with the new locale on refresh
+    document.cookie = `locale=${next};path=/;max-age=31536000;SameSite=Lax`
+    setLocale(next)
+    // Trigger re-render of all Server Components on the current route
+    router.refresh()
   }
 
   return (

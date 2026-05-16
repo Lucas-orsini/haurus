@@ -5,9 +5,11 @@ import { Search, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
+import { useLocale } from '@/providers/LocaleProvider'
 
 function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
-  // @deprecated – plan prop is ignored; this badge always renders "Beta"
+  const { dict } = useLocale()
+  // @deprecated – plan prop is ignored; this badge always renders translated "Beta"
   return (
     <span
       className="w-fit inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap"
@@ -16,7 +18,7 @@ function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
         color: 'var(--badge-beta-text)',
       }}
     >
-      Beta
+      {dict.metrics.badgeBeta}
     </span>
   )
 }
@@ -28,6 +30,8 @@ function MetricDetailModal({
   metric: MetricDefinition | null
   onClose: () => void
 }) {
+  const { dict } = useLocale()
+
   // Escape key handler
   useEffect(() => {
     if (!metric) return
@@ -66,7 +70,7 @@ function MetricDetailModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={dict.metrics.modalClose}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150 shrink-0"
@@ -102,11 +106,13 @@ function MetricCard({
   metric: MetricDefinition
   onOpen: (id: string) => void
 }) {
+  const { dict } = useLocale()
+
   return (
     <button
       type="button"
       onClick={() => onOpen(metric.id)}
-      aria-label={`Ouvrir les détails de ${metric.name}`}
+      aria-label={dict.metrics.openMetricDetails.replace('{metric}', metric.name)}
       className={cn(
         'bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4',
         'hover:border-[var(--border-hi)] hover:bg-white/[0.02]',
@@ -166,6 +172,7 @@ function MetricsSection({
 }
 
 export default function MetricsEducationClient() {
+  const { dict } = useLocale()
   const [query, setQuery] = useState('')
   const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null)
 
@@ -207,11 +214,10 @@ export default function MetricsEducationClient() {
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-base font-semibold text-[var(--text-1)] mb-1">
-          Comprendre les métriques
+          {dict.metrics.pageTitle}
         </h1>
         <p className="text-sm text-[var(--text-3)]">
-          Chaque métrique expliquée simplement — descriptions courtes pour tous,
-          contenus experts pour approfondir.
+          {dict.metrics.pageDescription}
         </p>
       </div>
 
@@ -228,7 +234,7 @@ export default function MetricsEducationClient() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher une métrique..."
+            placeholder={dict.metrics.searchPlaceholder}
             className={cn(
               'w-full h-9 pl-9 pr-3 rounded-md text-sm',
               'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -242,7 +248,9 @@ export default function MetricsEducationClient() {
         {/* Metric count */}
         <span className="text-xs text-[var(--text-3)] shrink-0 tabular-nums">
           <span className="text-[var(--text-2)] font-medium">{totalCount}</span>{' '}
-          {totalCount === 1 ? 'métrique' : 'métriques'}
+          {totalCount === 1
+            ? dict.metrics.metricCountSingular
+            : dict.metrics.metricCountPlural}
         </span>
       </div>
 
@@ -265,10 +273,10 @@ export default function MetricsEducationClient() {
             <Search size={18} strokeWidth={1.5} className="text-[var(--text-3)]" />
           </div>
           <p className="text-sm font-medium text-[var(--text-2)] mb-1">
-            Aucune métrique ne correspond à votre recherche
+            {dict.metrics.emptyStateTitle}
           </p>
           <p className="text-xs text-[var(--text-3)]">
-            Essayez un autre terme — nom, description ou surface.
+            {dict.metrics.emptyStateDescription}
           </p>
         </div>
       )}
