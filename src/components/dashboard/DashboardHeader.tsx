@@ -2,19 +2,20 @@
 
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
+import { useLocale } from '@/providers/LocaleProvider'
 
 const ROUTE_META: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': {
-    title: 'Aperçu',
-    subtitle: 'Statistiques des matchs ATP',
+    title: 'overview',
+    subtitle: 'overviewSubtitle',
   },
   '/dashboard/player': {
-    title: 'Joueur',
-    subtitle: 'Profil et suivi des joueurs',
+    title: 'player',
+    subtitle: 'playerSubtitle',
   },
   '/dashboard/metrics': {
-    title: 'Métriques',
-    subtitle: 'Définitions des métriques',
+    title: 'metrics',
+    subtitle: 'metricsSubtitle',
   },
 }
 
@@ -26,14 +27,17 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
   const pathname = usePathname()
-  const { title, subtitle } = ROUTE_META[pathname] ?? DEFAULT_META
+  const { t } = useLocale()
+  const routeKey = ROUTE_META[pathname] ?? DEFAULT_META
+  const title = t(`dashboard.header.${routeKey.title}`)
+  const subtitle = t(`dashboard.header.${routeKey.subtitle}`)
 
   return (
     <header className="shrink-0 flex items-center justify-between h-14 px-4 md:px-6 border-b border-[var(--border)] bg-[var(--bg)]">
       {/* Mobile hamburger — visible only < md */}
       <button
         onClick={onMenuToggle}
-        aria-label="Ouvrir le menu"
+        aria-label={t('nav.openMenu')}
         className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg hover:bg-[var(--surface-1)] transition-colors duration-150 shrink-0"
       >
         <Menu size={20} strokeWidth={1.5} className="text-[var(--text-2)]" />
