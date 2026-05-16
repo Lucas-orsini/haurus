@@ -24,3 +24,34 @@ export interface MetricsNamespace {
     subtitle: string
   }
 }
+
+export interface UnsubscribeNamespace {
+  page: {
+    title: string
+    description: string
+    footerNote: string
+    emailLabel: string
+  }
+  form: {
+    confirmButton: string
+    keepSubscription: string
+  }
+  success: {
+    title: string
+    message: string
+  }
+  error: {
+    initFailed: string
+    generic: string
+  }
+  common: {
+    loading: string
+    retry: string
+    backToSite: string
+  }
+  confirmDialog: {
+    title: string
+    message: string
+    confirmLabel: string
+  }
+}
