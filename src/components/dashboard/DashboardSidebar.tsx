@@ -3,17 +3,18 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, User, BookOpen, Settings, Mail } from 'lucide-react'
+import { LayoutDashboard, LogOut, User, BookOpen, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
 import UserProfileModal from './UserProfileModal'
+import { useDashboardDict } from './DashboardDictContext'
 
 const NAV_ITEMS = [
-  { label: 'Aperçu', icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Joueur', icon: User, href: '/dashboard/player' },
-  { label: 'Métriques', icon: BookOpen, href: '/dashboard/metrics' },
+  { labelKey: 'overview' as const, icon: LayoutDashboard, href: '/dashboard' },
+  { labelKey: 'player' as const, icon: User, href: '/dashboard/player' },
+  { labelKey: 'metrics' as const, icon: BookOpen, href: '/dashboard/metrics' },
 ]
 
 interface DashboardSidebarProps {
@@ -24,6 +25,7 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const dict = useDashboardDict()
 
   const [sessionState, setSessionState] = useState<'loading' | 'success' | 'error'>('loading')
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -32,7 +34,6 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Charger la session au montage
   useEffect(() => {
     let cancelled = false
     async function loadSession() {
@@ -54,7 +55,6 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
     return () => { cancelled = true }
   }, [])
 
-  // Fermer le dropdown au clic extérieur
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -81,7 +81,6 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
     }
   }
 
-  // Extraire les initiales depuis le nom complet
   function getInitials(name: string): string {
     const parts = name.trim().split(/\s+/)
     const first = parts[0]?.[0] ?? ''
@@ -105,17 +104,8 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
             <div className="flex items-center justify-between px-2 mb-6 shrink-0">
               <Link href="/" className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg flex items-center justify-center transition-transform duration-200">
-                  <svg
-                    width="100%"
-                    height="100%"
-                    viewBox="0 0 122 110"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fill="#f2cb38"
-                      d="M66.68,9.92c2.15,1.49,3.96,3.12,5.25,5.38l34.14,59.88c5.06,8.87,2.55,20.18-4.92,26.71-8.61,7.53-21.36,6.81-29.45-1.16-1.57-1.55-4.23-.7-5.26.93-1.21,1.93-.49,3.85,1.11,5.31,9.01,8.23,22.26,9.97,33.06,4.27,2.82-1.49,5.2-3.39,7.41-5.71,4.51-4.74,7.16-10.82,7.8-17.35.68-6.84-1.28-13.25-4.64-19.12L78.53,11.95c-7.59-13.26-25.14-15.81-36.15-6.05l-3.15,3.13,13.66,23.9c.64,1.12.47,2.14-.14,3.21l-22.12,38.66c-1.75,3.06-2.08,6.5-.25,9.68,1.54,2.69,4.51,4.68,7.88,4.56,2.15-.08,3.74-1.72,3.69-3.76s-1.57-3.61-3.66-3.63c-.66,0-1.3-.46-1.53-.91-.33-.65-.29-1.24.07-1.88l25.42-44.46-13.7-23.97c5.46-3.83,12.5-4.03,18.14-.54ZM65.72,55.42l13.4,23.43c.37.64.45,1.23.13,1.87-.21.41-.82.97-1.49.97h-21.94s-8.51,14.86-8.51,14.86c-6.69,11.69-22.83,14.2-32.85,5.05-7.65-6.99-9.33-18.27-4.19-27.28l26.46-46.27c1.09-1.91.28-4.18-1.47-5.13-1.89-1.02-3.93-.27-4.99,1.58L4.36,69.68c-7.23,12.27-5.43,27.78,5.19,37.47,13.41,12.25,35.13,8.78,43.89-6.43l6.68-11.6h17.36c3.27,0,6.16-1.51,7.82-4.1,1.74-2.72,2.18-6.37.54-9.25l-13.84-24.28c-1.05-1.84-3.38-2.33-5.08-1.3-1.78,1.08-2.3,3.29-1.19,5.23Z"
-                    />
+                  <svg width="100%" height="100%" viewBox="0 0 122 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#f2cb38" d="M66.68,9.92c2.15,1.49,3.96,3.12,5.25,5.38l34.14,59.88c5.06,8.87,2.55,20.18-4.92,26.71-8.61,7.53-21.36,6.81-29.45-1.16-1.57-1.55-4.23-.7-5.26.93-1.21,1.93-.49,3.85,1.11,5.31,9.01,8.23,22.26,9.97,33.06,4.27,2.82-1.49,5.2-3.39,7.41-5.71,4.51-4.74,7.16-10.82,7.8-17.35.68-6.84-1.28-13.25-4.64-19.12L78.53,11.95c-7.59-13.26-25.14-15.81-36.15-6.05l-3.15,3.13,13.66,23.9c.64,1.12.47,2.14-.14,3.21l-22.12,38.66c-1.75,3.06-2.08,6.5-.25,9.68,1.54,2.69,4.51,4.68,7.88,4.56,2.15-.08,3.74-1.72,3.69-3.76s-1.57-3.61-3.66-3.63c-.66,0-1.3-.46-1.53-.91-.33-.65-.29-1.24.07-1.88l25.42-44.46-13.7-23.97c5.46-3.83,12.5-4.03,18.14-.54ZM65.72,55.42l13.4,23.43c.37.64.45,1.23.13,1.87-.21.41-.82.97-1.49.97h-21.94s-8.51,14.86-8.51,14.86c-6.69,11.69-22.83,14.2-32.85,5.05-7.65-6.99-9.33-18.27-4.19-27.28l26.46-46.27c1.09-1.91.28-4.18-1.47-5.13-1.89-1.02-3.93-.27-4.99,1.58L4.36,69.68c-7.23,12.27-5.43,27.78,5.19,37.47,13.41,12.25,35.13,8.78,43.89-6.43l6.68-11.6h17.36c3.27,0,6.16-1.51,7.82-4.1,1.74-2.72,2.18-6.37.54-9.25l-13.84-24.28c-1.05-1.84-3.38-2.33-5.08-1.3-1.78,1.08-2.3,3.29-1.19,5.23Z" />
                   </svg>
                 </div>
                 <span className="text-sm font-semibold tracking-tight text-[var(--text-1)]">
@@ -124,7 +114,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
               </Link>
               <button
                 onClick={onClose}
-                aria-label="Fermer le menu"
+                aria-label={dict.sidebar.closeMenu}
                 className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/[0.05] transition-colors"
               >
                 <span className="text-[var(--text-2)] text-lg leading-none">×</span>
@@ -133,16 +123,12 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
 
             {/* Navigation */}
             <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-              {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+              {NAV_ITEMS.map(({ labelKey, icon: Icon, href }) => {
                 const isActive = href === '/dashboard'
                   ? pathname === href
                   : pathname === href || pathname.startsWith(href + '/')
                 return (
-                  <motion.div
-                    key={href}
-                    className="relative"
-                    initial={false}
-                  >
+                  <motion.div key={href} className="relative" initial={false}>
                     <AnimatePresence initial={false} mode="wait">
                       {isActive && (
                         <motion.div
@@ -167,7 +153,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                       )}
                     >
                       <Icon size={15} strokeWidth={1.5} className="shrink-0" />
-                      <span className="truncate">{label}</span>
+                      <span className="truncate">{dict.sidebar.nav[labelKey]}</span>
                     </Link>
                   </motion.div>
                 )
@@ -190,7 +176,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                   <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
                     <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
                   </div>
-                  <span className="text-xs text-[var(--text-3)]">Session indisponible</span>
+                  <span className="text-xs text-[var(--text-3)]">{dict.sidebar.footer.sessionUnavailable}</span>
                 </div>
               )}
               {sessionState === 'success' && user && (
@@ -206,7 +192,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="text-xs font-medium text-[var(--text-1)] truncate block">
-                      {user.name ?? 'User'}
+                      {user.name ?? dict.sidebar.footer.defaultUserName}
                     </span>
                     <span className="text-[10px] text-[var(--text-3)] truncate block">
                       {user.email}
@@ -219,23 +205,13 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
         )}
       </AnimatePresence>
 
-      {/* Desktop sidebar — always visible, ignores isOpen/onClose */}
+      {/* Desktop sidebar */}
       <aside className="hidden md:flex w-[220px] shrink-0 h-screen flex-col bg-[var(--bg)] border-r border-[var(--border)] px-3 py-4">
-
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 px-2 mb-6 shrink-0">
           <div className="w-6 h-6 rounded-lg flex items-center justify-center transition-transform duration-200">
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 122 110"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill="#f2cb38"
-                d="M66.68,9.92c2.15,1.49,3.96,3.12,5.25,5.38l34.14,59.88c5.06,8.87,2.55,20.18-4.92,26.71-8.61,7.53-21.36,6.81-29.45-1.16-1.57-1.55-4.23-.7-5.26.93-1.21,1.93-.49,3.85,1.11,5.31,9.01,8.23,22.26,9.97,33.06,4.27,2.82-1.49,5.2-3.39,7.41-5.71,4.51-4.74,7.16-10.82,7.8-17.35.68-6.84-1.28-13.25-4.64-19.12L78.53,11.95c-7.59-13.26-25.14-15.81-36.15-6.05l-3.15,3.13,13.66,23.9c.64,1.12.47,2.14-.14,3.21l-22.12,38.66c-1.75,3.06-2.08,6.5-.25,9.68,1.54,2.69,4.51,4.68,7.88,4.56,2.15-.08,3.74-1.72,3.69-3.76s-1.57-3.61-3.66-3.63c-.66,0-1.3-.46-1.53-.91-.33-.65-.29-1.24.07-1.88l25.42-44.46-13.7-23.97c5.46-3.83,12.5-4.03,18.14-.54ZM65.72,55.42l13.4,23.43c.37.64.45,1.23.13,1.87-.21.41-.82.97-1.49.97h-21.94s-8.51,14.86-8.51,14.86c-6.69,11.69-22.83,14.2-32.85,5.05-7.65-6.99-9.33-18.27-4.19-27.28l26.46-46.27c1.09-1.91.28-4.18-1.47-5.13-1.89-1.02-3.93-.27-4.99,1.58L4.36,69.68c-7.23,12.27-5.43,27.78,5.19,37.47,13.41,12.25,35.13,8.78,43.89-6.43l6.68-11.6h17.36c3.27,0,6.16-1.51,7.82-4.1,1.74-2.72,2.18-6.37.54-9.25l-13.84-24.28c-1.05-1.84-3.38-2.33-5.08-1.3-1.78,1.08-2.3,3.29-1.19,5.23Z"
-              />
+            <svg width="100%" height="100%" viewBox="0 0 122 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#f2cb38" d="M66.68,9.92c2.15,1.49,3.96,3.12,5.25,5.38l34.14,59.88c5.06,8.87,2.55,20.18-4.92,26.71-8.61,7.53-21.36,6.81-29.45-1.16-1.57-1.55-4.23-.7-5.26.93-1.21,1.93-.49,3.85,1.11,5.31,9.01,8.23,22.26,9.97,33.06,4.27,2.82-1.49,5.2-3.39,7.41-5.71,4.51-4.74,7.16-10.82,7.8-17.35.68-6.84-1.28-13.25-4.64-19.12L78.53,11.95c-7.59-13.26-25.14-15.81-36.15-6.05l-3.15,3.13,13.66,23.9c.64,1.12.47,2.14-.14,3.21l-22.12,38.66c-1.75,3.06-2.08,6.5-.25,9.68,1.54,2.69,4.51,4.68,7.88,4.56,2.15-.08,3.74-1.72,3.69-3.76s-1.57-3.61-3.66-3.63c-.66,0-1.3-.46-1.53-.91-.33-.65-.29-1.24.07-1.88l25.42-44.46-13.7-23.97c5.46-3.83,12.5-4.03,18.14-.54ZM65.72,55.42l13.4,23.43c.37.64.45,1.23.13,1.87-.21.41-.82.97-1.49.97h-21.94s-8.51,14.86-8.51,14.86c-6.69,11.69-22.83,14.2-32.85,5.05-7.65-6.99-9.33-18.27-4.19-27.28l26.46-46.27c1.09-1.91.28-4.18-1.47-5.13-1.89-1.02-3.93-.27-4.99,1.58L4.36,69.68c-7.23,12.27-5.43,27.78,5.19,37.47,13.41,12.25,35.13,8.78,43.89-6.43l6.68-11.6h17.36c3.27,0,6.16-1.51,7.82-4.1,1.74-2.72,2.18-6.37.54-9.25l-13.84-24.28c-1.05-1.84-3.38-2.33-5.08-1.3-1.78,1.08-2.3,3.29-1.19,5.23Z" />
             </svg>
           </div>
           <span className="text-sm font-semibold tracking-tight text-[var(--text-1)]">
@@ -245,16 +221,12 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+          {NAV_ITEMS.map(({ labelKey, icon: Icon, href }) => {
             const isActive = href === '/dashboard'
               ? pathname === href
               : pathname === href || pathname.startsWith(href + '/')
             return (
-              <motion.div
-                key={href}
-                className="relative"
-                initial={false}
-              >
+              <motion.div key={href} className="relative" initial={false}>
                 <AnimatePresence initial={false} mode="wait">
                   {isActive && (
                     <motion.div
@@ -278,14 +250,14 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                   )}
                 >
                   <Icon size={15} strokeWidth={1.5} className="shrink-0" />
-                  <span className="truncate">{label}</span>
+                  <span className="truncate">{dict.sidebar.nav[labelKey]}</span>
                 </Link>
               </motion.div>
             )
           })}
         </nav>
 
-        {/* User footer — bloc profil */}
+        {/* User footer */}
         <div className="shrink-0 border-t border-[var(--border)] pt-3 mt-2">
           {sessionState === 'loading' && (
             <div className="flex items-center gap-2 px-2 py-2 animate-pulse">
@@ -301,9 +273,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
               <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
                 <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
               </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs text-[var(--text-3)] truncate">Session indisponible</span>
-              </div>
+              <span className="text-xs text-[var(--text-3)] truncate">{dict.sidebar.footer.sessionUnavailable}</span>
             </div>
           )}
           {sessionState === 'success' && user && (
@@ -323,7 +293,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                 </div>
                 <div className="flex flex-col min-w-0 flex-1 text-left">
                   <span className="text-xs font-medium text-[var(--text-1)] truncate">
-                    {user.name ?? 'User'}
+                    {user.name ?? dict.sidebar.footer.defaultUserName}
                   </span>
                   <span className="text-[10px] text-[var(--text-3)] truncate">
                     {user.email}
@@ -352,7 +322,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  transition-colors duration-100 whitespace-nowrap"
                     >
                       <User size={13} strokeWidth={1.5} className="shrink-0" />
-                      Profil
+                      {dict.sidebar.dropdown.profile}
                     </button>
 
                     <button
@@ -362,7 +332,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  transition-colors duration-100 whitespace-nowrap"
                     >
                       <Settings size={13} strokeWidth={1.5} className="shrink-0" />
-                      Réglage
+                      {dict.sidebar.dropdown.settings}
                     </button>
 
                     <div className="h-px bg-[var(--border)] my-1" />
@@ -379,7 +349,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-                      {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
+                      {signingOut ? dict.sidebar.dropdown.signingOut : dict.sidebar.dropdown.signOut}
                     </button>
                   </motion.div>
                 )}

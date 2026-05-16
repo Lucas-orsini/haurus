@@ -1,14 +1,28 @@
 'use client'
 import { useLocale } from '@/providers/LocaleProvider'
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  dict?: {
+    dashboard?: {
+      languageSwitcher: {
+        frAriaLabel: string
+        enAriaLabel: string
+      }
+    }
+  }
+}
+
+export default function LanguageSwitcher({ dict }: LanguageSwitcherProps) {
   const { locale, setLocale } = useLocale()
+
+  const frAriaLabel = dict?.dashboard?.languageSwitcher?.frAriaLabel ?? 'Passer en français'
+  const enAriaLabel = dict?.dashboard?.languageSwitcher?.enAriaLabel ?? 'Switch to English'
 
   return (
     <div className="flex items-center gap-1 rounded-full border border-[var(--border-md)] p-0.5 shrink-0">
       <button
         onClick={() => setLocale('fr')}
-        aria-label="Passer en français"
+        aria-label={frAriaLabel}
         aria-pressed={locale === 'fr'}
         className={`h-7 px-2.5 rounded-full text-xs font-medium transition-all duration-150 ${
           locale === 'fr'
@@ -20,7 +34,7 @@ export default function LanguageSwitcher() {
       </button>
       <button
         onClick={() => setLocale('en')}
-        aria-label="Switch to English"
+        aria-label={enAriaLabel}
         aria-pressed={locale === 'en'}
         className={`h-7 px-2.5 rounded-full text-xs font-medium transition-all duration-150 ${
           locale === 'en'

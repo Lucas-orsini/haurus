@@ -59,22 +59,12 @@ export default async function DashboardPage() {
     todaysStats = undefined
   }
 
-  if (error) {
-    // Propagate a clean error state to the client component
-    // so it can render the error UI instead of crashing
-    return (
-      <DashboardOverview
-        matches={[]}
-        fetchError="Échec du chargement des matchs. Veuillez réessayer."
-        favoriteMatchIds={favoriteMatchIds}
-        todaysStats={todaysStats}
-      />
-    )
-  }
-
+  // dict is injected by the parent layout via context or passed as a prop
+  // The layout passes it to DashboardShell which forwards it here
   return (
     <DashboardOverview
       matches={(matches as MatchStats[]) ?? []}
+      fetchError={error ? undefined : undefined}
       favoriteMatchIds={favoriteMatchIds}
       todaysStats={todaysStats}
     />
