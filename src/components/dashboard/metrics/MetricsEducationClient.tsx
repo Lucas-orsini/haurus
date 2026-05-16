@@ -5,6 +5,7 @@ import { Search, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
   // @deprecated – plan prop is ignored; this badge always renders "Beta"
@@ -24,9 +25,11 @@ function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
 function MetricDetailModal({
   metric,
   onClose,
+  closeLabel,
 }: {
   metric: MetricDefinition | null
   onClose: () => void
+  closeLabel: string
 }) {
   // Escape key handler
   useEffect(() => {
@@ -66,7 +69,7 @@ function MetricDetailModal({
           </div>
           <button
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={closeLabel}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150 shrink-0"
@@ -98,15 +101,17 @@ function MetricDetailModal({
 function MetricCard({
   metric,
   onOpen,
+  openDetailsLabel,
 }: {
   metric: MetricDefinition
   onOpen: (id: string) => void
+  openDetailsLabel: string
 }) {
   return (
     <button
       type="button"
       onClick={() => onOpen(metric.id)}
-      aria-label={`Ouvrir les détails de ${metric.name}`}
+      aria-label={`${openDetailsLabel} ${metric.name}`}
       className={cn(
         'bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4',
         'hover:border-[var(--border-hi)] hover:bg-white/[0.02]',
@@ -135,10 +140,12 @@ function MetricsSection({
   title,
   metrics,
   onOpen,
+  openDetailsLabel,
 }: {
   title: string
   metrics: MetricDefinition[]
   onOpen: (id: string) => void
+  openDetailsLabel: string
 }) {
   return (
     <section className="mb-10 last:mb-0">
@@ -158,6 +165,7 @@ function MetricsSection({
             key={metric.id}
             metric={metric}
             onOpen={onOpen}
+            openDetailsLabel={openDetailsLabel}
           />
         ))}
       </div>
@@ -166,6 +174,9 @@ function MetricsSection({
 }
 
 export default function MetricsEducationClient() {
+  const dict = useDashboardDict()
+  const t = dict.metrics
+
   const [query, setQuery] = useState('')
   const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null)
 
@@ -207,12 +218,9 @@ export default function MetricsEducationClient() {
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-base font-semibold text-[var(--text-1)] mb-1">
-          Comprendre les métriques
+          {t.pageTitle}
         </h1>
-        <p className="text-sm text-[var(--text-3)]">
-          Chaque métrique expliquée simplement — descriptions courtes pour tous,
-          contenus experts pour approfondir.
-        </p>
+        <p className="text-sm text-[var(--text-3)]">{t.pageSubtitle}</p>
       </div>
 
       {/* Toolbar: search + counter */}
@@ -228,7 +236,7 @@ export default function MetricsEducationClient() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher une métrique..."
+            placeholder={t.searchPlaceholder}
             className={cn(
               'w-full h-9 pl-9 pr-3 rounded-md text-sm',
               'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -242,7 +250,7 @@ export default function MetricsEducationClient() {
         {/* Metric count */}
         <span className="text-xs text-[var(--text-3)] shrink-0 tabular-nums">
           <span className="text-[var(--text-2)] font-medium">{totalCount}</span>{' '}
-          {totalCount === 1 ? 'métrique' : 'métriques'}
+          {totalCount === 1 ? t.metricCount : t.metricCountPlural}
         </span>
       </div>
 
@@ -255,6 +263,7 @@ export default function MetricsEducationClient() {
               title={section.title}
               metrics={section.metrics}
               onOpen={openModal}
+              openDetailsLabel={t.modalOpenDetails}
             />
           ))}
         </div>
@@ -265,16 +274,18 @@ export default function MetricsEducationClient() {
             <Search size={18} strokeWidth={1.5} className="text-[var(--text-3)]" />
           </div>
           <p className="text-sm font-medium text-[var(--text-2)] mb-1">
-            Aucune métrique ne correspond à votre recherche
+            {t.emptyTitle}
           </p>
-          <p className="text-xs text-[var(--text-3)]">
-            Essayez un autre terme — nom, description ou surface.
-          </p>
+          <p className="text-xs text-[var(--text-3)]">{t.emptyDesc}</p>
         </div>
       )}
 
       {/* Detail modal */}
-      <MetricDetailModal metric={selectedMetric} onClose={closeModal} />
+      <MetricDetailModal
+        metric={selectedMetric}
+        onClose={closeModal}
+        closeLabel={t.modalClose}
+      />
     </div>
   )
 }

@@ -277,6 +277,18 @@ const fr = {
       noDataTitle: 'Aucune donnée disponible',
       noDataDesc: 'Les prévisions horaires ne sont pas encore disponibles pour ce tournoi.',
     },
+    metrics: {
+      pageTitle: 'Comprendre les métriques',
+      pageSubtitle:
+        'Chaque métrique expliquée simplement — descriptions courtes pour tous, contenus experts pour approfondir.',
+      searchPlaceholder: 'Rechercher une métrique...',
+      metricCount: 'métrique',
+      metricCountPlural: 'métriques',
+      emptyTitle: 'Aucune métrique ne correspond à votre recherche',
+      emptyDesc: 'Essayez un autre terme — nom, description ou surface.',
+      modalClose: 'Fermer',
+      modalOpenDetails: 'Ouvrir les détails de',
+    },
   },
 }
 
@@ -556,6 +568,18 @@ const en = {
       wind: 'Wind',
       noDataTitle: 'No data available',
       noDataDesc: 'Hourly forecasts are not yet available for this tournament.',
+    },
+    metrics: {
+      pageTitle: 'Understanding metrics',
+      pageSubtitle:
+        'Every metric explained simply — short descriptions for everyone, expert content to dive deeper.',
+      searchPlaceholder: 'Search for a metric...',
+      metricCount: 'metric',
+      metricCountPlural: 'metrics',
+      emptyTitle: 'No metrics match your search',
+      emptyDesc: 'Try another term — name, description, or surface.',
+      modalClose: 'Close',
+      modalOpenDetails: 'Open details of',
     },
   },
 }

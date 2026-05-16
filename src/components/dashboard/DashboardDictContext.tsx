@@ -52,6 +52,43 @@ export type DashboardDict = {
       noMatchesDesc: string
     }
   }
+  statCards: {
+    card1: {
+      label: string
+      noMatches: string
+    }
+    card2: {
+      label: string
+      unavailable: string
+      noTournament: string
+      forecast: string
+    }
+    card3: {
+      label: string
+      unavailable: string
+    }
+  }
+  weatherModal: {
+    close: string
+    precipitations: string
+    forecast24h: string
+    temperature: string
+    humidity: string
+    wind: string
+    noDataTitle: string
+    noDataDesc: string
+  }
+  metrics: {
+    pageTitle: string
+    pageSubtitle: string
+    searchPlaceholder: string
+    metricCount: string
+    metricCountPlural: string
+    emptyTitle: string
+    emptyDesc: string
+    modalClose: string
+    modalOpenDetails: string
+  }
 }
 
 export const DashboardDictContext = createContext<DashboardDict | null>(null)
