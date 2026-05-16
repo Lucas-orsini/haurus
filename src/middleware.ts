@@ -2,11 +2,16 @@
  * Edge middleware — refreshes Supabase session cookies on every request,
  * and protects authenticated routes by redirecting to /login when no session.
  *
+ * Also manages the NEXT_LOCALE cookie: if no locale cookie is present,
+ * sets it to the default locale ('en'). This ensures the locale is always
+ * available for the root layout's lang attribute and the LocaleProvider.
+ *
  * Protects all routes under (app)/ only.
  * Auth pages (login, signup) are NOT in (app)/ so they pass through freely.
  */
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { LOCALE_COOKIE_NAME, DEFAULT_LOCALE } from '@/lib/i18n/config'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -74,6 +79,18 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/login'
     url.searchParams.set('redirectTo', pathname)
     return NextResponse.redirect(url, 302)
+  }
+
+  // ── Locale cookie management ─────────────────────────────────────────────
+  // If no locale cookie is present, set the default locale.
+  // This ensures the HTML lang attribute and LocaleProvider always have a valid locale.
+  const localeCookie = request.cookies.get(LOCALE_COOKIE_NAME)
+  if (!localeCookie) {
+    supabaseResponse.cookies.set(LOCALE_COOKIE_NAME, DEFAULT_LOCALE, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    })
   }
 
   return supabaseResponse

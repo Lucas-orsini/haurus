@@ -6,38 +6,29 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { cn } from '@/lib/utils'
+import { useDictionary } from '@/components/providers/locale-provider'
 import type { Database } from '@/lib/supabase/database.types'
 import type { StatsHistoryPoint } from '@/lib/types/player'
 
 type Json = Database['public']['Tables']['player_stats']['Row']['stats_history'] extends infer T ? T : never
 
-const METRICS: Array<{ key: string; label: string }> = [
-  { key: 'bppi', label: 'BPPI' },
-  { key: 'rank', label: 'Classement' },
-  { key: 'p_serve', label: 'Service %' },
-  { key: 'p_return', label: 'Retour %' },
-  { key: 'tsd_clay', label: 'TSD Terre battue' },
-  { key: 'tsd_hard', label: 'TSD Dur' },
-  { key: 'tsd_grass', label: 'TSD Gazon' },
-  { key: 'glicko_clay', label: 'Glicko Terre battue' },
-  { key: 'glicko_hard', label: 'Glicko Dur' },
-  { key: 'glicko_grass', label: 'Glicko Gazon' },
-  { key: 'momentum_td', label: 'Momentum' },
-  { key: 'win_rate_td', label: 'Win Rate' },
-  { key: 'win_rate_clay_td', label: 'Win Rate Terre battue' },
-  { key: 'win_rate_hard_td', label: 'Win Rate Dur' },
-  { key: 'win_rate_grass_td', label: 'Win Rate Gazon' },
-  { key: 'breaks_won_td', label: 'Breaks gagnés' },
-  { key: 'breaks_lost_td', label: 'Breaks perdus' },
-  { key: 'delta_rank_6m', label: 'Δ Classement 6M' },
-]
+const METRIC_KEYS = [
+  'bppi', 'rank', 'p_serve', 'p_return',
+  'tsd_clay', 'tsd_hard', 'tsd_grass',
+  'glicko_clay', 'glicko_hard', 'glicko_grass',
+  'momentum_td', 'win_rate_td',
+  'win_rate_clay_td', 'win_rate_hard_td', 'win_rate_grass_td',
+  'breaks_won_td', 'breaks_lost_td', 'delta_rank_6m',
+] as const
+
+type MetricKey = typeof METRIC_KEYS[number]
 
 interface PlayerStatsChartProps {
   statsHistory: Json | null
 }
 
-export function formatMetricLabel(key: string): string {
-  return METRICS.find((m) => m.key === key)?.label ?? key
+export function formatMetricLabel(_key: string): string {
+  return ''
 }
 
 function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoint[] {
@@ -67,13 +58,13 @@ function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoi
     .slice(-60)
 }
 
-function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number }) {
+function MetricChart({ data, color, chartHeight = 250, insufficientLabel }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number; insufficientLabel: string }) {
   const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
 
   if (validData.length < 3) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+        <p className="text-sm text-[var(--text-3)]">{insufficientLabel}</p>
       </div>
     )
   }
@@ -129,31 +120,56 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
 }
 
 export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps) {
-  const [selectedMetric, setSelectedMetric] = useState(METRICS[0].key)
+  const dict = useDictionary()
+  const [selectedMetric, setSelectedMetric] = useState<MetricKey>(METRIC_KEYS[0])
+
+  const METRICS = useMemo(() => {
+    const d = dict.player.statsChart
+    return [
+      { key: 'bppi' as const, label: d.bppi },
+      { key: 'rank' as const, label: d.rank },
+      { key: 'p_serve' as const, label: d.pServePct },
+      { key: 'p_return' as const, label: d.pReturnPct },
+      { key: 'tsd_clay' as const, label: d.tsdClay },
+      { key: 'tsd_hard' as const, label: d.tsdHard },
+      { key: 'tsd_grass' as const, label: d.tsdGrass },
+      { key: 'glicko_clay' as const, label: d.glickoClay },
+      { key: 'glicko_hard' as const, label: d.glickoHard },
+      { key: 'glicko_grass' as const, label: d.glickoGrass },
+      { key: 'momentum_td' as const, label: d.momentum },
+      { key: 'win_rate_td' as const, label: d.winRate },
+      { key: 'win_rate_clay_td' as const, label: d.winRateClay },
+      { key: 'win_rate_hard_td' as const, label: d.winRateHard },
+      { key: 'win_rate_grass_td' as const, label: d.winRateGrass },
+      { key: 'breaks_won_td' as const, label: d.breaksWon },
+      { key: 'breaks_lost_td' as const, label: d.breaksLost },
+      { key: 'delta_rank_6m' as const, label: d.deltaRank6m },
+    ] as const
+  }, [dict.player.statsChart])
 
   const parsedData = useMemo(
     () => parseStatsHistory(statsHistory, selectedMetric),
     [statsHistory, selectedMetric]
   )
 
-  const activeLabel = formatMetricLabel(selectedMetric)
+  const activeLabel = METRICS.find((m) => m.key === selectedMetric)?.label ?? selectedMetric
 
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-      {/* Sélecteur de métrique — column mobile, row desktop */}
+      {/* Sélecteur de métrique */}
       <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
         <label
           htmlFor="metric-select"
           className="text-xs font-medium text-[var(--text-2)] shrink-0"
         >
-          Métrique
+          {dict.player.statsChart.metricLabel}
         </label>
 
         <div className="relative flex-1 max-w-full md:max-w-[220px]">
           <select
             id="metric-select"
             value={selectedMetric}
-            onChange={(e) => setSelectedMetric(e.target.value)}
+            onChange={(e) => setSelectedMetric(e.target.value as MetricKey)}
             className={cn(
               'h-8 w-full pl-3 pr-8 rounded-md text-sm appearance-none cursor-pointer',
               'bg-[var(--surface-2)] border border-[var(--border-md)] text-[var(--text-1)]',
@@ -187,26 +203,26 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
         {/* Label actif */}
         {parsedData.length > 0 && (
           <span className="text-xs text-[var(--text-3)] font-mono tabular-nums md:ml-auto">
-            {parsedData.length} pts
+            {parsedData.length} {dict.player.statsChart.pts}
           </span>
         )}
       </div>
 
-      {/* Chart — 250px mobile, 200px desktop */}
+      {/* Chart */}
       <div className="h-[250px] md:h-[200px]">
         {parsedData.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+            <p className="text-sm text-[var(--text-3)]">{dict.player.statsChart.insufficientHistory}</p>
           </div>
         ) : (
           <>
-            {/* Desktop chart — hidden on mobile */}
+            {/* Desktop chart */}
             <div className="hidden md:block h-full">
-              <MetricChart data={parsedData} color="var(--accent)" chartHeight={200} />
+              <MetricChart data={parsedData} color="var(--accent)" chartHeight={200} insufficientLabel={dict.player.statsChart.insufficientHistory} />
             </div>
-            {/* Mobile chart — hidden on desktop */}
+            {/* Mobile chart */}
             <div className="md:hidden h-full">
-              <MetricChart data={parsedData} color="var(--accent)" chartHeight={250} />
+              <MetricChart data={parsedData} color="var(--accent)" chartHeight={250} insufficientLabel={dict.player.statsChart.insufficientHistory} />
             </div>
           </>
         )}

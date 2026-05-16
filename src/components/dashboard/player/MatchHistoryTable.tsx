@@ -1,5 +1,6 @@
 'use client'
 
+import { useDictionary } from '@/components/providers/locale-provider'
 import type { EnrichedMatchHistory } from './PlayerProfileClient'
 
 interface MatchHistoryTableProps {
@@ -21,6 +22,8 @@ export default function MatchHistoryTable({
   selectedPlayerName,
   onOpenMetrics,
 }: MatchHistoryTableProps) {
+  const dict = useDictionary()
+
   if (matchHistory.length === 0) {
     return (
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-8">
@@ -34,8 +37,8 @@ export default function MatchHistoryTable({
               <path d="M15 3v18" />
             </svg>
           </div>
-          <p className="text-sm text-[var(--text-2)]">Aucun match disponible</p>
-          <p className="text-xs text-[var(--text-3)] mt-1">L&apos;historique de ce joueur est vide</p>
+          <p className="text-sm text-[var(--text-2)]">{dict.player.matchHistory.emptyTitle}</p>
+          <p className="text-xs text-[var(--text-3)] mt-1">{dict.player.matchHistory.emptyHint}</p>
         </div>
       </div>
     )
@@ -44,19 +47,19 @@ export default function MatchHistoryTable({
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-[var(--border-md)]">
-        <h3 className="text-sm font-medium text-[var(--text-1)]">Derniers matchs</h3>
+        <h3 className="text-sm font-medium text-[var(--text-1)]">{dict.player.matchHistory.title}</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-md)]">
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Date</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Adversaire</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Tournoi</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Surface</th>
-              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Score</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Résultat</th>
-              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide w-24">Métriques</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colDate}</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colOpponent}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colTournament}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colSurface}</th>
+              <th className="hidden md:table-cell px-4 py-2.5 text-left text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colScore}</th>
+              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">{dict.player.matchHistory.colResult}</th>
+              <th className="px-4 py-2.5 text-center text-xs font-medium text-[var(--text-3)] uppercase tracking-wide w-24">{dict.player.matchHistory.colMetrics}</th>
             </tr>
           </thead>
           <tbody>
@@ -88,12 +91,12 @@ export default function MatchHistoryTable({
                   <td className="px-4 py-3 text-center">
                     {isWin === true && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-[var(--green)]/10 text-[var(--green)] text-xs font-semibold">
-                        V
+                        {dict.player.matchHistory.resultWin}
                       </span>
                     )}
                     {isWin === false && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-[var(--red)]/10 text-[var(--red)] text-xs font-semibold">
-                        D
+                        {dict.player.matchHistory.resultLoss}
                       </span>
                     )}
                     {isWin === null && (
@@ -107,7 +110,7 @@ export default function MatchHistoryTable({
                       onClick={() => onOpenMetrics(match.date_match, match.player1, match.player2)}
                       className="inline-flex items-center justify-center h-7 px-3 rounded text-xs font-medium bg-white/[0.04] hover:bg-white/[0.08] text-[var(--text-2)] hover:text-[var(--text-1)] border border-[var(--border-md)] hover:border-[var(--border)] transition-all duration-150"
                     >
-                      Métriques
+                      {dict.player.matchHistory.colMetrics}
                     </button>
                   </td>
                 </tr>

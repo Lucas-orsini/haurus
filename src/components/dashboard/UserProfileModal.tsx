@@ -12,11 +12,12 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import type { AuthUser } from '@/lib/auth'
 import { validateName } from '@/lib/auth'
 import { updateProfile, signOut } from '@/lib/auth'
+import { useDictionary } from '@/components/providers/locale-provider'
 
 interface UserProfileModalProps {
   user: AuthUser
   onClose: () => void
-  onUpdateSuccess: (updatedUser: AuthUser) => void
+  onUpdateSuccess: (updatedUser: AuthUser | null) => void
 }
 
 type SaveState = 'idle' | 'saving' | 'error'
@@ -51,6 +52,8 @@ function getDisplayToken(token: string | null | undefined, revealed: boolean): s
 }
 
 export default function UserProfileModal({ user, onClose, onUpdateSuccess }: UserProfileModalProps) {
+  const dict = useDictionary()
+  const p = dict.profile
   const router = useRouter()
   const [name, setName] = useState(user.name ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? '')
@@ -207,7 +210,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
             <h2 id="profile-modal-title" className="text-sm font-semibold text-[var(--text-1)]">
-              Modifier le profil
+              {p.title}
             </h2>
             <button
               onClick={onClose}
@@ -215,7 +218,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
               className="w-7 h-7 flex items-center justify-center rounded-md
                          hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                          transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Fermer"
+              aria-label={p.close}
             >
               <X size={14} />
             </button>
@@ -232,7 +235,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
               )}
             >
-              Profil
+              {p.tabProfile}
             </button>
             <button
               onClick={() => setActiveSection('telegram')}
@@ -243,7 +246,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   : 'text-[var(--text-3)] border-transparent hover:text-[var(--text-2)]',
               )}
             >
-              Telegram
+              {p.tabTelegram}
             </button>
           </div>
 
@@ -269,12 +272,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[var(--text-3)]">Avatar — initiales affichées par defaut</p>
+                    <p className="text-[11px] text-[var(--text-3)]">{p.avatarHint}</p>
                   </div>
 
                   {/* Photo URL */}
                   <Input
-                    label="Photo de profil (URL)"
+                    label={p.photoUrlLabel}
                     type="url"
                     placeholder="https://example.com/avatar.jpg"
                     value={avatarUrl}
@@ -284,9 +287,9 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
 
                   {/* Nom */}
                   <Input
-                    label="Nom"
+                    label={p.nameLabel}
                     type="text"
-                    placeholder="Votre nom"
+                    placeholder={p.namePlaceholder}
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value)
@@ -300,7 +303,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Email — lecture seule */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium select-none text-[var(--text-3)]">
-                      Email
+                      {p.emailLabel}
                     </label>
                     <div className="relative">
                       <input
@@ -315,7 +318,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         )}
                       />
                       <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-medium text-[var(--text-3)] whitespace-nowrap">
-                        Non modifiable
+                        {p.nonModifiable}
                       </span>
                     </div>
 
@@ -325,7 +328,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         href="/unsubscribe"
                         className="text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors duration-150"
                       >
-                        Se désinscrire de la newsletter
+                        {p.unsubscribeNewsletter}
                       </Link>
                     </div>
                   </div>
@@ -333,7 +336,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   {/* Erreur persistante */}
                   {saveState === 'error' && (
                     <p className="text-xs text-[var(--red)] leading-tight">
-                      Une erreur est survenue lors de l&apos;enregistrement. Veuillez reessayer.
+                      {p.saveError}
                     </p>
                   )}
                 </div>
@@ -350,12 +353,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--text-3)]/10 text-[var(--text-3)] border border-[var(--text-3)]/20">
-                        &#128274;&nbsp;Fonctionnalite non disponible
+                        &#128274;&nbsp;{p.telegramState.notEligibleBadge}
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      Les notifications Telegram sont disponibles a partir du plan Analyse.
+                      {p.telegramState.notEligibleText}
                     </p>
 
                     <div className="flex items-center gap-2">
@@ -364,7 +367,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                         size="sm"
                         href="/pricing"
                       >
-                        Mettre a niveau
+                        {p.telegramState.notEligibleCta}
                       </Button>
                     </div>
                   </div>
@@ -376,12 +379,12 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--green)]/10 text-[var(--green)] border border-[var(--green)]/20">
-                        &#10004;&#65039;&nbsp;Telegram connecte
+                        &#10004;&#65039;&nbsp;{p.telegramState.connectedBadge}
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      Vous recevrez une notification a chaque nouveau match ajoute.
+                      {p.telegramState.connectedText}
                     </p>
 
                     <div className="flex items-center gap-2">
@@ -405,10 +408,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                             >
                               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                             </svg>
-                            Deconnexion...
+                            {p.telegramState.suspendedCta}
                           </>
                         ) : (
-                          'Deconnecter'
+                          p.telegramState.connectedCta
                         )}
                       </Button>
                     </div>
@@ -425,18 +428,17 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap
                                        bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20">
-                        &#9888;&nbsp;Notifications suspendues
+                        &#9888;&nbsp;{p.telegramState.suspendedBadge}
                       </span>
                     </div>
 
                     <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                      Votre plan actuel ne donne pas acces aux notifications Telegram.
-                      Mettez a jour votre abonnement pour les reactiver.
+                      {p.telegramState.suspendedText}
                     </p>
 
                     {user.telegramToken && (
                       <div className="flex flex-col gap-1.5">
-                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
+                        <p className="text-xs font-medium text-[var(--text-3)]">{p.telegramState.tokenLabel}</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
@@ -444,7 +446,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                           </code>
                           <button
                             onClick={() => setTokenRevealed((r: boolean) => !r)}
-                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
+                            title={tokenRevealed ? p.telegramState.hideKey : p.telegramState.showKey}
                             className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
                                        text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
                                        transition-colors duration-150"
@@ -467,7 +469,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copied ? 'Copie !' : 'Copier'}
+                            {copied ? p.telegramState.copied : p.telegramState.copy}
                           </Button>
                         </div>
                       </div>
@@ -479,15 +481,15 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                 {telegramTab === 'not-connected' && (
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <h3 className="text-sm font-semibold text-[var(--text-1)]">Connecter Telegram</h3>
+                      <h3 className="text-sm font-semibold text-[var(--text-1)]">{p.telegramState.notConnectedTitle}</h3>
                       <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                        Recevez une notification a chaque nouveau match ajoute.
+                        {p.telegramState.notConnectedText}
                       </p>
                     </div>
 
                     {user.telegramToken ? (
                       <div className="flex flex-col gap-1.5">
-                        <p className="text-xs font-medium text-[var(--text-3)]">Token de connexion</p>
+                        <p className="text-xs font-medium text-[var(--text-3)]">{p.telegramState.tokenLabel}</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 min-w-0 px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-1)]
                                            bg-[var(--surface-2)] border border-[var(--border-md)] truncate">
@@ -495,7 +497,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                           </code>
                           <button
                             onClick={() => setTokenRevealed((r: boolean) => !r)}
-                            title={tokenRevealed ? 'Masquer la cle' : 'Afficher la cle'}
+                            title={tokenRevealed ? p.telegramState.hideKey : p.telegramState.showKey}
                             className="w-7 h-7 flex items-center justify-center rounded-md shrink-0
                                        text-[var(--text-3)] hover:text-[var(--text-2)] hover:bg-white/[0.05]
                                        transition-colors duration-150"
@@ -518,7 +520,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                               )
                             }
                           >
-                            {copied ? 'Copie !' : 'Copier'}
+                            {copied ? p.telegramState.copied : p.telegramState.copy}
                           </Button>
                         </div>
                       </div>
@@ -528,9 +530,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
 
                     <div className="flex flex-col gap-1">
                       <p className="text-xs text-[var(--text-3)] leading-relaxed">
-                        Ouvrez{' '}
-                        <span className="font-mono text-[var(--text-2)]">@{telegramBotUsername}</span>{' '}
-                        sur Telegram et envoyez&nbsp;:
+                        {p.telegramState.notConnectedText}
                       </p>
                       <code className="inline-flex items-center px-3 py-2 rounded-md text-xs font-mono text-[var(--text-1)]
                                        bg-[var(--surface-2)] border border-[var(--border-md)]">
@@ -547,7 +547,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                                    bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium
                                    transition-colors duration-150"
                       >
-                        Ouvrir le bot
+                        {p.telegramState.openBot}
                       </a>
                     </div>
                   </div>
@@ -567,7 +567,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                     onClick={() => setShowDeleteConfirm(true)}
                     className="text-xs text-[var(--red)] hover:text-[var(--red)]/80 transition-colors duration-150"
                   >
-                    Supprimer mon compte
+                    {p.deleteAccount}
                   </button>
                 </div>
               </div>
@@ -581,7 +581,7 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                   onClick={onClose}
                   disabled={isSaving}
                 >
-                  Annuler
+                  {p.cancel}
                 </Button>
                 <Button
                   type="submit"
@@ -603,10 +603,10 @@ export default function UserProfileModal({ user, onClose, onUpdateSuccess }: Use
                       >
                         <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                       </svg>
-                      Enregistrement...
+                      {p.saving}
                     </>
                   ) : (
-                    'Enregistrer'
+                    p.save
                   )}
                 </Button>
               </div>
