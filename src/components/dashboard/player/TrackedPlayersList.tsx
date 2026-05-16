@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Loader2, Trash2, Lock, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useDictionary } from '@/components/providers/locale-provider'
 
 /** Type TrackedPlayer — aligné avec la réponse GET /api/tracked-players */
 export interface TrackedPlayer {
@@ -43,7 +42,6 @@ export default function TrackedPlayersList({
   onRemovePlayer,
   onClose,
 }: TrackedPlayersListProps) {
-  const dict = useDictionary()
   const [removingName, setRemovingName] = useState<string | null>(null)
 
   const lockDays = role === 'starter' || role === 'analyste'
@@ -67,7 +65,7 @@ export default function TrackedPlayersList({
         {/* Counter — sticky top mobile */}
         <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
           <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.player.trackedList.title}
+            Suivis
           </span>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
@@ -95,9 +93,9 @@ export default function TrackedPlayersList({
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <p className="text-xs font-medium text-[var(--text-2)] mb-1">{dict.player.trackedList.emptyTitle}</p>
+          <p className="text-xs font-medium text-[var(--text-2)] mb-1">Aucun joueur suivi</p>
           <p className="text-[11px] text-[var(--text-3)] leading-relaxed">
-            {dict.player.trackedList.emptyHint}
+            Recherchez un joueur et ajoutez-le à vos suivis
           </p>
         </div>
       </div>
@@ -109,7 +107,7 @@ export default function TrackedPlayersList({
       {/* Counter — sticky top mobile */}
       <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
         <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-          {dict.player.trackedList.title}
+          Suivis
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
@@ -132,7 +130,6 @@ export default function TrackedPlayersList({
         {trackedPlayers.map((player) => {
           const locked = lockDays && isLocked(player.locked_until)
           const removing = removingName === player.player_name
-          const lockedDate = formatLockDate(player.locked_until)
 
           return (
             <div
@@ -149,12 +146,12 @@ export default function TrackedPlayersList({
                 {lockDays && locked && (
                   <p className="text-[11px] text-[var(--text-3)] flex items-center gap-1 mt-0.5">
                     <Lock size={9} strokeWidth={1.5} className="shrink-0" />
-                    {dict.player.trackedList.lockedUntil.replace('{date}', lockedDate)}
+                    Verrouillé jusqu&apos;au {formatLockDate(player.locked_until)}
                   </p>
                 )}
                 {lockDays && !locked && (
                   <p className="text-[11px] text-[var(--green)] mt-0.5">
-                    {dict.player.trackedList.unlocked}
+                    Débloqué
                   </p>
                 )}
               </div>
@@ -163,10 +160,7 @@ export default function TrackedPlayersList({
               <button
                 onClick={(e) => handleRemove(e, player.player_name)}
                 disabled={locked || removing}
-                title={locked
-                  ? dict.player.trackedList.removeLockedTooltip.replace('{date}', lockedDate)
-                  : dict.player.trackedList.removeTooltip
-                }
+                title={locked ? `Joueur verrouillé jusqu'au ${formatLockDate(player.locked_until)}` : 'Retirer des suivis'}
                 className={cn(
                   'w-6 h-6 shrink-0 rounded flex items-center justify-center transition-all duration-150',
                   locked

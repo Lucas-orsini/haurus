@@ -5,7 +5,6 @@ import { Search, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { METRIC_SECTIONS, ALL_METRICS } from '@/lib/metrics/definitions'
 import type { MetricDefinition } from '@/lib/metrics/definitions'
-import { useDictionary } from '@/components/providers/locale-provider'
 
 function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
   // @deprecated – plan prop is ignored; this badge always renders "Beta"
@@ -167,7 +166,6 @@ function MetricsSection({
 }
 
 export default function MetricsEducationClient() {
-  const t = useDictionary()
   const [query, setQuery] = useState('')
   const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null)
 
@@ -209,10 +207,11 @@ export default function MetricsEducationClient() {
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-base font-semibold text-[var(--text-1)] mb-1">
-          {t.metrics.pageTitle}
+          Comprendre les métriques
         </h1>
         <p className="text-sm text-[var(--text-3)]">
-          {t.metrics.pageDescription}
+          Chaque métrique expliquée simplement — descriptions courtes pour tous,
+          contenus experts pour approfondir.
         </p>
       </div>
 
@@ -229,7 +228,7 @@ export default function MetricsEducationClient() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={t.metrics.searchPlaceholder}
+            placeholder="Rechercher une métrique..."
             className={cn(
               'w-full h-9 pl-9 pr-3 rounded-md text-sm',
               'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -243,7 +242,7 @@ export default function MetricsEducationClient() {
         {/* Metric count */}
         <span className="text-xs text-[var(--text-3)] shrink-0 tabular-nums">
           <span className="text-[var(--text-2)] font-medium">{totalCount}</span>{' '}
-          {totalCount === 1 ? t.metrics.metricCountSingular : t.metrics.metricCount}
+          {totalCount === 1 ? 'métrique' : 'métriques'}
         </span>
       </div>
 
@@ -266,10 +265,10 @@ export default function MetricsEducationClient() {
             <Search size={18} strokeWidth={1.5} className="text-[var(--text-3)]" />
           </div>
           <p className="text-sm font-medium text-[var(--text-2)] mb-1">
-            {t.metrics.emptyStateTitle}
+            Aucune métrique ne correspond à votre recherche
           </p>
           <p className="text-xs text-[var(--text-3)]">
-            {t.metrics.emptyStateHint}
+            Essayez un autre terme — nom, description ou surface.
           </p>
         </div>
       )}

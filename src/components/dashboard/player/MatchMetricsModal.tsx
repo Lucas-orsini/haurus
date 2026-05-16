@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { X } from 'lucide-react'
 import { cn, formatMetricValue, getMetricColor } from '@/lib/utils'
-import { useDictionary } from '@/components/providers/locale-provider'
 import type { MatchStats } from '@/lib/types/match'
 import { METRIC_DEFS } from '@/components/dashboard/MatchRow'
 
@@ -22,8 +21,6 @@ export default function MatchMetricsModal({
   playerName,
   onClose,
 }: MatchMetricsModalProps) {
-  const dict = useDictionary()
-
   // Ne rien rendre si le modal est fermé
   if (!isOpen) return null
 
@@ -54,14 +51,14 @@ export default function MatchMetricsModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
-            {dict.player.matchMetricsModal.title}
+            Métriques pré-match
           </h2>
           <button
             onClick={onClose}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150"
-            aria-label={dict.player.matchMetricsModal.close}
+            aria-label="Fermer"
           >
             <X size={14} />
           </button>
@@ -69,6 +66,7 @@ export default function MatchMetricsModal({
 
         {/* Body */}
         {stats === null ? (
+          // Stats non disponibles
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
             <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-[var(--border)] flex items-center justify-center mb-3">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-3)]">
@@ -78,12 +76,12 @@ export default function MatchMetricsModal({
               </svg>
             </div>
             <p className="text-sm font-medium text-[var(--text-2)]">
-              {dict.player.matchMetricsModal.unavailable}
+              Métriques pré-match non disponibles pour ce match
             </p>
           </div>
         ) : (
           <div className="px-5 py-5 max-h-[70vh] overflow-y-auto">
-            {/* En-têtes joueurs */}
+            {/* En-têtes joueurs — noms et ranks orientés — stack mobile, grid desktop */}
             <div className="flex flex-col md:grid md:grid-cols-[1fr_2fr_1fr] gap-3 mb-4 pb-3 border-b border-[var(--border)]">
               <div className="flex flex-col items-center min-w-0">
                 <span className="text-xs font-medium text-[var(--text-1)] truncate">
@@ -104,7 +102,7 @@ export default function MatchMetricsModal({
               </div>
             </div>
 
-            {/* Métriques */}
+            {/* Métriques — exclut 'Forme' */}
             <div className="space-y-0">
               {METRIC_DEFS.filter((m) => m.label !== 'Forme').map((metric, idx, arr) => {
                 const p1Key = metric.p1Key as keyof MatchStats
@@ -211,15 +209,11 @@ export default function MatchMetricsModal({
             <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-[var(--border)]">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--green)]" />
-                <span className="text-[10px] text-[var(--text-3)]">
-                  {dict.player.matchMetricsModal.advantage.replace('{player}', playerName)}
-                </span>
+                <span className="text-[10px] text-[var(--text-3)]">Avantage {playerName}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--red)]" />
-                <span className="text-[10px] text-[var(--text-3)]">
-                  {dict.player.matchMetricsModal.disadvantage.replace('{player}', playerName)}
-                </span>
+                <span className="text-[10px] text-[var(--text-3)]">Désavantage {playerName}</span>
               </div>
             </div>
           </div>

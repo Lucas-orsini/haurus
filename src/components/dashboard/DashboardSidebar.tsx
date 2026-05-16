@@ -3,13 +3,18 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, LogOut, User, BookOpen, Settings } from 'lucide-react'
+import { LayoutDashboard, LogOut, User, BookOpen, Settings, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getSession, type AuthUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
 import UserProfileModal from './UserProfileModal'
-import { useDictionary } from '@/components/providers/locale-provider'
+
+const NAV_ITEMS = [
+  { label: 'Aperçu', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Joueur', icon: User, href: '/dashboard/player' },
+  { label: 'Métriques', icon: BookOpen, href: '/dashboard/metrics' },
+]
 
 interface DashboardSidebarProps {
   isOpen?: boolean
@@ -19,7 +24,6 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const dict = useDictionary()
 
   const [sessionState, setSessionState] = useState<'loading' | 'success' | 'error'>('loading')
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -129,11 +133,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
 
             {/* Navigation */}
             <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-              {[
-                { key: 'overview' as const, label: dict.nav.overview, icon: LayoutDashboard, href: '/dashboard' },
-                { key: 'player' as const, label: dict.nav.player, icon: User, href: '/dashboard/player' },
-                { key: 'metrics' as const, label: dict.nav.metrics, icon: BookOpen, href: '/dashboard/metrics' },
-              ].map(({ key, label, icon: Icon, href }) => {
+              {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
                 const isActive = href === '/dashboard'
                   ? pathname === href
                   : pathname === href || pathname.startsWith(href + '/')
@@ -190,7 +190,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                   <div className="w-6 h-6 rounded-full bg-[var(--surface-3)] flex items-center justify-center shrink-0">
                     <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
                   </div>
-                  <span className="text-xs text-[var(--text-3)]">{dict.nav.sessionUnavailable}</span>
+                  <span className="text-xs text-[var(--text-3)]">Session indisponible</span>
                 </div>
               )}
               {sessionState === 'success' && user && (
@@ -245,11 +245,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-          {[
-            { key: 'overview' as const, label: dict.nav.overview, icon: LayoutDashboard, href: '/dashboard' },
-            { key: 'player' as const, label: dict.nav.player, icon: User, href: '/dashboard/player' },
-            { key: 'metrics' as const, label: dict.nav.metrics, icon: BookOpen, href: '/dashboard/metrics' },
-          ].map(({ key, label, icon: Icon, href }) => {
+          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
             const isActive = href === '/dashboard'
               ? pathname === href
               : pathname === href || pathname.startsWith(href + '/')
@@ -306,7 +302,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                 <User size={12} className="text-[var(--text-3)]" strokeWidth={1.5} />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs text-[var(--text-3)] truncate">{dict.nav.sessionUnavailable}</span>
+                <span className="text-xs text-[var(--text-3)] truncate">Session indisponible</span>
               </div>
             </div>
           )}
@@ -356,7 +352,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  transition-colors duration-100 whitespace-nowrap"
                     >
                       <User size={13} strokeWidth={1.5} className="shrink-0" />
-                      {dict.nav.profile}
+                      Profil
                     </button>
 
                     <button
@@ -383,7 +379,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
                                  disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-                      {signingOut ? dict.nav.signingOut : dict.nav.signOut}
+                      {signingOut ? 'Déconnexion...' : 'Se déconnecter'}
                     </button>
                   </motion.div>
                 )}
@@ -394,7 +390,7 @@ export default function DashboardSidebar({ isOpen, onClose }: DashboardSidebarPr
             <UserProfileModal
               user={user}
               onClose={() => setIsProfileModalOpen(false)}
-              onUpdateSuccess={(updated: AuthUser | null) => {
+              onUpdateSuccess={(updated: AuthUser) => {
                 setUser(updated)
                 setIsProfileModalOpen(false)
               }}
