@@ -28,7 +28,6 @@ export type Dictionary = {
     signOut: string
     signOutLoading: string
     sessionUnavailable: string
-    openMenu: string
   }
   dashboard: {
     title: string
@@ -112,105 +111,6 @@ export type Dictionary = {
     metricCountPlural: string
     emptyStateTitle: string
     emptyStateDescription: string
-    // ── Performance metrics education page ──────────────────────
-    details: {
-      // Table column headers
-      columns: {
-        metric: string
-        description: string
-      }
-      // Section titles (keys match MetricSection.titleKey)
-      sections: {
-        serviceRetour: string
-        ratingNiveau: string
-        formeDynamique: string
-        conditionPhysique: string
-      }
-      // Legend for the "better when" indicator
-      legend: {
-        higherIsBetter: string
-        lowerIsBetter: string
-      }
-      // Individual metric translations
-      // Key name = camelCase version of metric id (e.g. "p-serve" → "pServe")
-      metrics: {
-        pServe: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        pReturn: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        tsd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        bppi: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        classementAtp: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        glicko2: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        deltaRank6m: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        forme: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        winRateTd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        winRateSurfaceTd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        momentumTd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        breaksWonTd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        breaksLostTd: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        fatigue72h: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-        joursRepos: {
-          name: string
-          shortDescription: string
-          expertDescription: string
-        }
-      }
-    }
   }
   common: {
     date: string

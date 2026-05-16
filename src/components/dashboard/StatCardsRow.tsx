@@ -1,50 +1,41 @@
 'use client'
 
+import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { getPaceColor, getPaceCategory } from '@/lib/utils'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
   onWeatherClick?: (tourneyName: string) => void
-  dict: {
-    todaysMatches: string
-    noMatchesScheduled: string
-    weather: string
-    dataUnavailable: string
-    noActiveTournament: string
-    surfaceSpeed: string
-    forecast: string
-  }
 }
 
-export default function StatCardsRow({ todaysStats, onWeatherClick, dict }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsRowProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
-      <Card1 card1={todaysStats?.card1} dict={dict} />
+      <Card1 card1={todaysStats?.card1} />
 
       {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} dict={dict} />
+      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
 
       {/* Card 3 — Vitesse de surface */}
-      <Card3 card3={todaysStats?.card3 ?? null} dict={dict} />
+      <Card3 card3={todaysStats?.card3 ?? null} />
     </div>
   )
 }
 
-function Card1({ card1, dict }: { card1?: TodaysStats['card1']; dict: StatCardsRowProps['dict'] }) {
+function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
   if (!card1 || card1.count === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.todaysMatches}
+            Matchs du jour
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">{dict.noMatchesScheduled}</p>
+        <p className="text-sm text-[var(--text-3)]">Aucun match prévu</p>
       </div>
     )
   }
@@ -54,7 +45,7 @@ function Card1({ card1, dict }: { card1?: TodaysStats['card1']; dict: StatCardsR
       <div className="flex items-center gap-2 mb-2">
         <CalendarDays size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          {dict.todaysMatches}
+          Matchs du jour
         </p>
       </div>
       <p className="text-2xl font-medium text-[var(--text-1)] font-mono tabular-nums tracking-tight mb-1">
@@ -85,49 +76,53 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2, onWeatherClick, dict }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void; dict: StatCardsRowProps['dict'] }) {
+function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
+  // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.weather}
+            Météo
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">{dict.dataUnavailable}</p>
+        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
       </div>
     )
   }
 
+  // State: empty — no active tournament today (card2 is null or [])
   if (!card2 || card2.length === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.weather}
+            Météo
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
-        <p className="text-[11px] text-[var(--text-3)] mt-0.5">{dict.noActiveTournament}</p>
+        <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
       </div>
     )
   }
 
+  // State: success — render one weather block per tournament entry
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-3">
         <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          {dict.weather}
+          Météo
         </p>
+        {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
           onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
           title="Voir les prévisions horaires"
           className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
-          {dict.forecast}
+          Prévision
         </button>
       </div>
 
@@ -136,11 +131,14 @@ function Card2({ card2, onWeatherClick, dict }: { card2?: Card2Entry[] | null; o
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
+              {/* Tournament name — non cliquable */}
               <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
                 {name}
               </p>
 
+              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">
+                {/* Left zone — conditions label + OpenWeatherMap icon */}
                 <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
                   {w.conditions_icon ? (
                     <img
@@ -158,6 +156,7 @@ function Card2({ card2, onWeatherClick, dict }: { card2?: Card2Entry[] | null; o
                   </p>
                 </div>
 
+                {/* Right zone — 4 stacked metrics */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
                     label="Température"
@@ -208,17 +207,17 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
 
 type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
-function Card3({ card3, dict }: { card3?: Card3Entry[] | null; dict: StatCardsRowProps['dict'] }) {
+function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
   if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.surfaceSpeed}
+            Vitesse de surface
           </p>
         </div>
-        <p className="text-sm text-[var(--text-3)]">{dict.dataUnavailable}</p>
+        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
       </div>
     )
   }
@@ -229,7 +228,7 @@ function Card3({ card3, dict }: { card3?: Card3Entry[] | null; dict: StatCardsRo
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
           <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-            {dict.surfaceSpeed}
+            Vitesse de surface
           </p>
         </div>
         <p className="text-sm text-[var(--text-3)]">—</p>
@@ -242,7 +241,7 @@ function Card3({ card3, dict }: { card3?: Card3Entry[] | null; dict: StatCardsRo
       <div className="flex items-center gap-2 mb-3">
         <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
-          {dict.surfaceSpeed}
+          Vitesse de surface
         </p>
       </div>
       <div className="flex flex-col gap-4">
@@ -254,6 +253,7 @@ function Card3({ card3, dict }: { card3?: Card3Entry[] | null; dict: StatCardsRo
   )
 }
 
+/** Palette hex pour la jauge — indexée par PaceColor */
 const PACE_COLOR_HEX: Record<string, string> = {
   blue:   '#3b82f6',
   yellow: '#facc15',

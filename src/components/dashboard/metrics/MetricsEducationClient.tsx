@@ -9,6 +9,7 @@ import { useLocale } from '@/providers/LocaleProvider'
 
 function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
   const { dict } = useLocale()
+  // @deprecated – plan prop is ignored; this badge always renders translated "Beta"
   return (
     <span
       className="w-fit inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap"
@@ -25,12 +26,12 @@ function PlanBadge({ plan: _plan }: { plan: MetricDefinition['plan'] }) {
 function MetricDetailModal({
   metric,
   onClose,
-  t,
 }: {
   metric: MetricDefinition | null
   onClose: () => void
-  t: (key: string) => string
 }) {
+  const { dict } = useLocale()
+
   // Escape key handler
   useEffect(() => {
     if (!metric) return
@@ -42,10 +43,6 @@ function MetricDetailModal({
   }, [metric, onClose])
 
   if (!metric) return null
-
-  const name = t(metric.name)
-  const shortDescription = t(metric.shortDescription)
-  const expertDescription = t(metric.expertDescription)
 
   return (
     <div
@@ -67,13 +64,13 @@ function MetricDetailModal({
               id="modal-metric-name"
               className="text-sm font-semibold text-[var(--text-1)] leading-snug"
             >
-              {name}
+              {metric.name}
             </h2>
             <PlanBadge plan={metric.plan} />
           </div>
           <button
             onClick={onClose}
-            aria-label={t('metrics.modalClose')}
+            aria-label={dict.metrics.modalClose}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150 shrink-0"
@@ -86,7 +83,7 @@ function MetricDetailModal({
         <div className="px-5 pb-5 flex flex-col gap-4">
           {/* Short description */}
           <p className="text-xs text-[var(--text-2)] leading-relaxed">
-            {shortDescription}
+            {metric.shortDescription}
           </p>
 
           {/* Visual separator */}
@@ -94,7 +91,7 @@ function MetricDetailModal({
 
           {/* Expert description */}
           <p className="text-xs text-[var(--text-3)] leading-relaxed">
-            {expertDescription}
+            {metric.expertDescription}
           </p>
         </div>
       </div>
@@ -105,20 +102,17 @@ function MetricDetailModal({
 function MetricCard({
   metric,
   onOpen,
-  t,
 }: {
   metric: MetricDefinition
   onOpen: (id: string) => void
-  t: (key: string) => string
 }) {
-  const name = t(metric.name)
-  const shortDescription = t(metric.shortDescription)
+  const { dict } = useLocale()
 
   return (
     <button
       type="button"
       onClick={() => onOpen(metric.id)}
-      aria-label={t('metrics.openMetricDetails').replace('{metric}', name)}
+      aria-label={dict.metrics.openMetricDetails.replace('{metric}', metric.name)}
       className={cn(
         'bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4',
         'hover:border-[var(--border-hi)] hover:bg-white/[0.02]',
@@ -129,7 +123,7 @@ function MetricCard({
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1.5 min-w-0 flex-1 items-center">
           <h3 className="text-sm font-semibold text-[var(--text-1)] leading-snug">
-            {name}
+            {metric.name}
           </h3>
           <PlanBadge plan={metric.plan} />
         </div>
@@ -137,7 +131,7 @@ function MetricCard({
 
       {/* Short description — always visible */}
       <p className="text-xs text-[var(--text-2)] leading-relaxed">
-        {shortDescription}
+        {metric.shortDescription}
       </p>
     </button>
   )
@@ -147,12 +141,10 @@ function MetricsSection({
   title,
   metrics,
   onOpen,
-  t,
 }: {
   title: string
   metrics: MetricDefinition[]
   onOpen: (id: string) => void
-  t: (key: string) => string
 }) {
   return (
     <section className="mb-10 last:mb-0">
@@ -172,7 +164,6 @@ function MetricsSection({
             key={metric.id}
             metric={metric}
             onOpen={onOpen}
-            t={t}
           />
         ))}
       </div>
@@ -182,29 +173,13 @@ function MetricsSection({
 
 export default function MetricsEducationClient() {
   const { dict } = useLocale()
-
-  // Translation helper — wraps dict access for i18n keys
-  const t = useCallback(
-    (key: string): string => {
-      // Navigate nested keys like "dashboard.metrics.sectionServiceRetour"
-      const parts = key.split('.')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let value: any = dict
-      for (const part of parts) {
-        value = value?.[part]
-      }
-      return typeof value === 'string' ? value : key
-    },
-    [dict]
-  )
-
   const [query, setQuery] = useState('')
   const [selectedMetricId, setSelectedMetricId] = useState<string | null>(null)
 
   const openModal = useCallback((id: string) => setSelectedMetricId(id), [])
   const closeModal = useCallback(() => setSelectedMetricId(null), [])
 
-  // Filter sections by query — translates before comparing
+  // Filter sections by query — searches name + shortDescription + expertDescription
   const filteredSections = useMemo(() => {
     if (!query.trim()) return METRIC_SECTIONS
 
@@ -212,20 +187,14 @@ export default function MetricsEducationClient() {
 
     return METRIC_SECTIONS.map((section) => ({
       ...section,
-      // Translate section title before comparing
-      title: t(section.title),
-      metrics: section.metrics.filter((m) => {
-        const name = t(m.name).toLowerCase()
-        const shortDesc = t(m.shortDescription).toLowerCase()
-        const expertDesc = t(m.expertDescription).toLowerCase()
-        return (
-          name.includes(q) ||
-          shortDesc.includes(q) ||
-          expertDesc.includes(q)
-        )
-      }),
+      metrics: section.metrics.filter(
+        (m) =>
+          m.name.toLowerCase().includes(q) ||
+          m.shortDescription.toLowerCase().includes(q) ||
+          m.expertDescription.toLowerCase().includes(q)
+      ),
     })).filter((section) => section.metrics.length > 0)
-  }, [query, t])
+  }, [query])
 
   const hasResults = filteredSections.length > 0
 
@@ -294,7 +263,6 @@ export default function MetricsEducationClient() {
               title={section.title}
               metrics={section.metrics}
               onOpen={openModal}
-              t={t}
             />
           ))}
         </div>
@@ -314,7 +282,7 @@ export default function MetricsEducationClient() {
       )}
 
       {/* Detail modal */}
-      <MetricDetailModal metric={selectedMetric} onClose={closeModal} t={t} />
+      <MetricDetailModal metric={selectedMetric} onClose={closeModal} />
     </div>
   )
 }
