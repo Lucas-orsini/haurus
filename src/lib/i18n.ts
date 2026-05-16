@@ -47,7 +47,7 @@ const fr = {
   ctaBanner: {
     title: 'Prêt à analyser comme un PRO',
     subtitle:
-      "Devenez de vrais analystes qui ajustent leur décision grâce à des données, pas sur les intuitions.",
+      "Devenez de vrais analysts qui ajustent leur décision grâce à des données, pas sur les intuitions.",
     cta: 'Commencer maintenant',
     disclaimer: "Pas de prédiction. Pas d'intuition. Seulement des données.",
   },
@@ -176,6 +176,7 @@ const fr = {
       passwordPlaceholder: '••••••••',
       confirmPasswordLabel: 'Confirmer le mot de passe',
       confirmPasswordPlaceholder: '••••••••',
+      confirmPasswordMismatch: 'Les mots de passe ne correspondent pas.',
       submitButton: 'Créer mon compte',
       submitButtonLoading: 'Création...',
       submitButtonRedirecting: 'Redirection...',
@@ -365,6 +366,7 @@ const en = {
       passwordPlaceholder: '••••••••',
       confirmPasswordLabel: 'Confirm password',
       confirmPasswordPlaceholder: '••••••••',
+      confirmPasswordMismatch: 'Passwords do not match.',
       submitButton: 'Create my account',
       submitButtonLoading: 'Creating account...',
       submitButtonRedirecting: 'Redirecting...',
