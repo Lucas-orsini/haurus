@@ -581,6 +581,43 @@ const en = {
       modalClose: 'Close',
       modalOpenDetails: 'Open details of',
     },
+    player: {
+      searchBar: {
+        placeholder: 'Search for an ATP player...',
+        minCharsHint: 'Type at least 2 characters to start',
+        noResults: 'No player found',
+        sessionExpired: 'Session expired. Please reconnect.',
+        searchFailed: 'Search failed. Please try again.',
+      },
+      trackedPanelButton: 'My players',
+      trackedPanelAriaLabel: 'Open or close the My players panel',
+      trackedEmptyHint: 'Search for an ATP player',
+      trackedEmptySubHint: 'Type at least 2 characters to start',
+      metricCards: {
+        glicko2: 'Glicko-2',
+        pServe: 'P-Serve',
+        momentum: 'Momentum TD',
+        vsAtp: 'vs ATP',
+        days30: '30 days',
+      },
+      matchHistory: {
+        title: 'Recent matches',
+        emptyTitle: 'No match history',
+        emptyDesc: "This player has no match data available yet.",
+        columns: {
+          date: 'Date',
+          opponent: 'Opponent',
+          tournament: 'Tournament',
+          surface: 'Surface',
+          score: 'Score',
+          result: 'Result',
+          metrics: 'Metrics',
+        },
+        metricsButton: 'Metrics',
+        resultWin: 'W',
+        resultLoss: 'L',
+      },
+    },
   },
 }
 

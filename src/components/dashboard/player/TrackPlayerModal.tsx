@@ -1,6 +1,7 @@
 'use client'
 
 import { X, AlertTriangle, Loader2 } from 'lucide-react'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 interface TrackPlayerModalProps {
   isOpen: boolean
@@ -17,6 +18,17 @@ export default function TrackPlayerModal({
   onConfirm,
   onCancel,
 }: TrackPlayerModalProps) {
+  const dict = useDashboardDict()
+  const t = dict.player?.trackModal ?? {
+    followTitle: 'Track',
+    body: 'Once added to your tracked players, this player will be',
+    lockedUntil: 'locked until the first day of the following month',
+    cannotRemove: 'You will not be able to remove them before that date.',
+    noRestrictionNote: 'Note: no restriction applies for now on your plan.',
+    cancel: 'Cancel',
+    confirm: 'Track and view',
+  }
+
   if (!isOpen) return null
 
   return (
@@ -33,7 +45,8 @@ export default function TrackPlayerModal({
             </div>
             <div className="min-w-0">
               <h2 className="text-sm font-semibold text-[var(--text-1)] truncate max-w-[200px]">
-                Suivre {playerName}
+                {t.followTitle}{' '}
+                <span className="text-[var(--accent)]">{playerName}</span>
               </h2>
             </div>
           </div>
@@ -48,15 +61,17 @@ export default function TrackPlayerModal({
         {/* Body */}
         <div className="px-5 py-4">
           <p className="text-xs text-[var(--text-2)] leading-relaxed">
-            Une fois ajouté à vos suivis, ce joueur sera{' '}
-            <span className="text-[var(--text-1)] font-medium">verrouillé jusqu&apos;au premier jour du mois suivant</span>.
-            Vous ne pourrez pas le retirer de vos suivis avant cette date.
+            {t.body}{' '}
+            <span className="text-[var(--text-1)] font-medium">
+              {t.lockedUntil}
+            </span>
+            . {t.cannotRemove}
           </p>
 
           {/* Note pour le rôle user */}
           {role === 'user' && (
             <p className="text-[11px] text-[var(--text-3)] mt-2 leading-relaxed">
-              Note : aucune restriction ne s&apos;applique pour le moment sur votre plan.
+              {t.noRestrictionNote}
             </p>
           )}
         </div>
@@ -67,13 +82,13 @@ export default function TrackPlayerModal({
             onClick={onCancel}
             className="h-8 w-full md:w-auto px-4 flex items-center justify-center rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors duration-150"
           >
-            Annuler
+            {t.cancel}
           </button>
           <button
             onClick={onConfirm}
             className="h-8 w-full md:w-auto px-4 flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-white text-xs font-medium transition-colors duration-150"
           >
-            Suivre et consulter
+            {t.confirm}
           </button>
         </div>
       </div>

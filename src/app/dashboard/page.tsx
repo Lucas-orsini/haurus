@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD in server timezone
+  const today = new Date().toISOString().slice(0, 10)
 
   const { data: matches, error } = await supabase
     .from('match_stats')
@@ -46,7 +46,6 @@ export default async function DashboardPage() {
       favoriteMatchIds = favorites.map((f) => f.match_id)
     }
   } catch {
-    // Non-critical: if favorites fetch fails, pass empty array
     favoriteMatchIds = []
   }
 
@@ -55,12 +54,9 @@ export default async function DashboardPage() {
   try {
     todaysStats = await computeTodaysStats(supabase)
   } catch {
-    // Non-critical: if stats computation fails, cards show fallbacks
     todaysStats = undefined
   }
 
-  // dict is injected by the parent layout via context or passed as a prop
-  // The layout passes it to DashboardShell which forwards it here
   return (
     <DashboardOverview
       matches={(matches as MatchStats[]) ?? []}

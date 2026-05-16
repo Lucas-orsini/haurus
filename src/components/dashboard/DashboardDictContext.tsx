@@ -89,6 +89,95 @@ export type DashboardDict = {
     modalClose: string
     modalOpenDetails: string
   }
+  player?: {
+    searchBar: {
+      placeholder: string
+      minCharsHint: string
+      noResults: string
+      sessionExpired: string
+      searchFailed: string
+    }
+    trackedPanelButton: string
+    trackedPanelAriaLabel: string
+    trackedEmptyHint: string
+    trackedEmptySubHint: string
+    metricCards: {
+      glicko2: string
+      pServe: string
+      momentum: string
+      vsAtp: string
+      days30: string
+    }
+    matchHistory: {
+      title: string
+      emptyTitle: string
+      emptyDesc: string
+      columns: {
+        date: string
+        opponent: string
+        tournament: string
+        surface: string
+        score: string
+        result: string
+        metrics: string
+      }
+      metricsButton: string
+      resultWin: string
+      resultLoss: string
+    }
+    statsChart?: {
+      metricLabel: string
+      insufficientHistory: string
+      bppi: string
+      rank: string
+      p_serve: string
+      p_return: string
+      tsd_clay: string
+      tsd_hard: string
+      tsd_grass: string
+      glicko_clay: string
+      glicko_hard: string
+      glicko_grass: string
+      momentum_td: string
+      win_rate_td: string
+      win_rate_clay_td: string
+      win_rate_hard_td: string
+      win_rate_grass_td: string
+      breaks_won_td: string
+      breaks_lost_td: string
+      delta_rank_6m: string
+    }
+    surface?: {
+      hard: string
+      clay: string
+      grass: string
+    }
+    trackModal?: {
+      followTitle: string
+      body: string
+      lockedUntil: string
+      cannotRemove: string
+      noRestrictionNote: string
+      cancel: string
+      confirm: string
+    }
+    tracked?: {
+      label: string
+      emptyTitle: string
+      emptyDesc: string
+      lockedUntil: string
+      unlocked: string
+      removeFromTracked: string
+      closePanel: string
+    }
+    matchMetrics?: {
+      title: string
+      close: string
+      notAvailable: string
+      advantage: string
+      disadvantage: string
+    }
+  }
 }
 
 export const DashboardDictContext = createContext<DashboardDict | null>(null)
