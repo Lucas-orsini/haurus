@@ -2,7 +2,6 @@
 
 import { cn, getDeltaColor, getMomentumColor } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
-import { useLocale } from '@/providers/LocaleProvider'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
@@ -31,9 +30,6 @@ function getAtpPServe(surface: string, atpAverages: AtpAverage[]): number | null
 }
 
 export default function PlayerMetricCards({ surface, playerStats, atpAverages }: PlayerMetricCardsProps) {
-  const { dict } = useLocale()
-  const surfaceLabel = dict.surfaces[surface.toLowerCase() as 'hard' | 'clay' | 'grass']
-
   const glicko = getGlicko(surface, playerStats)
   const pServe = getPServe(surface, playerStats)
   const atpPServe = getAtpPServe(surface, atpAverages)
@@ -50,7 +46,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
         <p className="text-2xl font-semibold text-[var(--text-1)] tabular-nums font-mono">
           {glicko !== null ? Math.round(glicko).toLocaleString() : '—'}
         </p>
-        <p className="text-xs text-[var(--text-3)] mt-1">{surfaceLabel}</p>
+        <p className="text-xs text-[var(--text-3)] mt-1">{surface}</p>
       </div>
 
       {/* Card 2 — P-Serve + comparaison ATP */}
@@ -67,7 +63,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
             </span>
           </p>
         ) : (
-          <p className="text-xs text-[var(--text-3)] mt-1">{surfaceLabel}</p>
+          <p className="text-xs text-[var(--text-3)] mt-1">{surface}</p>
         )}
       </div>
 

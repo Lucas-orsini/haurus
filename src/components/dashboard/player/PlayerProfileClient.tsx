@@ -14,7 +14,6 @@ import TrackedPlayersList from './TrackedPlayersList'
 import TrackPlayerModal from './TrackPlayerModal'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
-import { useLocale } from '@/providers/LocaleProvider'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
@@ -50,9 +49,6 @@ interface TrackedPlayersResponse {
 }
 
 export default function PlayerProfileClient() {
-  const { dict } = useLocale()
-  const t = dict.player
-
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
@@ -315,10 +311,10 @@ export default function PlayerProfileClient() {
               className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto
                          border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
                          text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-              aria-label={t.myPlayers}
+              aria-label="Ouvrir ou fermer le panneau Mes joueurs"
             >
               <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">{t.myPlayers}</span>
+              <span className="whitespace-nowrap">Mes joueurs</span>
             </button>
 
             {/* Barre de recherche — pleine largeur mobile */}
@@ -346,7 +342,7 @@ export default function PlayerProfileClient() {
                     <h2 className="text-base font-semibold text-[var(--text-1)]">{selectedPlayer.player_name}</h2>
                     {selectedPlayer.rank && (
                       <p className="text-xs text-[var(--text-3)] mt-0.5">
-                        {t.atpRank}{selectedPlayer.rank}
+                        ATP #{selectedPlayer.rank}
                       </p>
                     )}
                   </div>
@@ -403,8 +399,8 @@ export default function PlayerProfileClient() {
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-[var(--text-2)]">{t.searchPlaceholder}</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">{t.searchHint}</p>
+              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
             </div>
           )}
         </div>

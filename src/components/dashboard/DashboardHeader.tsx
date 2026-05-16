@@ -2,8 +2,6 @@
 
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
-import { useLocale } from '@/providers/LocaleProvider'
-import LanguageSwitcher from '@/components/layout/LanguageSwitcher'
 
 const ROUTE_META: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': {
@@ -28,7 +26,6 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) {
   const pathname = usePathname()
-  const { dict } = useLocale()
   const { title, subtitle } = ROUTE_META[pathname] ?? DEFAULT_META
 
   return (
@@ -45,11 +42,6 @@ export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) 
       <div className="min-w-0 flex-1 md:flex-none">
         <h1 className="text-sm font-semibold text-[var(--text-1)] truncate">{title}</h1>
         <p className="text-xs text-[var(--text-3)] truncate">{subtitle}</p>
-      </div>
-
-      {/* Language switcher — right side */}
-      <div className="shrink-0 ml-3">
-        <LanguageSwitcher />
       </div>
     </header>
   )

@@ -1,7 +1,6 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useLocale } from '@/providers/LocaleProvider'
 
 interface SurfaceSelectorProps {
   selectedSurface: 'Hard' | 'Clay' | 'Grass'
@@ -10,21 +9,17 @@ interface SurfaceSelectorProps {
 
 const SURFACES = ['Hard', 'Clay', 'Grass'] as const
 
-const SURFACE_KEYS: Record<'Hard' | 'Clay' | 'Grass', 'hard' | 'clay' | 'grass'> = {
-  Hard: 'hard',
-  Clay: 'clay',
-  Grass: 'grass',
+const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
+  Hard: 'Dur',
+  Clay: 'Terre battue',
+  Grass: 'Gazon',
 }
 
 export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: SurfaceSelectorProps) {
-  const { dict } = useLocale()
-  const surfaceLabels = dict.surfaces
-
   return (
     <div className="w-full md:w-auto flex items-center gap-1">
       {SURFACES.map((surface) => {
         const active = selectedSurface === surface
-        const label = surfaceLabels[SURFACE_KEYS[surface]]
         return (
           <button
             key={surface}
@@ -37,7 +32,7 @@ export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: Su
                 : 'border border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
             )}
           >
-            {label}
+            {LABEL_MAP[surface]}
           </button>
         )
       })}

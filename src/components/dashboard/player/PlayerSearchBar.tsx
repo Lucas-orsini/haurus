@@ -5,7 +5,6 @@ import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
-import { useLocale } from '@/providers/LocaleProvider'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 
@@ -15,13 +14,11 @@ interface PlayerSearchBarProps {
 
 type SearchState = 'idle' | 'searching' | 'success' | 'empty' | 'error'
 
+const MAX_RESULTS = 8
 const MIN_CHARS = 2
 const DEBOUNCE_MS = 300
 
 export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps) {
-  const { dict } = useLocale()
-  const searchDict = dict.player.search
-
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<PlayerStats[]>([])
   const [searchState, setSearchState] = useState<SearchState>('idle')
@@ -54,10 +51,10 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         if (!res.ok) {
           if (res.status === 401) {
             setSearchState('error')
-            setErrorMessage(searchDict.errorUnauthorized)
+            setErrorMessage('Session expirée. Veuillez vous reconnecter.')
           } else {
             setSearchState('error')
-            setErrorMessage(searchDict.errorGeneric)
+            setErrorMessage('Échec de la recherche. Veuillez réessayer.')
           }
           setResults([])
           setOpen(true)
@@ -74,7 +71,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
         if (err instanceof Error && err.name === 'AbortError') return
 
         setSearchState('error')
-        setErrorMessage(searchDict.errorGeneric)
+        setErrorMessage('Échec de la recherche. Veuillez réessayer.')
         setResults([])
         setOpen(true)
       }
@@ -84,7 +81,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
       clearTimeout(debounceRef.current)
       controller.abort()
     }
-  }, [query, searchDict.errorGeneric, searchDict.errorUnauthorized])
+  }, [query])
 
   // Close on outside click
   useEffect(() => {
@@ -143,7 +140,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder={searchDict.placeholder}
+          placeholder="Rechercher un joueur ATP..."
           className={cn(
             'w-full h-9 pl-9 pr-9 rounded-md text-sm',
             'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -204,7 +201,7 @@ export default function PlayerSearchBar({ onSelectPlayer }: PlayerSearchBarProps
             ))
           ) : searchState === 'empty' ? (
             <div className="px-3 py-4 text-center">
-              <p className="text-sm text-[var(--text-3)]">{searchDict.noResults}</p>
+              <p className="text-sm text-[var(--text-3)]">Aucun joueur trouvé</p>
             </div>
           ) : null}
         </div>

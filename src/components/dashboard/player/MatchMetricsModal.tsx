@@ -5,7 +5,6 @@ import { X } from 'lucide-react'
 import { cn, formatMetricValue, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 import { METRIC_DEFS } from '@/components/dashboard/MatchRow'
-import { useLocale } from '@/providers/LocaleProvider'
 
 interface MatchMetricsModalProps {
   isOpen: boolean
@@ -22,9 +21,6 @@ export default function MatchMetricsModal({
   playerName,
   onClose,
 }: MatchMetricsModalProps) {
-  const { dict } = useLocale()
-  const common = dict.common
-
   // Ne rien rendre si le modal est fermé
   if (!isOpen) return null
 
@@ -55,14 +51,14 @@ export default function MatchMetricsModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
-            {dict.player.metrics}
+            Métriques pré-match
           </h2>
           <button
             onClick={onClose}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150"
-            aria-label={common.close}
+            aria-label="Fermer"
           >
             <X size={14} />
           </button>
@@ -80,7 +76,7 @@ export default function MatchMetricsModal({
               </svg>
             </div>
             <p className="text-sm font-medium text-[var(--text-2)]">
-              {dict.player.noMatchAvailable}
+              Métriques pré-match non disponibles pour ce match
             </p>
           </div>
         ) : (
