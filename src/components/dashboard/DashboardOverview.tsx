@@ -8,6 +8,7 @@ import StatCardsRow from './StatCardsRow'
 import WeatherForecastModal from './WeatherForecastModal'
 import type { MatchStats } from '@/lib/types/match'
 import type { TodaysStats, HourlyForecastEntry } from '@/lib/types/dashboard'
+import type { Dictionary } from '@/lib/i18n/types'
 import { createClient } from '@/lib/supabase/client'
 
 interface DashboardOverviewProps {
@@ -15,6 +16,8 @@ interface DashboardOverviewProps {
   fetchError?: string
   favoriteMatchIds?: string[]
   todaysStats?: TodaysStats
+  statCardsDict?: Dictionary['statCards']
+  dashboardDict?: Dictionary['dashboard']
 }
 
 const TODAY_FILTER_KEY = '__today__'
@@ -24,6 +27,8 @@ export default function DashboardOverview({
   fetchError,
   favoriteMatchIds = [],
   todaysStats,
+  statCardsDict,
+  dashboardDict,
 }: DashboardOverviewProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set())
@@ -190,6 +195,26 @@ export default function DashboardOverview({
     activeFilters.size > 0 || searchQuery.trim().length > 0 || favoritesOnly
   const showFavoritesEmpty = favoritesOnly && localFavoriteIds.length === 0
 
+  // ── Resolved translation strings ─────────────────────────────────────────
+  const t = {
+    retry: dashboardDict?.retry ?? 'Réessayer',
+    searchPlaceholder: dashboardDict?.searchPlaceholder ?? 'Rechercher un joueur...',
+    todayFilter: dashboardDict?.todayFilter ?? "Aujourd'hui",
+    favoritesBtn: dashboardDict?.favoritesBtn ?? 'Favoris',
+    clearFilters: dashboardDict?.clearFilters ?? 'Effacer',
+    favoritesEmpty: dashboardDict?.favoritesEmpty ?? 'Aucun favori',
+    noFavoritesDesc: dashboardDict?.noFavoritesDesc ?? 'Ajoutez des matchs en étoile.',
+    noMatchFound: dashboardDict?.noMatchFound ?? 'Aucun match trouvé',
+    noMatchFoundDesc: dashboardDict?.noMatchFoundDesc ?? 'Modifiez vos critères de recherche ou filtres.',
+    clearAllFilters: dashboardDict?.clearAllFilters ?? 'Effacer les filtres',
+    table: {
+      date: dashboardDict?.table?.date ?? 'Date',
+      tournament: dashboardDict?.table?.tournament ?? 'Tournoi',
+      players: dashboardDict?.table?.players ?? 'Joueurs',
+      surface: dashboardDict?.table?.surface ?? 'Surface',
+    },
+  }
+
   return (
     <div className="space-y-4">
 
@@ -197,6 +222,15 @@ export default function DashboardOverview({
       <StatCardsRow
         todaysStats={todaysStats}
         onWeatherClick={handleWeatherClick}
+        dict={statCardsDict ?? {
+          todaysMatches: "Today's matches",
+          noMatchesScheduled: 'No matches scheduled',
+          weather: 'Weather',
+          dataUnavailable: 'Data unavailable',
+          noActiveTournament: 'No active tournament',
+          surfaceSpeed: 'Surface speed',
+          forecast: 'Forecast',
+        }}
       />
 
       {/* Error banner */}
@@ -208,7 +242,7 @@ export default function DashboardOverview({
             onClick={() => window.location.reload()}
             className="h-7 px-3 flex items-center justify-center gap-1.5 rounded-md bg-[var(--red)]/15 hover:bg-[var(--red)]/25 text-[var(--red)] text-xs font-medium transition-colors"
           >
-            Réessayer
+            {t.retry}
           </button>
         </div>
       )}
@@ -225,7 +259,7 @@ export default function DashboardOverview({
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher un joueur..."
+              placeholder={t.searchPlaceholder}
               className={cn(
                 'w-full h-8 pl-8 pr-8 rounded-md text-sm',
                 'bg-[var(--surface-1)] border border-[var(--border-md)]',
@@ -256,7 +290,7 @@ export default function DashboardOverview({
               )}
             >
               <ChevronDown size={11} strokeWidth={1.5} />
-              Aujourd&apos;hui
+              {t.todayFilter}
             </button>
 
             <button
@@ -270,22 +304,22 @@ export default function DashboardOverview({
             >
               <Star size={11} strokeWidth={1.5} />
               {localFavoriteIds.length > 0
-                ? `Favoris (${localFavoriteIds.length})`
-                : 'Favoris'}
+                ? `${t.favoritesBtn} (${localFavoriteIds.length})`
+                : t.favoritesBtn}
             </button>
 
-            {tournaments.slice(0, 5).map((t) => (
+            {tournaments.slice(0, 5).map((tournoi) => (
               <button
-                key={t}
-                onClick={() => toggleFilter(t)}
+                key={tournoi}
+                onClick={() => toggleFilter(tournoi)}
                 className={cn(
                   'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap max-w-[160px]',
-                  activeFilters.has(t)
+                  activeFilters.has(tournoi)
                     ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
                     : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
                 )}
               >
-                <span className="truncate">{t}</span>
+                <span className="truncate">{tournoi}</span>
               </button>
             ))}
 
@@ -295,7 +329,7 @@ export default function DashboardOverview({
                 className="h-8 px-2.5 flex items-center justify-center gap-1 rounded-md text-xs text-[var(--text-3)] hover:text-[var(--red)] transition-colors"
               >
                 <X size={11} />
-                Effacer
+                {t.clearFilters}
               </button>
             )}
 
@@ -316,16 +350,16 @@ export default function DashboardOverview({
             <thead>
               <tr className="border-b border-[var(--border)]">
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
-                  Date
+                  {t.table.date}
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
-                  Tournoi
+                  {t.table.tournament}
                 </th>
                 <th className="px-2 md:px-4 py-2.5 text-left text-[10px] md:text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap">
-                  Joueurs
+                  {t.table.players}
                 </th>
                 <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider whitespace-nowrap hidden md:table-cell">
-                  Surface
+                  {t.table.surface}
                 </th>
                 <th className="px-2 md:px-4 py-2.5 w-10" />
               </tr>
@@ -346,19 +380,19 @@ export default function DashboardOverview({
                         {showFavoritesEmpty ? (
                           <>
                             <p className="text-sm font-medium text-[var(--text-2)]">
-                              Aucun favori
+                              {t.favoritesEmpty}
                             </p>
                             <p className="text-xs text-[var(--text-3)] mt-0.5">
-                              Ajoutez des matchs en étoile.
+                              {t.noFavoritesDesc}
                             </p>
                           </>
                         ) : (
                           <>
                             <p className="text-sm font-medium text-[var(--text-2)]">
-                              Aucun match trouvé
+                              {t.noMatchFound}
                             </p>
                             <p className="text-xs text-[var(--text-3)] mt-0.5">
-                              Modifiez vos critères de recherche ou filtres.
+                              {t.noMatchFoundDesc}
                             </p>
                           </>
                         )}
@@ -369,7 +403,7 @@ export default function DashboardOverview({
                           className="h-7 px-3 flex items-center justify-center gap-1.5 rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors mt-1"
                         >
                           <X size={11} />
-                          Effacer les filtres
+                          {t.clearAllFilters}
                         </button>
                       )}
                     </div>
