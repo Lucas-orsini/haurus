@@ -4,23 +4,38 @@ import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { normalizeTournamentName } from '@/lib/dashboard/stats'
+import { useTournament } from '@/contexts/TournamentContext'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
   onWeatherClick?: (tourneyName: string) => void
+  /** Filter stat cards to show only this tournament's data. Null = show all. */
+  selectedTournament?: string | null
 }
 
-export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats, onWeatherClick, selectedTournament }: StatCardsRowProps) {
+  const { tournaments } = useTournament()
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
       <Card1 card1={todaysStats?.card1} />
 
       {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
+      <Card2
+        card2={todaysStats?.card2}
+        onWeatherClick={onWeatherClick}
+        selectedTournament={selectedTournament}
+        normalizeTournamentName={normalizeTournamentName}
+      />
 
       {/* Card 3 — Vitesse de surface */}
-      <Card3 card3={todaysStats?.card3 ?? null} />
+      <Card3
+        card3={todaysStats?.card3 ?? null}
+        selectedTournament={selectedTournament}
+        normalizeTournamentName={normalizeTournamentName}
+      />
     </div>
   )
 }
@@ -76,7 +91,30 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
+function Card2({
+  card2,
+  onWeatherClick,
+  selectedTournament,
+  normalizeTournamentName,
+}: {
+  card2?: Card2Entry[] | null
+  onWeatherClick?: (name: string) => void
+  selectedTournament?: string | null
+  normalizeTournamentName: (name: string) => string
+}) {
+  // Apply tournament filter using normalized name soft-matching.
+  // Handles mismatch between DB formats (e.g., "ATP Rome Masters, Italy" vs "Rome").
+  const filteredEntries = selectedTournament
+    ? (card2 ?? []).filter((entry) => {
+        const normalizedSelected = normalizeTournamentName(selectedTournament)
+        const normalizedEntry = normalizeTournamentName(entry.name)
+        return (
+          normalizedEntry.includes(normalizedSelected) ||
+          normalizedSelected.includes(normalizedEntry)
+        )
+      })
+    : card2 ?? []
+
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -92,8 +130,8 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
     )
   }
 
-  // State: empty — no active tournament today (card2 is null or [])
-  if (!card2 || card2.length === 0) {
+  // State: empty — no active tournament today or filtered result is empty
+  if (!card2 || card2.length === 0 || filteredEntries.length === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
@@ -108,7 +146,7 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
     )
   }
 
-  // State: success — render one weather block per tournament entry
+  // State: success — render filtered weather blocks
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-3">
@@ -116,9 +154,8 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
           Météo
         </p>
-        {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
         <button
-          onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
+          onClick={() => onWeatherClick?.(filteredEntries[0]?.name ?? '')}
           title="Voir les prévisions horaires"
           className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
@@ -127,18 +164,15 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
       </div>
 
       <div className="flex flex-col gap-4">
-        {card2.map((entry, i) => {
+        {filteredEntries.map((entry, i) => {
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
-              {/* Tournament name — non cliquable */}
               <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
                 {name}
               </p>
 
-              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">
-                {/* Left zone — conditions label + OpenWeatherMap icon */}
                 <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
                   {w.conditions_icon ? (
                     <img
@@ -156,7 +190,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
                   </p>
                 </div>
 
-                {/* Right zone — 4 stacked metrics */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
                     label="Température"
@@ -207,7 +240,28 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
 
 type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
-function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
+function Card3({
+  card3,
+  selectedTournament,
+  normalizeTournamentName,
+}: {
+  card3?: Card3Entry[] | null
+  selectedTournament?: string | null
+  normalizeTournamentName: (name: string) => string
+}) {
+  // Apply tournament filter using normalized name soft-matching.
+  // Handles format mismatch between match_stats tournament names and tournament_pace names.
+  const filteredEntries = selectedTournament
+    ? (card3 ?? []).filter((entry) => {
+        const normalizedSelected = normalizeTournamentName(selectedTournament)
+        const normalizedEntry = normalizeTournamentName(entry.name)
+        return (
+          normalizedEntry.includes(normalizedSelected) ||
+          normalizedSelected.includes(normalizedEntry)
+        )
+      })
+    : card3 ?? []
+
   if (card3 === undefined) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
@@ -222,7 +276,7 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
     )
   }
 
-  if (card3 === null || card3.length === 0) {
+  if (card3 === null || card3.length === 0 || filteredEntries.length === 0) {
     return (
       <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
         <div className="flex items-center gap-2 mb-2">
@@ -245,7 +299,7 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        {card3.map((entry, i) => (
+        {filteredEntries.map((entry, i) => (
           <GaugeEntry key={i} entry={entry} index={i} />
         ))}
       </div>
