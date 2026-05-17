@@ -228,10 +228,8 @@ export default function DashboardOverview({
   return (
     <TournamentProvider initialTournaments={tournamentList}>
       <div className="space-y-4">
-        {/* Tournament selector — always visible once list is loaded */}
-        <div className="flex items-center justify-end">
-          {tournamentList.length > 0 && <TournamentSelector />}
-        </div>
+        {/* Tournament selector — full-width above stat cards */}
+        {tournamentList.length > 0 && <TournamentSelector />}
 
         {/* Stat cards row */}
         <StatCardsRow
