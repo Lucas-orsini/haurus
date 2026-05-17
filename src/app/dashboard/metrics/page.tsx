@@ -2,15 +2,16 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import DashboardShell from '@/components/dashboard/DashboardShell'
+import { getTranslations } from '@/lib/i18n'
+import { DashboardDictProvider } from '@/components/dashboard/DashboardDictContext'
 import MetricsEducationClient from '@/components/dashboard/metrics/MetricsEducationClient'
 
 /**
  * Metrics education page.
  *
- * Server Component — verifies the user session and renders the
- * MetricsEducationClient. The app shell (Sidebar, header) is provided
- * by the parent layout (src/app/dashboard/layout.tsx) via DashboardShell.
+ * Server Component — verifies the user session, loads locale-aware
+ * translations, and wraps MetricsEducationClient inside DashboardDictProvider
+ * so all child components can access translated strings via useDashboardDict().
  */
 export default async function MetricsPage() {
   const supabase = await createClient()
@@ -23,5 +24,19 @@ export default async function MetricsPage() {
     redirect('/login')
   }
 
-  return <MetricsEducationClient />
+  // Fetch user profile to determine locale preference
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('locale')
+    .eq('id', user.id)
+    .single()
+
+  const locale = (profile as { locale?: string } | null)?.locale === 'en' ? 'en' : 'fr'
+  const dict = getTranslations(locale)
+
+  return (
+    <DashboardDictProvider dict={dict.dashboard}>
+      <MetricsEducationClient />
+    </DashboardDictProvider>
+  )
 }

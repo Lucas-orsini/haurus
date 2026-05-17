@@ -14,6 +14,7 @@ import TrackedPlayersList from './TrackedPlayersList'
 import TrackPlayerModal from './TrackPlayerModal'
 import type { Database } from '@/lib/supabase/database.types'
 import type { MatchStats } from '@/lib/types/match'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
@@ -49,6 +50,21 @@ interface TrackedPlayersResponse {
 }
 
 export default function PlayerProfileClient() {
+  const dict = useDashboardDict()
+  const t = dict.player ?? {
+    searchBar: {
+      placeholder: 'Rechercher un joueur ATP...',
+      minCharsHint: 'Tapez au moins 2 caractères pour démarrer',
+      noResults: 'Aucun joueur trouvé',
+      sessionExpired: 'Session expirée. Veuillez vous reconnecter.',
+      searchFailed: 'Échec de la recherche. Veuillez réessayer.',
+    },
+    trackedPanelButton: 'Mes joueurs',
+    trackedPanelAriaLabel: 'Ouvrir ou fermer le panneau Mes joueurs',
+    trackedEmptyHint: 'Recherchez un joueur ATP',
+    trackedEmptySubHint: 'Tapez au moins 2 caractères pour démarrer',
+  }
+
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
   const [selectedSurface, setSelectedSurface] = useState<'Hard' | 'Clay' | 'Grass'>('Hard')
   const [matchHistory, setMatchHistory] = useState<EnrichedMatchHistory[]>([])
@@ -311,10 +327,10 @@ export default function PlayerProfileClient() {
               className="h-9 px-3 flex items-center justify-center gap-2 rounded-md w-full md:w-auto
                          border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06]
                          text-[var(--text-2)] text-xs font-medium transition-colors duration-150 shrink-0"
-              aria-label="Ouvrir ou fermer le panneau Mes joueurs"
+              aria-label={t.trackedPanelAriaLabel}
             >
               <Users size={14} strokeWidth={1.5} className="shrink-0" />
-              <span className="whitespace-nowrap">Mes joueurs</span>
+              <span className="whitespace-nowrap">{t.trackedPanelButton}</span>
             </button>
 
             {/* Barre de recherche — pleine largeur mobile */}
@@ -399,8 +415,8 @@ export default function PlayerProfileClient() {
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-[var(--text-2)]">Recherchez un joueur ATP</p>
-              <p className="text-xs text-[var(--text-3)] mt-1">Tapez au moins 2 caractères pour démarrer</p>
+              <p className="text-sm font-medium text-[var(--text-2)]">{t.trackedEmptyHint}</p>
+              <p className="text-xs text-[var(--text-3)] mt-1">{t.trackedEmptySubHint}</p>
             </div>
           )}
         </div>

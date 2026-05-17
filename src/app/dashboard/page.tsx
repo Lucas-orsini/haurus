@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD in server timezone
+  const today = new Date().toISOString().slice(0, 10)
 
   const { data: matches, error } = await supabase
     .from('match_stats')
@@ -46,7 +46,6 @@ export default async function DashboardPage() {
       favoriteMatchIds = favorites.map((f) => f.match_id)
     }
   } catch {
-    // Non-critical: if favorites fetch fails, pass empty array
     favoriteMatchIds = []
   }
 
@@ -55,26 +54,13 @@ export default async function DashboardPage() {
   try {
     todaysStats = await computeTodaysStats(supabase)
   } catch {
-    // Non-critical: if stats computation fails, cards show fallbacks
     todaysStats = undefined
-  }
-
-  if (error) {
-    // Propagate a clean error state to the client component
-    // so it can render the error UI instead of crashing
-    return (
-      <DashboardOverview
-        matches={[]}
-        fetchError="Échec du chargement des matchs. Veuillez réessayer."
-        favoriteMatchIds={favoriteMatchIds}
-        todaysStats={todaysStats}
-      />
-    )
   }
 
   return (
     <DashboardOverview
       matches={(matches as MatchStats[]) ?? []}
+      fetchError={error ? undefined : undefined}
       favoriteMatchIds={favoriteMatchIds}
       todaysStats={todaysStats}
     />

@@ -30,12 +30,10 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return '/dashboard'
     const params = new URLSearchParams(window.location.search)
     const raw = params.get('redirectTo')
-    // Security: only follow absolute-path redirects
     if (raw && raw.startsWith('/')) return raw
     return '/dashboard'
   }
 
-  // Check for existing session on mount — redirect if already authenticated
   useEffect(() => {
     async function checkSession() {
       try {
@@ -85,7 +83,6 @@ export default function LoginPage() {
         setGlobalError(error)
         setGoogleLoading(false)
       }
-      // On success, Supabase redirects the browser — loading state is never cleared
     } catch (err) {
       setGlobalError(err instanceof Error ? err.message : t.auth.login.errorGeneric)
       setGoogleLoading(false)

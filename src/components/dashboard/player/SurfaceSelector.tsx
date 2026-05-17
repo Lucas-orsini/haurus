@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 interface SurfaceSelectorProps {
   selectedSurface: 'Hard' | 'Clay' | 'Grass'
@@ -9,13 +10,16 @@ interface SurfaceSelectorProps {
 
 const SURFACES = ['Hard', 'Clay', 'Grass'] as const
 
-const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
-  Hard: 'Dur',
-  Clay: 'Terre battue',
-  Grass: 'Gazon',
-}
-
 export default function SurfaceSelector({ selectedSurface, onSurfaceChange }: SurfaceSelectorProps) {
+  const dict = useDashboardDict()
+  const t = dict.player?.surface ?? { hard: 'Dur', clay: 'Terre battue', grass: 'Gazon' }
+
+  const LABEL_MAP: Record<'Hard' | 'Clay' | 'Grass', string> = {
+    Hard: t.hard,
+    Clay: t.clay,
+    Grass: t.grass,
+  }
+
   return (
     <div className="w-full md:w-auto flex items-center gap-1">
       {SURFACES.map((surface) => {

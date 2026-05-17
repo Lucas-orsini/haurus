@@ -8,36 +8,33 @@ import {
 import { cn } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
 import type { StatsHistoryPoint } from '@/lib/types/player'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 type Json = Database['public']['Tables']['player_stats']['Row']['stats_history'] extends infer T ? T : never
 
-const METRICS: Array<{ key: string; label: string }> = [
-  { key: 'bppi', label: 'BPPI' },
-  { key: 'rank', label: 'Classement' },
-  { key: 'p_serve', label: 'Service %' },
-  { key: 'p_return', label: 'Retour %' },
-  { key: 'tsd_clay', label: 'TSD Terre battue' },
-  { key: 'tsd_hard', label: 'TSD Dur' },
-  { key: 'tsd_grass', label: 'TSD Gazon' },
-  { key: 'glicko_clay', label: 'Glicko Terre battue' },
-  { key: 'glicko_hard', label: 'Glicko Dur' },
-  { key: 'glicko_grass', label: 'Glicko Gazon' },
-  { key: 'momentum_td', label: 'Momentum' },
-  { key: 'win_rate_td', label: 'Win Rate' },
-  { key: 'win_rate_clay_td', label: 'Win Rate Terre battue' },
-  { key: 'win_rate_hard_td', label: 'Win Rate Dur' },
-  { key: 'win_rate_grass_td', label: 'Win Rate Gazon' },
-  { key: 'breaks_won_td', label: 'Breaks gagnés' },
-  { key: 'breaks_lost_td', label: 'Breaks perdus' },
-  { key: 'delta_rank_6m', label: 'Δ Classement 6M' },
-]
+const METRICS_KEYS = [
+  'bppi',
+  'rank',
+  'p_serve',
+  'p_return',
+  'tsd_clay',
+  'tsd_hard',
+  'tsd_grass',
+  'glicko_clay',
+  'glicko_hard',
+  'glicko_grass',
+  'momentum_td',
+  'win_rate_td',
+  'win_rate_clay_td',
+  'win_rate_hard_td',
+  'win_rate_grass_td',
+  'breaks_won_td',
+  'breaks_lost_td',
+  'delta_rank_6m',
+] as const
 
 interface PlayerStatsChartProps {
   statsHistory: Json | null
-}
-
-export function formatMetricLabel(key: string): string {
-  return METRICS.find((m) => m.key === key)?.label ?? key
 }
 
 function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoint[] {
@@ -67,8 +64,18 @@ function parseStatsHistory(raw: Json | null, metricKey: string): StatsHistoryPoi
     .slice(-60)
 }
 
-function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoint[]; color: string; chartHeight?: number }) {
-  const validData = data.filter((d) => !isNaN(d.value) && d.value !== null && d.value !== undefined)
+function MetricChart({
+  data,
+  color,
+  chartHeight = 250,
+}: {
+  data: StatsHistoryPoint[]
+  color: string
+  chartHeight?: number
+}) {
+  const validData = data.filter(
+    (d) => !isNaN(d.value) && d.value !== null && d.value !== undefined
+  )
 
   if (validData.length < 3) {
     return (
@@ -129,24 +136,31 @@ function MetricChart({ data, color, chartHeight = 250 }: { data: StatsHistoryPoi
 }
 
 export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps) {
-  const [selectedMetric, setSelectedMetric] = useState(METRICS[0].key)
+  const [selectedMetric, setSelectedMetric] = useState<string>(METRICS_KEYS[0])
+  const dict = useDashboardDict()
+  const t = dict.player?.statsChart
 
   const parsedData = useMemo(
     () => parseStatsHistory(statsHistory, selectedMetric),
     [statsHistory, selectedMetric]
   )
 
-  const activeLabel = formatMetricLabel(selectedMetric)
+  const METRICS_WITH_LABELS = METRICS_KEYS.map((key) => ({
+    key,
+    label: t?.[key] ?? key,
+  }))
+
+  const activeLabel = METRICS_WITH_LABELS.find((m) => m.key === selectedMetric)?.label ?? selectedMetric
 
   return (
     <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-      {/* Sélecteur de métrique — column mobile, row desktop */}
+      {/* Metric selector — column mobile, row desktop */}
       <div className="flex flex-col md:flex-row md:items-center gap-2 mb-4">
         <label
           htmlFor="metric-select"
           className="text-xs font-medium text-[var(--text-2)] shrink-0"
         >
-          Métrique
+          {t?.metricLabel ?? 'Metric'}
         </label>
 
         <div className="relative flex-1 max-w-full md:max-w-[220px]">
@@ -161,7 +175,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
               'transition-colors duration-150'
             )}
           >
-            {METRICS.map((m) => (
+            {METRICS_WITH_LABELS.map((m) => (
               <option key={m.key} value={m.key}>
                 {m.label}
               </option>
@@ -184,7 +198,7 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
           </svg>
         </div>
 
-        {/* Label actif */}
+        {/* Active label */}
         {parsedData.length > 0 && (
           <span className="text-xs text-[var(--text-3)] font-mono tabular-nums md:ml-auto">
             {parsedData.length} pts
@@ -196,7 +210,9 @@ export default function PlayerStatsChart({ statsHistory }: PlayerStatsChartProps
       <div className="h-[250px] md:h-[200px]">
         {parsedData.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-sm text-[var(--text-3)]">Historique insuffisant — revenez dans quelques jours</p>
+            <p className="text-sm text-[var(--text-3)]">
+              {t?.insufficientHistory ?? 'Insufficient history — come back in a few days'}
+            </p>
           </div>
         ) : (
           <>

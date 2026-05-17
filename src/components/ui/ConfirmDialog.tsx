@@ -4,6 +4,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface ConfirmDialogProps {
+  open?: boolean
   title: string
   message: string
   confirmLabel: string

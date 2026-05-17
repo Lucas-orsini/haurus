@@ -47,7 +47,7 @@ const fr = {
   ctaBanner: {
     title: 'Prêt à analyser comme un PRO',
     subtitle:
-      "Devenez de vrais analystes qui ajustent leur décision grâce à des données, pas sur les intuitions.",
+      "Devenez de vrais analysts qui ajustent leur décision grâce à des données, pas sur les intuitions.",
     cta: 'Commencer maintenant',
     disclaimer: "Pas de prédiction. Pas d'intuition. Seulement des données.",
   },
@@ -176,6 +176,7 @@ const fr = {
       passwordPlaceholder: '••••••••',
       confirmPasswordLabel: 'Confirmer le mot de passe',
       confirmPasswordPlaceholder: '••••••••',
+      confirmPasswordMismatch: 'Les mots de passe ne correspondent pas.',
       submitButton: 'Créer mon compte',
       submitButtonLoading: 'Création...',
       submitButtonRedirecting: 'Redirection...',
@@ -185,6 +186,108 @@ const fr = {
       linkToLogin: 'Déjà un compte ?',
       linkToLoginAction: 'Se connecter',
       errorGeneric: 'Une erreur est survenue.',
+    },
+  },
+  dashboard: {
+    header: {
+      routes: {
+        '/dashboard': {
+          title: 'Aperçu',
+          subtitle: 'Statistiques des matchs ATP',
+        },
+        '/dashboard/player': {
+          title: 'Joueur',
+          subtitle: 'Profil et suivi des joueurs',
+        },
+        '/dashboard/metrics': {
+          title: 'Métriques',
+          subtitle: 'Définitions des métriques',
+        },
+      },
+      openMenu: 'Ouvrir le menu',
+    },
+    sidebar: {
+      nav: {
+        overview: 'Aperçu',
+        player: 'Joueur',
+        metrics: 'Métriques',
+      },
+      footer: {
+        sessionUnavailable: 'Session indisponible',
+        defaultUserName: 'Utilisateur',
+      },
+      dropdown: {
+        profile: 'Profil',
+        settings: 'Réglage',
+        signOut: 'Se déconnecter',
+        signingOut: 'Déconnexion...',
+      },
+      closeMenu: 'Fermer le menu',
+    },
+    overview: {
+      searchPlaceholder: 'Rechercher un joueur...',
+      filters: {
+        today: "Aujourd'hui",
+        favorites: 'Favoris',
+        favoritesWithCount: 'Favoris ({count})',
+        clear: 'Effacer',
+        clearFilters: 'Effacer les filtres',
+      },
+      table: {
+        date: 'Date',
+        tournament: 'Tournoi',
+        players: 'Joueurs',
+        surface: 'Surface',
+      },
+      matchesCount: '{count} match{count, plural, one {} other {s}}',
+      error: {
+        fetchFailed: 'Échec du chargement des matchs. Veuillez réessayer.',
+        retry: 'Réessayer',
+      },
+      empty: {
+        favoritesTitle: 'Aucun favori',
+        favoritesDesc: 'Ajoutez des matchs en étoile.',
+        noMatchesTitle: 'Aucun match trouvé',
+        noMatchesDesc: 'Modifiez vos critères de recherche ou filtres.',
+      },
+    },
+    statCards: {
+      card1: {
+        label: 'Matchs du jour',
+        noMatches: 'Aucun match prévu',
+      },
+      card2: {
+        label: 'Météo',
+        unavailable: 'Données indisponibles',
+        noTournament: 'Aucun tournoi actif',
+        forecast: 'Prévision',
+      },
+      card3: {
+        label: 'Vitesse de surface',
+        unavailable: 'Données indisponibles',
+      },
+    },
+    weatherModal: {
+      close: 'Fermer',
+      precipitations: 'Précipitations',
+      forecast24h: 'Prévision 24h',
+      temperature: 'Température',
+      humidity: 'Humidité',
+      wind: 'Vent',
+      noDataTitle: 'Aucune donnée disponible',
+      noDataDesc: 'Les prévisions horaires ne sont pas encore disponibles pour ce tournoi.',
+    },
+    metrics: {
+      pageTitle: 'Comprendre les métriques',
+      pageSubtitle:
+        'Chaque métrique expliquée simplement — descriptions courtes pour tous, contenus experts pour approfondir.',
+      searchPlaceholder: 'Rechercher une métrique...',
+      metricCount: 'métrique',
+      metricCountPlural: 'métriques',
+      emptyTitle: 'Aucune métrique ne correspond à votre recherche',
+      emptyDesc: 'Essayez un autre terme — nom, description ou surface.',
+      modalClose: 'Fermer',
+      modalOpenDetails: 'Ouvrir les détails de',
     },
   },
 }
@@ -365,6 +468,7 @@ const en = {
       passwordPlaceholder: '••••••••',
       confirmPasswordLabel: 'Confirm password',
       confirmPasswordPlaceholder: '••••••••',
+      confirmPasswordMismatch: 'Passwords do not match.',
       submitButton: 'Create my account',
       submitButtonLoading: 'Creating account...',
       submitButtonRedirecting: 'Redirecting...',
@@ -374,6 +478,145 @@ const en = {
       linkToLogin: 'Already have an account?',
       linkToLoginAction: 'Sign in',
       errorGeneric: 'Something went wrong.',
+    },
+  },
+  dashboard: {
+    header: {
+      routes: {
+        '/dashboard': {
+          title: 'Overview',
+          subtitle: 'ATP match statistics',
+        },
+        '/dashboard/player': {
+          title: 'Player',
+          subtitle: 'Profile and player tracking',
+        },
+        '/dashboard/metrics': {
+          title: 'Metrics',
+          subtitle: 'Metric definitions',
+        },
+      },
+      openMenu: 'Open menu',
+    },
+    sidebar: {
+      nav: {
+        overview: 'Overview',
+        player: 'Player',
+        metrics: 'Metrics',
+      },
+      footer: {
+        sessionUnavailable: 'Session unavailable',
+        defaultUserName: 'User',
+      },
+      dropdown: {
+        profile: 'Profile',
+        settings: 'Settings',
+        signOut: 'Sign out',
+        signingOut: 'Signing out...',
+      },
+      closeMenu: 'Close menu',
+    },
+    overview: {
+      searchPlaceholder: 'Search for a player...',
+      filters: {
+        today: 'Today',
+        favorites: 'Favorites',
+        favoritesWithCount: 'Favorites ({count})',
+        clear: 'Clear',
+        clearFilters: 'Clear filters',
+      },
+      table: {
+        date: 'Date',
+        tournament: 'Tournament',
+        players: 'Players',
+        surface: 'Surface',
+      },
+      matchesCount: '{count} match{count, plural, one {} other {es}}',
+      error: {
+        fetchFailed: 'Failed to load matches. Please try again.',
+        retry: 'Retry',
+      },
+      empty: {
+        favoritesTitle: 'No favorites',
+        favoritesDesc: 'Star matches to add them here.',
+        noMatchesTitle: 'No matches found',
+        noMatchesDesc: 'Modify your search criteria or filters.',
+      },
+    },
+    statCards: {
+      card1: {
+        label: "Today's matches",
+        noMatches: 'No matches scheduled',
+      },
+      card2: {
+        label: 'Weather',
+        unavailable: 'Data unavailable',
+        noTournament: 'No active tournament',
+        forecast: 'Forecast',
+      },
+      card3: {
+        label: 'Surface speed',
+        unavailable: 'Data unavailable',
+      },
+    },
+    weatherModal: {
+      close: 'Close',
+      precipitations: 'Precipitations',
+      forecast24h: '24h forecast',
+      temperature: 'Temperature',
+      humidity: 'Humidity',
+      wind: 'Wind',
+      noDataTitle: 'No data available',
+      noDataDesc: 'Hourly forecasts are not yet available for this tournament.',
+    },
+    metrics: {
+      pageTitle: 'Understanding metrics',
+      pageSubtitle:
+        'Every metric explained simply — short descriptions for everyone, expert content to dive deeper.',
+      searchPlaceholder: 'Search for a metric...',
+      metricCount: 'metric',
+      metricCountPlural: 'metrics',
+      emptyTitle: 'No metrics match your search',
+      emptyDesc: 'Try another term — name, description, or surface.',
+      modalClose: 'Close',
+      modalOpenDetails: 'Open details of',
+    },
+    player: {
+      searchBar: {
+        placeholder: 'Search for an ATP player...',
+        minCharsHint: 'Type at least 2 characters to start',
+        noResults: 'No player found',
+        sessionExpired: 'Session expired. Please reconnect.',
+        searchFailed: 'Search failed. Please try again.',
+      },
+      trackedPanelButton: 'My players',
+      trackedPanelAriaLabel: 'Open or close the My players panel',
+      trackedEmptyHint: 'Search for an ATP player',
+      trackedEmptySubHint: 'Type at least 2 characters to start',
+      metricCards: {
+        glicko2: 'Glicko-2',
+        pServe: 'P-Serve',
+        momentum: 'Momentum TD',
+        vsAtp: 'vs ATP',
+        days30: '30 days',
+      },
+      matchHistory: {
+        title: 'Recent matches',
+        emptyTitle: 'No match history',
+        emptyDesc: "This player has no match data available yet.",
+        columns: {
+          date: 'Date',
+          opponent: 'Opponent',
+          tournament: 'Tournament',
+          surface: 'Surface',
+          score: 'Score',
+          result: 'Result',
+          metrics: 'Metrics',
+        },
+        metricsButton: 'Metrics',
+        resultWin: 'W',
+        resultLoss: 'L',
+      },
     },
   },
 }

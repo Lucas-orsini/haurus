@@ -65,7 +65,7 @@ export default function SignupPage() {
     let confirmError: string | undefined
 
     if (password !== confirmPassword) {
-      confirmError = locale === 'fr' ? 'Les mots de passe ne correspondent pas.' : 'Passwords do not match.'
+      confirmError = t.auth.signup.confirmPasswordMismatch
     }
 
     if (nameError || emailError || passwordError || confirmError) {
