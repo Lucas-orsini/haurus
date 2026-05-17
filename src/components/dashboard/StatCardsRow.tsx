@@ -5,7 +5,6 @@ import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { normalizeTournamentName } from '@/lib/dashboard/stats'
-import { useTournament } from '@/contexts/TournamentContext'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
@@ -15,8 +14,6 @@ interface StatCardsRowProps {
 }
 
 export default function StatCardsRow({ todaysStats, onWeatherClick, selectedTournament }: StatCardsRowProps) {
-  const { tournaments } = useTournament()
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
