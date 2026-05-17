@@ -42,7 +42,12 @@ export default function TournamentSelector({ onSelect }: TournamentSelectorProps
 
   if (tournaments.length === 0) return null
 
-  const selected = tournaments.find((t) => t === selectedTournament) ?? selectedTournament ?? tournaments[0]
+  // selectedTournament is a string; tournaments is string[]
+  // Match by value equality (not object property)
+  const selected =
+    selectedTournament && tournaments.includes(selectedTournament)
+      ? selectedTournament
+      : tournaments[0]
 
   return (
     <div ref={ref} className="relative">

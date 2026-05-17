@@ -9,7 +9,7 @@ import WeatherForecastModal from './WeatherForecastModal'
 import TournamentSelector from './TournamentSelector'
 import { TournamentProvider, useTournament } from '@/contexts/TournamentContext'
 import type { MatchStats } from '@/lib/types/match'
-import type { TodaysStats, HourlyForecastEntry } from '@/lib/types/dashboard'
+import type { TodaysStats } from '@/lib/types/dashboard'
 import { createClient } from '@/lib/supabase/client'
 import { useDashboardDict } from './DashboardDictContext'
 
@@ -38,7 +38,6 @@ export default function DashboardOverview({
 
   // ── Tournament context setup ─────────────────────────────────────────────
   // Fetch distinct tournament names from tournament_weather at mount.
-  // The list is passed to TournamentProvider which auto-selects the first alphabetically.
   const [tournamentList, setTournamentList] = useState<string[]>([])
 
   useEffect(() => {
@@ -69,94 +68,13 @@ export default function DashboardOverview({
 
   // ── Weather modal state ───────────────────────────────────────────────────
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedTournament, setSelectedTournament] = useState<string | null>(null)
-  const [hourlyData, setHourlyData] = useState<HourlyForecastEntry[]>([])
-  const [hourlyLoading, setHourlyLoading] = useState(false)
-  const [hourlyError, setHourlyError] = useState<string | null>(null)
 
-  async function handleWeatherClick(tourneyName: string) {
-    setSelectedTournament(tourneyName)
-    setHourlyError(null)
-    setHourlyData([])
+  function handleOpenWeatherModal(tourneyName: string) {
     setIsModalOpen(true)
-    setHourlyLoading(true)
-
-    try {
-      const supabase = createClient()
-      if (!supabase) {
-        throw new Error('Client Supabase non disponible')
-      }
-
-      const formatter = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Europe/Paris',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        hour12: false,
-      })
-      const parts = formatter.formatToParts(new Date())
-      const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
-      const today = `${get('year')}-${get('month')}-${get('day')}`
-
-      const tomorrowDate = new Date()
-      tomorrowDate.setDate(tomorrowDate.getDate() + 1)
-      const tomorrow = tomorrowDate.toISOString().slice(0, 10)
-
-      const { data, error } = await supabase
-        .from('tournament_weather')
-        .select(
-          'hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date, wind_speed, humidity, pressure, feels_like'
-        )
-        .eq('tourney_name', tourneyName)
-        .in('date', [today, tomorrow])
-        .order('date', { ascending: true })
-        .order('hour', { ascending: true })
-
-      if (error) throw error
-
-      const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
-        hour: row.hour as number,
-        rain_mm_h: (row.rain_mm_h as number) ?? null,
-        temperature: (row.temperature as number) ?? null,
-        pop: (row.pop as number) ?? null,
-        conditions_icon: (row.conditions_icon as string) ?? null,
-        conditions: (row.conditions as string) ?? null,
-        dayOffset: (row.date as string) === today ? (0 as const) : (1 as const),
-        wind_speed: (row.wind_speed as number) ?? null,
-        humidity: (row.humidity as number) ?? null,
-        pressure: (row.pressure as number) ?? null,
-        feels_like: (row.feels_like as number) ?? null,
-      }))
-
-      const now = new Date()
-      const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-
-      const windowEntries = entries.filter((e) => {
-        const entryDate = new Date(
-          e.dayOffset === 0
-            ? `${today}T${String(e.hour).padStart(2, '0')}:00:00`
-            : `${tomorrow}T${String(e.hour).padStart(2, '0')}:00:00`
-        )
-        return entryDate >= now && entryDate < cutoff
-      })
-
-      setHourlyData(windowEntries.slice(0, 24))
-    } catch (err) {
-      setHourlyError(
-        err instanceof Error ? err.message : 'Échec du chargement des prévisions météo.'
-      )
-      setHourlyData([])
-    } finally {
-      setHourlyLoading(false)
-    }
   }
 
   function handleModalClose() {
     setIsModalOpen(false)
-    setSelectedTournament(null)
-    setHourlyData([])
-    setHourlyError(null)
   }
 
   const tournaments = useMemo(() => {
@@ -222,22 +140,21 @@ export default function DashboardOverview({
     activeFilters.size > 0 || searchQuery.trim().length > 0 || favoritesOnly
   const showFavoritesEmpty = favoritesOnly && localFavoriteIds.length === 0
 
-  // Consume context for selectedTournament (controls stat card filtering)
-  const { selectedTournament: contextSelectedTournament } = useTournament()
+  // Consume context for selectedTournament (used for chip display in filter bar)
+  const { selectedTournament } = useTournament()
 
   return (
     <TournamentProvider initialTournaments={tournamentList}>
       <div className="space-y-4">
         {/* Tournament selector — always visible once list is loaded */}
         <div className="flex items-center justify-end mb-4">
-          {tournamentList.length > 0 && <TournamentSelector onSelect={setSelectedTournament} />}
+          {tournamentList.length > 0 && <TournamentSelector />}
         </div>
 
-        {/* Stat cards row */}
+        {/* Stat cards row — onOpenModal opens the weather forecast modal */}
         <StatCardsRow
           todaysStats={todaysStats}
-          onWeatherClick={handleWeatherClick}
-          selectedTournament={contextSelectedTournament}
+          onOpenModal={handleOpenWeatherModal}
         />
 
         {/* Error banner */}
@@ -424,13 +341,10 @@ export default function DashboardOverview({
           </div>
         </div>
 
-        {/* Weather forecast modal */}
+        {/* Weather forecast modal — reads selectedTournament from context internally */}
         {isModalOpen && (
           <WeatherForecastModal
-            tourneyName={selectedTournament ?? ''}
-            hourlyData={hourlyData}
-            isLoading={hourlyLoading}
-            error={hourlyError}
+            isOpen={isModalOpen}
             onClose={handleModalClose}
           />
         )}
