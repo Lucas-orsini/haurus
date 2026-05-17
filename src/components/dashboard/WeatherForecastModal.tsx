@@ -5,15 +5,10 @@ import { X, AlertCircle, CloudOff, Droplets, Thermometer, Wind, MapPin } from 'l
 import { motion, AnimatePresence } from 'framer-motion'
 import type { HourlyForecastEntry } from '@/lib/types/dashboard'
 import { useTournamentWeather } from '@/hooks/useTournamentWeather'
+import { useTournament } from '@/contexts/TournamentContext'
 
 interface WeatherForecastModalProps {
-  /** Tournament name string — empty string means no tournament selected. */
-  tourneyName: string
-  /** Existing hourly data passed in when modal is opened from stat card button.
-   *  When provided, the hook fetch is skipped (data already loaded). */
-  hourlyData?: HourlyForecastEntry[]
-  isLoading?: boolean
-  error?: string | null
+  isOpen: boolean
   onClose: () => void
 }
 
@@ -39,41 +34,39 @@ function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 export default function WeatherForecastModal({
-  tourneyName,
-  hourlyData: externalHourlyData,
-  isLoading: externalIsLoading,
-  error: externalError,
+  isOpen,
   onClose,
 }: WeatherForecastModalProps) {
+  // Lit le tournoi depuis le contexte — pas de prop externe nécessaire
+  const { selectedTournament } = useTournament()
+
+  // Fetch les données météo horaires dès que le tournoi change
+  const {
+    hourlyData,
+    isLoading,
+    error,
+  } = useTournamentWeather({ tourneyName: selectedTournament })
+
   // ── Keyboard close: Escape ──────────────────────────────────────────────
   useEffect(() => {
+    if (!isOpen) return
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
-
-  // ── Weather hook: fetches when tourneyName is non-empty, skips when '' ───
-  const {
-    hourlyData: hookHourlyData,
-    isLoading: hookIsLoading,
-    error: hookError,
-  } = useTournamentWeather({ tourneyName: tourneyName || null })
-
-  // Resolve data sources: external takes priority (already fetched), else use hook
-  const hourlyData = externalHourlyData !== undefined ? externalHourlyData : hookHourlyData
-  const isLoading = externalIsLoading !== undefined ? externalIsLoading : hookIsLoading
-  const error = externalError !== undefined ? externalError : hookError
+  }, [isOpen, onClose])
 
   // ── Derived values for bar chart ───────────────────────────────────────
   const rainValues = hourlyData.map((h) => h.rain_mm_h ?? 0)
-  const maxRain = Math.max(...rainValues, 0.1) // ≥ 0.1 so chart never empties
+  const maxRain = Math.max(...rainValues, 0.1)
   const hasRain = hourlyData.some((h) => (h.rain_mm_h ?? 0) > 0)
   const hourlyCount = hourlyData.length
 
-  // ── no-tournament-selected guard ──────────────────────────────────────
-  const hasTournament = tourneyName.trim().length > 0
+  const hasTournament = Boolean(selectedTournament && selectedTournament.trim().length > 0)
+
+  // ── Ne rien rendre si la modal est fermée ───────────────────────────────
+  if (!isOpen) return null
 
   return (
     <AnimatePresence>
@@ -87,7 +80,7 @@ export default function WeatherForecastModal({
         onClick={onClose}
         aria-modal="true"
         role="dialog"
-        aria-label={`Prévisions météo pour ${tourneyName || 'aucun tournoi sélectionné'}`}
+        aria-label={`Prévisions météo pour ${selectedTournament || 'aucun tournoi sélectionné'}`}
       >
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -106,7 +99,7 @@ export default function WeatherForecastModal({
           <div className="flex items-center justify-between shrink-0 px-5 py-4 border-b border-[var(--border-md)]">
             <div className="flex flex-col min-w-0 mr-4">
               <h2 className="text-sm font-semibold text-[var(--text-1)] truncate">
-                {tourneyName || 'Prévisions météo'}
+                {selectedTournament || 'Prévisions météo'}
               </h2>
               <p className="text-[11px] text-[var(--text-3)] mt-0.5">
                 {hasTournament
