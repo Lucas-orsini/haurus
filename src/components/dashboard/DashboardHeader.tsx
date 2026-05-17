@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import { useDashboardDict } from './DashboardDictContext'
+import TournamentSelector from './TournamentSelector'
 
 const DEFAULT_ROUTE_KEY = '/dashboard'
 
@@ -32,6 +33,8 @@ export default function DashboardHeader({ onMenuToggle }: DashboardHeaderProps) 
         <h1 className="text-sm font-semibold text-[var(--text-1)] truncate">{title}</h1>
         <p className="text-xs text-[var(--text-3)] truncate">{subtitle}</p>
       </div>
+
+      <TournamentSelector />
     </header>
   )
 }

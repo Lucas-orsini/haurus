@@ -273,20 +273,12 @@ export default function DashboardOverview({
                 : t.filters.favorites}
             </button>
 
-            {tournaments.slice(0, 5).map((tourney) => (
-              <button
-                key={tourney}
-                onClick={() => toggleFilter(tourney)}
-                className={cn(
-                  'h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors duration-150 whitespace-nowrap max-w-[160px]',
-                  activeFilters.has(tourney)
-                    ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
-                    : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06]'
-                )}
-              >
-                <span className="truncate">{tourney}</span>
-              </button>
-            ))}
+===
+            {selectedTournament && (
+              <span className="h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md border border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent-hi)] text-xs font-medium whitespace-nowrap">
+                {selectedTournament}
+              </span>
+            )}
 
             {hasActiveFilters && (
               <button
