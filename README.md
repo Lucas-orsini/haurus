@@ -47,7 +47,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -88,7 +88,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (or `Cmd+`` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -96,21 +96,19 @@ Then open http://localhost:3000 in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key section | Public key for client-side Supabase access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Server-side key for admin operations (never expose to client) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Server-side key with admin privileges — never expose to client |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Required only if using Sign in with Google |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` by default | PostHog server endpoint |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email sending API key |
-| `RESEND_FROM_EMAIL` | Yes | Must match a verified domain in Resend Dashboard → Domains | Sender email address |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `RESEND_API_KEY` | No | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `RESEND_FROM_EMAIL` | No | Must be a domain verified in Resend Dashboard → Domains | Sender email address |
 | `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletters |
-| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL of your app (for email links) |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot authentication token |
-| `TELEGRAM_BOT_SECRET` | No | Set a custom secret when configuring your webhook | HMAC-SHA256 signature verification secret |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (e.g., `mybot`) | Used for client-side Telegram login |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather bot after creating your bot | Bot API token for Telegram integration |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string | HMAC-SHA256 secret for verifying incoming webhook requests |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Telegram BotFather provided this when you created the bot | Your bot's username (without the @) |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of the code work correctly without needing the full app running.
+Unit tests automatically check that individual pieces of code (like functions) work correctly. If a test fails, it means something broke.
 
 Run all tests:
 
@@ -124,27 +122,28 @@ Run a specific test file:
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when you save a file):
+Watch mode — re-runs tests automatically when files change:
 
 ```bash
 npx jest --watch
 ```
 
-**Reading the output**: `PASS` means all tests passed ✅. `FAIL` means something broke — you'll see which test failed and why. A test with `✓` checks one expected behavior; a test with `✕` indicates a broken expectation.
+**How to read the output:**
+- **PASS** ✅ — All tests in that file passed
+- **FAIL** ❌ — Something broke; check the error message below for which assertion failed
 
-These tests cover:
-
-- `__tests__/auth-validators.test.ts` — Authentication validation logic
-- `__tests__/auth.test.ts` — Authentication flows
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting for dashboard
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
-- `__tests__/lib/utils.test.ts` — Utility function tests
-- `__tests__/utils.test.ts` — General utility tests
+The tests cover:
+- Authentication validators (`__tests__/auth-validators.test.ts`)
+- Auth flow logic (`__tests__/auth.test.ts`)
+- Dashboard formatting utilities (`__tests__/dashboard/formatMetric.test.ts`)
+- Dashboard statistics (`__tests__/lib/dashboard/stats.test.ts`)
+- Utility functions (`__tests__/lib/utils.test.ts`)
+- General utilities (`__tests__/utils.test.ts`)
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components including TournamentSelector and WeatherForecastModal
-- `src/hooks` — Custom React hooks including useTournamentWeather for tournament weather data
+- `src/app/dashboard` — Dashboard pages and layouts using Next.js App Router
+- `__tests__` — Jest test files for authentication, dashboard, and utilities
 
 ## 🚀 Deploy to Vercel
 
@@ -155,7 +154,7 @@ These tests cover:
 3. Add all environment variables from your `.env.local` in **Vercel > Settings > Environment Variables**
 4. Click **Deploy**
 
-> ⚠️ **Important**: Make sure to copy every variable from your `.env.local` file into Vercel — missing variables will cause the app to fail.
+Make sure to add all variables from the Environment Variables section above — especially `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## 📝 License
 
