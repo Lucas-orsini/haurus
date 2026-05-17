@@ -9,13 +9,22 @@ export interface TournamentSelectorOption {
   tourney_name: string
 }
 
+export interface TournamentSelectorProps {
+  /** Called when the user selects a tournament, with the tournament name as argument. */
+  onSelect?: (id: string) => void
+}
+
 /** Standalone tournament dropdown.
  *
  * Reads/writes the selected tournament via TournamentContext so that
  * StatCardsRow (which receives selectedTournament from the same context)
  * automatically re-filters when the user changes the selection.
+ *
+ * When an external `onSelect` callback is provided, it is also invoked
+ * with the selected tournament name — useful for parent components that
+ * need to react to the selection event (e.g., logging, analytics).
  */
-export default function TournamentSelector() {
+export default function TournamentSelector({ onSelect }: TournamentSelectorProps = {}) {
   const { tournaments, selectedTournament, setSelectedTournament } = useTournament()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -63,6 +72,7 @@ export default function TournamentSelector() {
                 key={t}
                 onClick={() => {
                   setSelectedTournament(t)
+                  onSelect?.(t)
                   setOpen(false)
                 }}
                 className={cn(
