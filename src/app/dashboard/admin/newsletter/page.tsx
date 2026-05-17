@@ -1,88 +1,110 @@
-'use client'
+export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import NewsletterSendForm from '@/components/dashboard/admin/NewsletterSendForm'
-import NewsletterEmailPreview from '@/components/dashboard/admin/NewsletterEmailPreview'
+import { createClient } from '@/lib/supabase/server'
 
-export default function NewsletterAdminPage() {
-  const [subject, setSubject] = useState('')
-  const [body, setBody] = useState('')
-  const [subscriberCount, setSubscriberCount] = useState<number | null>(null)
-  const [checked, setChecked] = useState(false)
+export default async function NewsletterPage() {
+  const supabase = await createClient()
 
-  useEffect(() => {
-    async function init() {
-      const supabase = createClient()
-      if (!supabase) return
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        redirect('/login')
-        return
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (profile?.role !== 'admin') {
-        redirect('/dashboard')
-        return
-      }
-
-      const { count } = await supabase
-        .from('newsletter_subscribers')
-        .select('*', { count: 'exact', head: true })
-
-      setSubscriberCount(count ?? 0)
-      setChecked(true)
-    }
-
-    init()
-  }, [])
-
-  if (!checked) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-5 h-5 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
-      </div>
-    )
+  if (!user) {
+    redirect('/login')
   }
 
-  return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:gap-6 min-w-0">
-      {/* Left column — form */}
-      <div className="w-full lg:w-1/2 min-w-0">
-        {/* Page header */}
-        <div className="mb-6">
-          <h1 className="text-base font-semibold text-[var(--text-1)] tracking-tight">
-            Newsletter
-          </h1>
-          <p className="text-sm text-[var(--text-3)] mt-1">
-            {subscriberCount !== null && subscriberCount > 0
-              ? `${subscriberCount} abonné${subscriberCount !== 1 ? 's' : ''} inscrit${subscriberCount !== 1 ? 's' : ''} à la newsletter`
-              : 'Aucun abonné inscrit pour le moment'}
-          </p>
-        </div>
+  // Verify admin role — RLS allows only admins to read this table
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
 
-        {/* Form card */}
-        <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-5">
-          <NewsletterSendForm
-            onSubjectChange={setSubject}
-            onBodyChange={setBody}
-          />
-        </div>
+  if (profile?.role !== 'admin') {
+    redirect('/dashboard')
+  }
+
+  // Fetch all subscribers (active only) — RLS blocks non-admins anyway
+  const { data: subscribers } = await supabase
+    .from('newsletter_subscribers')
+    .select('id, email, created_at, subscribed')
+    .order('created_at', { ascending: false })
+
+  const activeCount = (subscribers ?? []).filter((s) => s.subscribed).length
+
+  return (
+    <div className="space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-lg font-semibold text-[var(--text-1)]">
+          Newsletter
+        </h1>
+        <p className="text-sm text-[var(--text-3)] mt-1">
+          Gestion des abonnés — {activeCount} actif{(activeCount !== 1) ? 's' : ''} / {(subscribers ?? []).length} total
+        </p>
       </div>
 
-      {/* Right column — live preview (desktop only) */}
-      <div className="hidden lg:flex lg:w-1/2 min-w-0">
-        <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-5 flex flex-col min-h-0 flex-1 max-h-[calc(100vh-8rem)] overflow-hidden">
-          <NewsletterEmailPreview subject={subject} body={body} />
-        </div>
+      {/* Subscriber table */}
+      <div className="bg-[var(--surface-1)] border border-[var(--border)] rounded-lg overflow-hidden">
+        {(subscribers ?? []).length === 0 ? (
+          <div className="px-4 py-16 text-center">
+            <p className="text-sm text-[var(--text-3)]">Aucun abonné pour le moment.</p>
+          </div>
+        ) : (
+          <div className="md:overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[var(--border)]">
+                  <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                    Statut
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
+                    Inscrit le
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {(subscribers ?? []).map((sub, i) => (
+                  <tr
+                    key={sub.id}
+                    className="border-b border-[var(--border)]/50 last:border-0 hover:bg-white/[0.02] transition-colors"
+                  >
+                    <td className="px-4 py-3 text-[var(--text-1)] font-mono text-xs">
+                      {sub.email}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${
+                          sub.subscribed
+                            ? 'bg-[var(--green)]/10 text-[var(--green)]'
+                            : 'bg-white/[0.05] text-[var(--text-3)]'
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            sub.subscribed ? 'bg-[var(--green)]' : 'bg-[var(--text-3)]'
+                          }`}
+                        />
+                        {sub.subscribed ? 'Actif' : 'Désabonné'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-[var(--text-3)] text-xs tabular-nums">
+                      {new Date(sub.created_at).toLocaleDateString('fr-FR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   )
