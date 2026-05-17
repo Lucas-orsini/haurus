@@ -47,7 +47,7 @@ npm install
 
 Create a `.env.local` file in the project root. This file stores sensitive credentials like API keys and secrets — it lives on your computer only and should never be committed to GitHub.
 
-**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `` Ctrl+` `` (Windows/Linux) or `` Cmd+` `` (Mac) to open the integrated terminal. Then run:
+**For no-code users**: A terminal is a text-based way to interact with your computer. In VS Code, press `Ctrl+`` (Windows/Linux) or `Cmd+`` (Mac) to open the integrated terminal. Then run:
 
 ```bash
 touch .env.local
@@ -88,7 +88,7 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-> 💡 **VS Code tip**: Open the integrated terminal with `` Ctrl+` `` (or `` Cmd+` `` on Mac)
+> 💡 **VS Code tip**: Open the integrated terminal with `Ctrl+`` (or `Cmd+`` on Mac)
 
 ## 🔑 Environment Variables
 
@@ -96,61 +96,66 @@ Then open http://localhost:3000 in your browser.
 |----------|----------|------------------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key section | Public key for client-side Supabase access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Secret key for server-side operations — never expose this to the client |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Client ID for Google Sign-In |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Your PostHog project API key for analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` (EU) or `https://app.posthog.com` (US) | PostHog server endpoint |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | API key for sending emails |
-| `RESEND_FROM_EMAIL` | Yes | Must be a domain verified in Resend Dashboard → Domains | Sender email address (e.g., `hello@yourdomain.com`) |
-| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → select audience → Settings | Audience ID for email list management |
-| `NEXT_PUBLIC_APP_URL` | Yes | Use `http://localhost:3000` for local development | Base URL of your application |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather → create bot → copy the token | Telegram bot API token for notifications |
-| `TELEGRAM_BOT_SECRET` | No | Your own secret string for webhook signature verification | HMAC-SHA256 secret for validating incoming webhook requests |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (without the @) | Bot username displayed in your app |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Server-side key for admin operations (never expose to client) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Required only if using Sign in with Google |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` by default | PostHog server endpoint |
+| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email sending API key |
+| `RESEND_FROM_EMAIL` | Yes | Must match a verified domain in Resend Dashboard → Domains | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend Dashboard → Audiences → Settings | Email audience ID for newsletters |
+| `NEXT_PUBLIC_APP_URL` | Yes | Set to `http://localhost:3000` for local dev | Base URL of your app (for email links) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram BotFather after creating a bot | Telegram bot authentication token |
+| `TELEGRAM_BOT_SECRET` | No | Set a custom secret when configuring your webhook | HMAC-SHA256 signature verification secret |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (e.g., `mybot`) | Used for client-side Telegram login |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that specific parts of your code work correctly — like making sure a calculation returns the right number or a form validates input properly.
+Unit tests automatically check that specific parts of the code work correctly without needing the full app running.
+
+Run all tests:
 
 ```bash
-# Run all tests
 npx jest
+```
 
-# Run a specific test file
-npx jest __tests__/lib/utils.test.ts
+Run a specific test file:
 
-# Watch mode — re-runs tests automatically when files change
+```bash
+npx jest __tests__/auth.test.ts
+```
+
+Watch mode (re-runs tests automatically when you save a file):
+
+```bash
 npx jest --watch
 ```
 
-**Reading the output:**
-- `PASS` — All assertions in the test passed ✓
-- `FAIL` — Something broke; check the error message below to see which test failed and why
+**Reading the output**: `PASS` means all tests passed ✅. `FAIL` means something broke — you'll see which test failed and why. A test with `✓` checks one expected behavior; a test with `✕` indicates a broken expectation.
 
-**What the tests cover:**
-- `auth-validators` — Authentication validation logic
-- `auth` — User authentication flows
-- `dashboard/formatMetric` — Metric formatting for dashboard display
-- `lib/dashboard/stats` — Dashboard statistics calculations
-- `lib/utils` — Utility helper functions
-- `utils` — General-purpose utility functions
+These tests cover:
+
+- `__tests__/auth-validators.test.ts` — Authentication validation logic
+- `__tests__/auth.test.ts` — Authentication flows
+- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting for dashboard
+- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics calculations
+- `__tests__/lib/utils.test.ts` — Utility function tests
+- `__tests__/utils.test.ts` — General utility tests
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (TournamentSelector, StatCardsRow, DashboardOverview)
+- `src/components/dashboard` — Dashboard UI components including TournamentSelector and WeatherForecastModal
+- `src/hooks` — Custom React hooks including useTournamentWeather for tournament weather data
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy](https://vercel.com/button)](https://vercel.com/new)
 
-1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the **Deploy** button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. In **Environment Variables**, add every variable from your `.env.local` file:
-   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-   - Add each key/value pair from `.env.local`
+3. Add all environment variables from your `.env.local` in **Vercel > Settings > Environment Variables**
 4. Click **Deploy**
 
-> ⚠️ **Important**: All environment variables must be added to Vercel before deploying, especially `SUPABASE_SERVICE_ROLE_KEY` (keep this secret!).
+> ⚠️ **Important**: Make sure to copy every variable from your `.env.local` file into Vercel — missing variables will cause the app to fail.
 
 ## 📝 License
 

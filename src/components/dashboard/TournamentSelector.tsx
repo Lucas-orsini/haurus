@@ -1,126 +1,85 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTournament } from '@/contexts/TournamentContext'
 
-function TournamentSelectorInner() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+export interface TournamentSelectorOption {
+  tourney_name: string
+}
+
+/** Standalone tournament dropdown.
+ *
+ * Reads/writes the selected tournament via TournamentContext so that
+ * StatCardsRow (which receives selectedTournament from the same context)
+ * automatically re-filters when the user changes the selection.
+ */
+export default function TournamentSelector() {
   const { tournaments, selectedTournament, setSelectedTournament } = useTournament()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
-  const [isOpen, setIsOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  // Sync open state from outside (e.g., mobile menu toggle)
+  // Close on outside click
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
       }
     }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen])
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
-  // Close on Escape
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setIsOpen(false)
-    }
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-    }
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen])
+  if (tournaments.length === 0) return null
 
-  function handleSelect(tournament: string) {
-    setSelectedTournament(tournament)
-    setIsOpen(false)
-
-    // Sync URL param for bookmarkability
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('tournament', tournament)
-    router.push(`?${params.toString()}`, { scroll: false })
-  }
-
-  if (tournaments.length === 0) {
-    return null
-  }
+  const selected = tournaments.find((t) => t === selectedTournament) ?? selectedTournament ?? tournaments[0]
 
   return (
-    <div ref={containerRef} className="relative">
-      {/* Trigger button */}
+    <div ref={ref} className="relative">
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-label="Sélectionner un tournoi"
+        onClick={() => setOpen((o) => !o)}
         className={cn(
-          'h-7 pl-2.5 pr-2 flex items-center gap-1.5 rounded-md text-xs font-medium',
-          'border transition-colors duration-150 whitespace-nowrap',
-          isOpen
-            ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent-hi)]'
-            : 'border-[var(--border-md)] bg-white/[0.03] text-[var(--text-2)] hover:bg-white/[0.06] hover:text-[var(--text-1)]'
+          'h-7 pl-2.5 pr-2 flex items-center gap-1.5 rounded-md text-[11px] font-medium',
+          'border transition-colors duration-150',
+          'border-[var(--border-md)] bg-[var(--surface-1)]',
+          'text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-[var(--surface-2)]',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50'
         )}
       >
-        <span className="truncate max-w-[120px]">
-          {selectedTournament ?? 'Tous les tournois'}
-        </span>
+        <span className="max-w-[140px] truncate">{selected}</span>
         <ChevronDown
           size={11}
           strokeWidth={1.5}
-          className={cn('shrink-0 transition-transform duration-150', isOpen && 'rotate-180')}
+          className={cn('shrink-0 transition-transform duration-150', open && 'rotate-180')}
         />
       </button>
 
-      {/* Dropdown panel */}
-      {isOpen && (
-        <div
-          role="listbox"
-          aria-label="Liste des tournois"
-          className={cn(
-            'absolute top-full right-0 mt-1.5 z-50',
-            'min-w-[200px] w-max max-w-[280px]',
-            'bg-[var(--surface-2)] border border-[var(--border-md)]',
-            'rounded-lg shadow-xl overflow-hidden py-1',
-            'animate-in fade-in-0 zoom-in-95 duration-150'
-          )}
-        >
-          {tournaments.map((tournament) => (
-            <button
-              key={tournament}
-              role="option"
-              aria-selected={tournament === selectedTournament}
-              onClick={() => handleSelect(tournament)}
-              className={cn(
-                'w-full flex items-center justify-between gap-2 px-3 h-8 text-sm',
-                'transition-colors duration-100 whitespace-nowrap',
-                tournament === selectedTournament
-                  ? 'bg-[var(--accent)]/10 text-[var(--accent-hi)]'
-                  : 'text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)]'
-              )}
-            >
-              <span className="truncate flex-1 text-left">{tournament}</span>
-              {tournament === selectedTournament && (
-                <Check size={12} strokeWidth={2} className="shrink-0 text-[var(--accent-hi)]" />
-              )}
-            </button>
-          ))}
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[180px] max-w-[240px] rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)] shadow-xl overflow-hidden">
+          <div className="py-1 max-h-64 overflow-y-auto">
+            {tournaments.map((t) => (
+              <button
+                key={t}
+                onClick={() => {
+                  setSelectedTournament(t)
+                  setOpen(false)
+                }}
+                className={cn(
+                  'w-full px-3 py-2 flex items-center justify-between gap-2 text-left',
+                  'text-xs transition-colors duration-100',
+                  t === selected
+                    ? 'bg-[var(--accent)]/10 text-[var(--accent-hi)]'
+                    : 'text-[var(--text-2)] hover:bg-white/[0.04] hover:text-[var(--text-1)]'
+                )}
+              >
+                <span className="truncate flex-1 min-w-0">{t}</span>
+                {t === selected && <Check size={11} strokeWidth={1.5} className="shrink-0 text-[var(--accent)]" />}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
-}
-
-export default function TournamentSelector() {
-  return <TournamentSelectorInner />
 }

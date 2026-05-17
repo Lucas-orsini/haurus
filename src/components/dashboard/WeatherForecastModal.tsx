@@ -1,15 +1,19 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X, AlertCircle, CloudOff, Droplets, Thermometer, Wind } from 'lucide-react'
+import { X, AlertCircle, CloudOff, Droplets, Thermometer, Wind, MapPin } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { HourlyForecastEntry } from '@/lib/types/dashboard'
+import { useTournamentWeather } from '@/hooks/useTournamentWeather'
 
 interface WeatherForecastModalProps {
+  /** Tournament name string — empty string means no tournament selected. */
   tourneyName: string
-  hourlyData: HourlyForecastEntry[]
-  isLoading: boolean
-  error: string | null
+  /** Existing hourly data passed in when modal is opened from stat card button.
+   *  When provided, the hook fetch is skipped (data already loaded). */
+  hourlyData?: HourlyForecastEntry[]
+  isLoading?: boolean
+  error?: string | null
   onClose: () => void
 }
 
@@ -29,11 +33,16 @@ function iconUrl(iconCode: string | null): string {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`
 }
 
+/** cn utility — inline for this standalone component */
+function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ')
+}
+
 export default function WeatherForecastModal({
   tourneyName,
-  hourlyData,
-  isLoading,
-  error,
+  hourlyData: externalHourlyData,
+  isLoading: externalIsLoading,
+  error: externalError,
   onClose,
 }: WeatherForecastModalProps) {
   // ── Keyboard close: Escape ──────────────────────────────────────────────
@@ -45,13 +54,26 @@ export default function WeatherForecastModal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
+  // ── Weather hook: fetches when tourneyName is non-empty, skips when '' ───
+  const {
+    hourlyData: hookHourlyData,
+    isLoading: hookIsLoading,
+    error: hookError,
+  } = useTournamentWeather({ tourneyName: tourneyName || null })
+
+  // Resolve data sources: external takes priority (already fetched), else use hook
+  const hourlyData = externalHourlyData !== undefined ? externalHourlyData : hookHourlyData
+  const isLoading = externalIsLoading !== undefined ? externalIsLoading : hookIsLoading
+  const error = externalError !== undefined ? externalError : hookError
+
   // ── Derived values for bar chart ───────────────────────────────────────
   const rainValues = hourlyData.map((h) => h.rain_mm_h ?? 0)
   const maxRain = Math.max(...rainValues, 0.1) // ≥ 0.1 so chart never empties
-  const midRain = Math.round(maxRain / 2)
-
   const hasRain = hourlyData.some((h) => (h.rain_mm_h ?? 0) > 0)
   const hourlyCount = hourlyData.length
+
+  // ── no-tournament-selected guard ──────────────────────────────────────
+  const hasTournament = tourneyName.trim().length > 0
 
   return (
     <AnimatePresence>
@@ -65,7 +87,7 @@ export default function WeatherForecastModal({
         onClick={onClose}
         aria-modal="true"
         role="dialog"
-        aria-label={`Prévisions météo pour ${tourneyName}`}
+        aria-label={`Prévisions météo pour ${tourneyName || 'aucun tournoi sélectionné'}`}
       >
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -84,10 +106,12 @@ export default function WeatherForecastModal({
           <div className="flex items-center justify-between shrink-0 px-5 py-4 border-b border-[var(--border-md)]">
             <div className="flex flex-col min-w-0 mr-4">
               <h2 className="text-sm font-semibold text-[var(--text-1)] truncate">
-                {tourneyName}
+                {tourneyName || 'Prévisions météo'}
               </h2>
               <p className="text-[11px] text-[var(--text-3)] mt-0.5">
-                Prévisions horaires · aujourd&apos;hui
+                {hasTournament
+                  ? 'Prévisions horaires · aujourd\'hui'
+                  : 'Sélectionnez un tournoi'}
               </p>
             </div>
             <button
@@ -101,8 +125,23 @@ export default function WeatherForecastModal({
 
           {/* ── Body ────────────────────────────────────────────────────── */}
           <div className="flex-1 overflow-y-auto min-h-0">
+            {/* No tournament selected state */}
+            {!hasTournament && (
+              <div className="flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center">
+                  <MapPin size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
+                </div>
+                <p className="text-sm font-medium text-[var(--text-2)]">
+                  Aucun tournoi sélectionné
+                </p>
+                <p className="text-xs text-[var(--text-3)]">
+                  Sélectionnez un tournoi dans le dashboard pour voir ses prévisions météo.
+                </p>
+              </div>
+            )}
+
             {/* Loading state */}
-            {isLoading && (
+            {isLoading && hasTournament && (
               <div className="flex flex-col gap-4 p-5">
                 <div className="h-4 bg-[var(--border-md)] rounded animate-pulse w-32" />
                 <div className="flex gap-2 items-end h-32">
@@ -141,7 +180,7 @@ export default function WeatherForecastModal({
             )}
 
             {/* Empty state */}
-            {!isLoading && !error && hourlyData.length === 0 && (
+            {!isLoading && hasTournament && !error && hourlyData.length === 0 && (
               <div className="flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
                 <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[var(--border-md)] flex items-center justify-center">
                   <CloudOff size={18} className="text-[var(--text-3)]" strokeWidth={1.5} />
@@ -156,7 +195,7 @@ export default function WeatherForecastModal({
             )}
 
             {/* Success state — content */}
-            {!isLoading && !error && hourlyData.length > 0 && (
+            {!isLoading && hasTournament && !error && hourlyData.length > 0 && (
               <div className="p-5 flex flex-col gap-6">
                 {/* ── Rain bar chart ───────────────────────────────── */}
                 <section>
@@ -172,11 +211,7 @@ export default function WeatherForecastModal({
                     )}
                   </div>
 
-                  {/*
-                   * Scroll container : bars + Y-axis right inside (stays aligned on scroll)
-                   */}
                   <div className="flex items-end gap-2">
-                    {/* Conteneur scrollable — Y-axis droite inside pour rester alignée au scroll */}
                     <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3 flex-1">
                       <div className="flex items-end gap-1 min-w-max">
                         {hourlyData.map((hour, idx) => {
@@ -190,7 +225,6 @@ export default function WeatherForecastModal({
                               className="flex flex-col items-center gap-0.5 w-12 shrink-0"
                               title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
                             >
-                              {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
                               <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
                                 {rain > 0 ? (
                                   <div
@@ -206,7 +240,6 @@ export default function WeatherForecastModal({
                                       minHeight: '4px',
                                     }}
                                   >
-                                    {/* Label inside bar if tall enough */}
                                     {heightPct > 25 && (
                                       <span className="absolute inset-x-0 top-1 flex justify-center">
                                         <span className="text-[9px] font-medium text-[var(--accent-hi)] tabular-nums leading-none">
@@ -220,7 +253,6 @@ export default function WeatherForecastModal({
                                 )}
                               </div>
 
-                              {/* X-axis hour label + day offset badge — flex-col justify-end forces baseline alignment */}
                               <div className="flex flex-col items-center justify-end h-[28px]">
                                 <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
                                   {formatHourChart(hour.hour)}
@@ -234,7 +266,6 @@ export default function WeatherForecastModal({
                             </div>
                           )
                         })}
-
                       </div>
                     </div>
                   </div>
@@ -259,12 +290,10 @@ export default function WeatherForecastModal({
                             idx < hourlyData.length - 1 && 'border-r border-[var(--border)]'
                           )}
                         >
-                          {/* Hour */}
                           <span className="text-[11px] font-mono font-medium text-[var(--text-1)] tabular-nums">
                             {formatHour(hour.hour)}
                           </span>
 
-                          {/* Weather icon */}
                           {hour.conditions_icon ? (
                             <img
                               src={iconUrl(hour.conditions_icon)}
@@ -278,7 +307,6 @@ export default function WeatherForecastModal({
                             <div className="w-10 h-10" />
                           )}
 
-                          {/* Temperature */}
                           <div className="flex items-center gap-1">
                             <Thermometer
                               size={10}
@@ -292,7 +320,6 @@ export default function WeatherForecastModal({
                             </span>
                           </div>
 
-                          {/* Wind speed */}
                           {hour.wind_speed !== undefined && hour.wind_speed !== null && (
                             <div className="flex items-center gap-1">
                               <Wind
@@ -306,7 +333,6 @@ export default function WeatherForecastModal({
                             </div>
                           )}
 
-                          {/* Humidity */}
                           {hour.humidity !== undefined && hour.humidity !== null && (
                             <div className="flex items-center gap-1">
                               <Droplets
@@ -331,9 +357,4 @@ export default function WeatherForecastModal({
       </motion.div>
     </AnimatePresence>
   )
-}
-
-/** cn utility — inline for this standalone component */
-function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ')
 }
