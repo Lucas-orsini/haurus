@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { cn, formatMetricValue, getMetricColor } from '@/lib/utils'
 import type { MatchStats } from '@/lib/types/match'
 import { METRIC_DEFS } from '@/components/dashboard/MatchRow'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 interface MatchMetricsModalProps {
   isOpen: boolean
@@ -21,6 +22,15 @@ export default function MatchMetricsModal({
   playerName,
   onClose,
 }: MatchMetricsModalProps) {
+  const dict = useDashboardDict()
+  const t = dict.player?.matchMetrics ?? {
+    title: 'Métriques pré-match',
+    close: 'Fermer',
+    notAvailable: 'Métriques pré-match non disponibles pour ce match',
+    advantage: 'Avantage',
+    disadvantage: 'Désavantage',
+  }
+
   // Ne rien rendre si le modal est fermé
   if (!isOpen) return null
 
@@ -31,11 +41,11 @@ export default function MatchMetricsModal({
   )
 
   // Noms affichés : toujours playerName à gauche, opponent à droite
-  const leftPlayer  = isPlayerOnLeft ? stats?.player1 : stats?.player2
+  const leftPlayer = isPlayerOnLeft ? stats?.player1 : stats?.player2
   const rightPlayer = isPlayerOnLeft ? stats?.player2 : stats?.player1
 
   // Ranks affichés selon l'orientation en base (rank_p1 pour le joueur en player1, rank_p2 pour celui en player2)
-  const leftRank  = isPlayerOnLeft ? stats?.rank_p1 : stats?.rank_p2
+  const leftRank = isPlayerOnLeft ? stats?.rank_p1 : stats?.rank_p2
   const rightRank = isPlayerOnLeft ? stats?.rank_p2 : stats?.rank_p1
 
   return (
@@ -51,14 +61,14 @@ export default function MatchMetricsModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
-            Métriques pré-match
+            {t.title}
           </h2>
           <button
             onClick={onClose}
             className="w-7 h-7 flex items-center justify-center rounded-md
                        hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-2)]
                        transition-colors duration-150"
-            aria-label="Fermer"
+            aria-label={t.close}
           >
             <X size={14} />
           </button>
@@ -76,7 +86,7 @@ export default function MatchMetricsModal({
               </svg>
             </div>
             <p className="text-sm font-medium text-[var(--text-2)]">
-              Métriques pré-match non disponibles pour ce match
+              {t.notAvailable}
             </p>
           </div>
         ) : (
@@ -129,7 +139,7 @@ export default function MatchMetricsModal({
                 const rdP1 = isGlickoP1 ? (stats.glicko_rd_p1 as number | null) : null
                 const rdP2 = isGlickoP2 ? (stats.glicko_rd_p2 as number | null) : null
 
-                const leftRd  = isPlayerOnLeft ? rdP1 : rdP2
+                const leftRd = isPlayerOnLeft ? rdP1 : rdP2
                 const rightRd = isPlayerOnLeft ? rdP2 : rdP1
 
                 return (
@@ -209,11 +219,15 @@ export default function MatchMetricsModal({
             <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-[var(--border)]">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--green)]" />
-                <span className="text-[10px] text-[var(--text-3)]">Avantage {playerName}</span>
+                <span className="text-[10px] text-[var(--text-3)]">
+                  {t.advantage} {playerName}
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-[var(--red)]" />
-                <span className="text-[10px] text-[var(--text-3)]">Désavantage {playerName}</span>
+                <span className="text-[10px] text-[var(--text-3)]">
+                  {t.disadvantage} {playerName}
+                </span>
               </div>
             </div>
           </div>

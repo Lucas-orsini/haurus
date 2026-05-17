@@ -62,18 +62,13 @@ const plans = [
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Button from '@/components/ui/Button'
-
-const betaFeatures = [
-  'Toutes les métriques ATP',
-  'Profils joueurs avec historique',
-  'Tableau comparatif des matchs',
-  'Tous les tournois ATP',
-  'Accès à toutes les surfaces',
-  'Accès nouvelles metriques à venir',
-  'Accès notification Telegram',
-]
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 export default function Pricing() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   return (
     <section id="pricing" className="py-24 px-6 relative">
       {/* Header */}
@@ -85,13 +80,13 @@ export default function Pricing() {
         className="max-w-5xl mx-auto text-center mb-16"
       >
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border-md)] bg-[var(--surface-2)] mb-6">
-          <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">Accès Beta</span>
+          <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">{t.pricing.sectionTag}</span>
         </span>
         <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-          Rejoignez la communauté Haurus
+          {t.pricing.sectionTitle}
         </h2>
         <p className="text-[var(--text-2)] max-w-md mx-auto text-sm leading-relaxed">
-          Accédez en avant-première à l'outil d'analyse tennis le plus avancé.
+          {t.pricing.sectionSubtitle}
         </p>
       </motion.div>
 
@@ -130,7 +125,7 @@ export default function Pricing() {
                 }}
               />
               <span className="text-[11px] font-medium text-[var(--text-2)] uppercase tracking-widest">
-                Accès limité
+                {t.pricing.betaLimited}
               </span>
             </div>
           </div>
@@ -138,10 +133,10 @@ export default function Pricing() {
           {/* Titre */}
           <div className="relative z-10 text-center">
             <h3 className="text-2xl font-semibold tracking-tight text-[var(--text-1)]">
-              Accès Beta
+              {t.pricing.betaTitle}
             </h3>
             <p className="mt-2 text-sm text-[var(--text-2)] leading-relaxed">
-              Accès complet. Gratuit pendant la bêta.
+              {t.pricing.betaDesc}
             </p>
           </div>
 
@@ -150,7 +145,7 @@ export default function Pricing() {
 
           {/* Liste des fonctionnalités */}
           <ul className="relative z-10 flex flex-col gap-3">
-            {betaFeatures.map((feature) => (
+            {t.pricing.betaFeatures.map((feature) => (
               <li key={feature} className="flex items-start gap-3 text-sm text-[var(--text-2)]">
                 <Check
                   size={14}
@@ -169,23 +164,23 @@ export default function Pricing() {
           {/* Prix */}
           <div className="relative z-10 text-center">
             <div className="flex items-end justify-center gap-1">
-              <span className="text-5xl font-bold text-[var(--text-1)] tracking-tight">Gratuit</span>
+              <span className="text-5xl font-bold text-[var(--text-1)] tracking-tight">{t.pricing.betaPrice}</span>
             </div>
             <p className="mt-1 text-xs text-[var(--text-3)]">
-              pendant la période beta
+              {t.pricing.betaPriceSuffix}
             </p>
           </div>
 
           {/* CTA */}
           <div className="relative z-10 flex justify-center">
             <Button href="/signup" variant="primary" size="lg" className="w-auto">
-              Rejoindre la beta
+              {t.pricing.betaCta}
             </Button>
           </div>
 
           {/* Note légale */}
           <p className="relative z-10 text-center text-[10px] text-[var(--text-3)] leading-relaxed">
-            En rejoignant la beta, vous acceptez que certaines fonctionnalités soient encore en développement.
+            {t.pricing.betaDisclaimer}
           </p>
         </div>
       </motion.div>

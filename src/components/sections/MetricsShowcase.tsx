@@ -3,8 +3,8 @@ import { useRef, useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, useAnimationFrame, type Variants } from 'framer-motion'
 import { BarChart3, Activity, Target, TrendingUp, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-// ── Framer Motion Variants (type-safe, no string ease) ──────────────────────
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -15,8 +15,6 @@ const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
 }
-
-// ── Animated Bar Chart (Glicko-2 per surface) ────────────────────────────────
 
 function GlickoChart() {
   const [animated, setAnimated] = useState(false)
@@ -54,8 +52,6 @@ function GlickoChart() {
     </div>
   )
 }
-
-// ── Circular Progress Rings (p_serve & p_return) ─────────────────────────────
 
 function CircularProgress({ value, label, color }: { value: number; label: string; color: string }) {
   const [animated, setAnimated] = useState(false)
@@ -95,11 +91,8 @@ function CircularProgress({ value, label, color }: { value: number; label: strin
   )
 }
 
-// ── Sparkline (TSD — Tiebreak Stress Data) ───────────────────────────────────
-
-function Sparkline() {
+function Sparkline({ vsAvgLabel = '+0.72 vs ATP average' }: { vsAvgLabel?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const progressRef = useRef(0)
   const [displayed, setDisplayed] = useState(0)
 
   useAnimationFrame((t) => {
@@ -123,7 +116,6 @@ function Sparkline() {
 
     if (pts === 0) return
 
-    // Grid line
     ctx.beginPath()
     ctx.strokeStyle = 'rgba(255,255,255,0.04)'
     ctx.lineWidth = 1
@@ -131,7 +123,6 @@ function Sparkline() {
     ctx.lineTo(w, h / 2)
     ctx.stroke()
 
-    // Gradient fill
     const grad = ctx.createLinearGradient(0, 0, 0, h)
     grad.addColorStop(0, 'rgba(242,203,56,0.25)')
     grad.addColorStop(1, 'rgba(242,203,56,0)')
@@ -149,7 +140,6 @@ function Sparkline() {
     ctx.fillStyle = grad
     ctx.fill()
 
-    // Line
     ctx.beginPath()
     points.slice(0, pts).forEach((p, i) => {
       const x = (i / (points.length - 1)) * w
@@ -162,7 +152,6 @@ function Sparkline() {
     ctx.lineJoin = 'round'
     ctx.stroke()
 
-    // Dot
     if (pts > 0) {
       const lastP = points[pts - 1]
       const lx = ((pts - 1) / (points.length - 1)) * w
@@ -182,23 +171,21 @@ function Sparkline() {
   })
 
   const lastVal = (() => {
-    const points = [-0.42, -0.68, -0.18, -0.89, 0.05, -0.55, 0.32, -0.22, -0.68, 0.08, -0.98, -0.42, 0.22, 0.08, -0.62, -0.35, -0.75, 0.05, -0.42, 0.72]
-    const idx = Math.min(displayed - 1, points.length - 1)
-    return points[Math.max(0, idx)]
+    const pts = [-0.42, -0.68, -0.18, -0.89, 0.05, -0.55, 0.32, -0.22, -0.68, 0.08, -0.98, -0.42, 0.22, 0.08, -0.62, -0.35, -0.75, 0.05, -0.42, 0.72]
+    const idx = Math.min(displayed - 1, pts.length - 1)
+    return pts[Math.max(0, idx)]
   })()
 
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[10px] text-[var(--text-3)]">+0.72 vs moyenne ATP</span>
+        <span className="text-[10px] text-[var(--text-3)]">{vsAvgLabel}</span>
         <span className="text-xs font-mono font-semibold text-[var(--accent)]">{lastVal}</span>
       </div>
       <canvas ref={canvasRef} width={240} height={64} className="w-full" />
     </div>
   )
 }
-
-// ── Animated Counter (BPPI) ────────────────────────────────────────────────────
 
 function AnimatedCounter({ target, duration = 1500 }: { target: number; duration?: number }) {
   const [count, setCount] = useState(0)
@@ -220,9 +207,7 @@ function AnimatedCounter({ target, duration = 1500 }: { target: number; duration
   return <>{count}</>
 }
 
-// ── Trend Line (Momentum TD) ──────────────────────────────────────────────────
-
-function TrendLine() {
+function TrendLine({ momentumLabel = 'Momentum over 30 days' }: { momentumLabel?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useAnimationFrame((t) => {
@@ -285,15 +270,13 @@ function TrendLine() {
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-1.5 px-1">
-        <span className="text-[10px] text-[var(--text-3)]">Momentum sur 30 jours</span>
+        <span className="text-[10px] text-[var(--text-3)]">{momentumLabel}</span>
         <span className="flex items-center gap-0.5 text-xs font-semibold text-[var(--green)]">+0.08 <TrendingUp size={10} /></span>
       </div>
       <canvas ref={canvasRef} width={240} height={56} className="w-full" />
     </div>
   )
 }
-
-// ── Bento Card with 3D tilt ────────────────────────────────────────────────────
 
 function BentoCard({
   children,
@@ -331,7 +314,6 @@ function BentoCard({
         className
       )}
     >
-      {/* Gradient hover overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
         style={{ background: hoverGradient }} />
       <div style={{ transform: 'translateZ(20px)' }} className="flex flex-col gap-2 flex-1 relative z-10">
@@ -341,9 +323,10 @@ function BentoCard({
   )
 }
 
-// ── Main Section ───────────────────────────────────────────────────────────────
-
 export default function MetricsShowcase() {
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
+
   return (
     <section id="metrics" className="py-24 px-6 relative">
       {/* Section header */}
@@ -356,13 +339,13 @@ export default function MetricsShowcase() {
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[rgba(242,203,56,0.25)] bg-[rgba(242,203,56,0.06)] mb-6">
             <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            <span className="text-[11px] font-medium text-[var(--accent)] uppercase tracking-widest">Données avancées</span>
+            <span className="text-[11px] font-medium text-[var(--accent)] uppercase tracking-widest">{t.metricsShowcase.sectionTag}</span>
           </span>
           <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-[var(--text-1)] mb-4">
-            La structure analytique
+            {t.metricsShowcase.sectionTitle}
           </h2>
           <p className="text-[var(--text-2)] max-w-xl mx-auto text-sm leading-relaxed">
-           Seize métriques. Chacune capture une dimension clé de la performance d’un joueur utilisée par les bookmakers. Toutes réunies au même endroit.
+            {t.metricsShowcase.sectionSubtitle}
           </p>
         </motion.div>
       </div>
@@ -381,8 +364,8 @@ export default function MetricsShowcase() {
                 <BarChart3 size={16} className="text-[var(--accent)]" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[var(--accent)] tracking-tight">Glicko-2</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Classement par surface · Intervalle de confiance</p>
+                <h3 className="text-sm font-semibold text-[var(--accent)] tracking-tight">{t.metricsShowcase.glicko2.title}</h3>
+                <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.glicko2.subtitle}</p>
               </div>
             </div>
             <GlickoChart />
@@ -394,13 +377,13 @@ export default function MetricsShowcase() {
                 <Activity size={16} className="text-blue-400" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">p_serve / p_return</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Points gagnés au service et au retour</p>
+                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">{t.metricsShowcase.pServe.title}</h3>
+                <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.pServe.subtitle}</p>
               </div>
             </div>
             <div className="mt-auto flex justify-around items-end pt-4">
-              <CircularProgress value={68} label="1er service gagné" color="#3b82f6" />
-              <CircularProgress value={42} label="Pts de retour gagnés" color="#a78bfa" />
+              <CircularProgress value={68} label={t.metricsShowcase.pServe.firstServe} color="#3b82f6" />
+              <CircularProgress value={42} label={t.metricsShowcase.pServe.returnPts} color="#a78bfa" />
             </div>
           </BentoCard>
 
@@ -411,11 +394,11 @@ export default function MetricsShowcase() {
                 <Zap size={16} className="text-purple-400" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">TSD</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Indice de dominance au service</p>
+                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">{t.metricsShowcase.tsd.title}</h3>
+                <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.tsd.subtitle}</p>
               </div>
             </div>
-            <Sparkline />
+            <Sparkline vsAvgLabel={t.metricsShowcase.tsd.vsAvg} />
           </BentoCard>
 
           <BentoCard glowColor="#F2CB38">
@@ -424,15 +407,15 @@ export default function MetricsShowcase() {
                 <Target size={16} className="text-[var(--accent)]" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">BPPI</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Indice de performance sur balles de break</p>
+                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">{t.metricsShowcase.bppi.title}</h3>
+                <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.bppi.subtitle}</p>
               </div>
             </div>
             <div className="flex-1 flex flex-col items-center justify-center pt-4">
               <div className="text-4xl font-bold text-[var(--accent)] font-mono">
                 <AnimatedCounter target={5} duration={1400} />
               </div>
-              <p className="text-[10px] text-[var(--text-3)] mt-1">indice de résistance sur balles de break au centième</p>
+              <p className="text-[10px] text-[var(--text-3)] mt-1">{t.metricsShowcase.bppi.label}</p>
             </div>
           </BentoCard>
 
@@ -442,11 +425,11 @@ export default function MetricsShowcase() {
                 <TrendingUp size={16} className="text-green-400" strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">Momentum TD</h3>
-                <p className="text-[11px] text-[var(--text-3)]">Mesure la dynamique actuelle du joueur</p>
+                <h3 className="text-sm font-semibold text-[var(--text-1)] tracking-tight">{t.metricsShowcase.momentum.title}</h3>
+                <p className="text-[11px] text-[var(--text-3)]">{t.metricsShowcase.momentum.subtitle}</p>
               </div>
             </div>
-            <TrendLine />
+            <TrendLine momentumLabel={t.metricsShowcase.momentum.label} />
           </BentoCard>
         </motion.div>
       </div>

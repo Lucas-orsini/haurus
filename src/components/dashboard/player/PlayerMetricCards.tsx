@@ -2,6 +2,7 @@
 
 import { cn, getDeltaColor, getMomentumColor } from '@/lib/utils'
 import type { Database } from '@/lib/supabase/database.types'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 type PlayerStats = Database['public']['Tables']['player_stats']['Row']
 type AtpAverage = Database['public']['Tables']['atp_averages']['Row']
@@ -35,6 +36,15 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
   const atpPServe = getAtpPServe(surface, atpAverages)
   const momentum = playerStats.momentum_td
 
+  const dict = useDashboardDict()
+  const mc = dict.player?.metricCards ?? {
+    glicko2: 'Glicko-2',
+    pServe: 'P-Serve',
+    momentum: 'Momentum TD',
+    vsAtp: 'vs ATP',
+    days30: '30 jours',
+  }
+
   const pServePct = pServe !== null ? (pServe * 100).toFixed(1) + '%' : '—'
   const pServeDelta = pServe !== null && atpPServe !== null ? pServe - atpPServe : null
 
@@ -42,7 +52,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Card 1 — Glicko-2 */}
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Glicko-2</p>
+        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">{mc.glicko2}</p>
         <p className="text-2xl font-semibold text-[var(--text-1)] tabular-nums font-mono">
           {glicko !== null ? Math.round(glicko).toLocaleString() : '—'}
         </p>
@@ -51,7 +61,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
 
       {/* Card 2 — P-Serve + comparaison ATP */}
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">P-Serve</p>
+        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">{mc.pServe}</p>
         <p className="text-2xl font-semibold text-[var(--text-1)] tabular-nums font-mono">
           {pServePct}
         </p>
@@ -59,7 +69,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
           <p className={cn('text-xs mt-1 flex items-center gap-1', getDeltaColor(pServeDelta > 0 ? 1 : -1))}>
             <span>{pServeDelta >= 0 ? '↑' : '↓'}</span>
             <span>
-              {pServeDelta >= 0 ? '+' : ''}{(pServeDelta * 100).toFixed(1)}% vs ATP
+              {pServeDelta >= 0 ? '+' : ''}{(pServeDelta * 100).toFixed(1)}% {mc.vsAtp}
             </span>
           </p>
         ) : (
@@ -69,7 +79,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
 
       {/* Card 3 — Momentum TD */}
       <div className="bg-[var(--surface-1)] border border-[var(--border-md)] rounded-lg p-4">
-        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">Momentum TD</p>
+        <p className="text-xs text-[var(--text-3)] mb-2 uppercase tracking-wider">{mc.momentum}</p>
         <p className={cn(
           'text-2xl font-semibold tabular-nums font-mono',
           momentum !== null ? getMomentumColor(momentum) : 'text-[var(--text-1)]'
@@ -78,7 +88,7 @@ export default function PlayerMetricCards({ surface, playerStats, atpAverages }:
             ? `${momentum >= 0 ? '↑' : '↓'} ${momentum >= 0 ? '+' : ''}${momentum.toFixed(2)}`
             : '—'}
         </p>
-        <p className="text-xs text-[var(--text-3)] mt-1">30 jours</p>
+        <p className="text-xs text-[var(--text-3)] mt-1">{mc.days30}</p>
       </div>
     </div>
   )

@@ -28,7 +28,6 @@ export const METRIC_DEFS: MetricDef[] = [
   { label: 'Glicko Rating',          p1Key: 'glicko_rating_p1',      p2Key: 'glicko_rating_p2',      mode: 'higher'  },
   { label: 'TSD',                   p1Key: 'tsd_p1',                p2Key: 'tsd_p2',                mode: 'higher'  },
   { label: 'BPPI',                  p1Key: 'bppi_p1',               p2Key: 'bppi_p2',               mode: 'higher'  },
-  { label: 'MAP',                   p1Key: 'map_p1',                p2Key: 'map_p2',                mode: 'higher'  },
   { label: 'Win Rate TD',           p1Key: 'win_rate_td_p1',        p2Key: 'win_rate_td_p2',        mode: 'higher'  },
   { label: 'Win Rate Surface TD',   p1Key: 'win_rate_surf_td_p1',   p2Key: 'win_rate_surf_td_p2',   mode: 'higher'  },
   { label: 'Momentum TD',           p1Key: 'momentum_td_p1',        p2Key: 'momentum_td_p2',        mode: 'higher'  },
@@ -43,7 +42,7 @@ export const METRIC_TOOLTIPS: Record<string, string> = {
   'Classement ATP': 'Rang officiel ATP du joueur. Plus le chiffre est bas, meilleur est le joueur.',
   'Évolution rank 6 mois': "Variation du classement ATP sur les 6 derniers mois. Une valeur négative signifie que le joueur a progressé au classement.",
   'P-Serve': 'Probabilité de remporter un point quand le joueur sert, calculée sur ses matchs récents. Plus la valeur est haute, plus il est efficace au service.',
-  'P-Return': 'Probabilité de remporté un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
+  'P-Return': 'Probabilité de został un point quand le joueur est en retour de service. Plus la valeur est haute, plus il gêne l\'adversaire sur son service.',
   'Glicko Rating': 'Système de rating par surface, plus précis que le classement ATP. Il se recalcule après chaque match et intègre l\'incertitude autour du niveau du joueur. Plus la valeur est haute, meilleur est le joueur sur cette surface.',
   'TSD': "Mesure à quel point le joueur domine au service par rapport à la moyenne ATP sur cette surface. Une valeur positive indique qu'il est au-dessus de la moyenne, négative qu'il est en dessous.",
   'BPPI': 'Mesure si le joueur résiste mieux ou moins bien que prévu sur les balles de break. Une valeur positive indique qu\'il sauve plus de balles de break que ce que ses statistiques laissent attendre.',
@@ -329,7 +328,7 @@ function FormeCell({ value, small }: { value: string | null; small?: boolean }) 
     <span className="flex items-center gap-px">
       {segments.map((seg, i) => (
         <span
-          key={i}
+          key={String(i)}
           className={cn(
             seg.color === 'green'  && 'text-[var(--green)]',
             seg.color === 'red'    && 'text-[var(--red)]',

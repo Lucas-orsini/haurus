@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2, Trash2, Lock, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDashboardDict } from '@/components/dashboard/DashboardDictContext'
 
 /** Type TrackedPlayer — aligné avec la réponse GET /api/tracked-players */
 export interface TrackedPlayer {
@@ -43,6 +44,16 @@ export default function TrackedPlayersList({
   onClose,
 }: TrackedPlayersListProps) {
   const [removingName, setRemovingName] = useState<string | null>(null)
+  const dict = useDashboardDict()
+  const t = dict.player?.tracked ?? {
+    label: 'Suivis',
+    emptyTitle: 'Aucun joueur suivi',
+    emptyDesc: 'Recherchez un joueur et ajoutez-le à vos suivis',
+    lockedUntil: 'Verrouillé jusqu\'au',
+    unlocked: 'Débloqué',
+    removeFromTracked: 'Retirer des suivis',
+    closePanel: 'Fermer le panneau',
+  }
 
   const lockDays = role === 'starter' || role === 'analyste'
   const limitDisplay = limit === null ? '∞' : limit
@@ -65,7 +76,7 @@ export default function TrackedPlayersList({
         {/* Counter — sticky top mobile */}
         <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
           <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-            Suivis
+            {t.label}
           </span>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
@@ -75,7 +86,7 @@ export default function TrackedPlayersList({
               <button
                 onClick={onClose}
                 className="md:hidden w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors duration-150"
-                aria-label="Fermer le panneau"
+                aria-label={t.closePanel}
               >
                 <X size={15} strokeWidth={1.5} className="shrink-0" />
               </button>
@@ -93,9 +104,11 @@ export default function TrackedPlayersList({
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <p className="text-xs font-medium text-[var(--text-2)] mb-1">Aucun joueur suivi</p>
+          <p className="text-xs font-medium text-[var(--text-2)] mb-1">
+            {t.emptyTitle}
+          </p>
           <p className="text-[11px] text-[var(--text-3)] leading-relaxed">
-            Recherchez un joueur et ajoutez-le à vos suivis
+            {t.emptyDesc}
           </p>
         </div>
       </div>
@@ -107,7 +120,7 @@ export default function TrackedPlayersList({
       {/* Counter — sticky top mobile */}
       <div className="sticky top-0 z-10 bg-[var(--surface-1)] flex items-center justify-between px-1 py-1">
         <span className="text-[11px] font-medium text-[var(--text-3)] uppercase tracking-wider">
-          Suivis
+          {t.label}
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-mono text-[var(--text-3)] tabular-nums">
@@ -117,7 +130,7 @@ export default function TrackedPlayersList({
             <button
               onClick={onClose}
               className="md:hidden w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/[0.06] text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors duration-150"
-              aria-label="Fermer le panneau"
+              aria-label={t.closePanel}
             >
               <X size={15} strokeWidth={1.5} className="shrink-0" />
             </button>
@@ -146,12 +159,12 @@ export default function TrackedPlayersList({
                 {lockDays && locked && (
                   <p className="text-[11px] text-[var(--text-3)] flex items-center gap-1 mt-0.5">
                     <Lock size={9} strokeWidth={1.5} className="shrink-0" />
-                    Verrouillé jusqu&apos;au {formatLockDate(player.locked_until)}
+                    {t.lockedUntil} {formatLockDate(player.locked_until)}
                   </p>
                 )}
                 {lockDays && !locked && (
                   <p className="text-[11px] text-[var(--green)] mt-0.5">
-                    Débloqué
+                    {t.unlocked}
                   </p>
                 )}
               </div>
@@ -160,7 +173,7 @@ export default function TrackedPlayersList({
               <button
                 onClick={(e) => handleRemove(e, player.player_name)}
                 disabled={locked || removing}
-                title={locked ? `Joueur verrouillé jusqu'au ${formatLockDate(player.locked_until)}` : 'Retirer des suivis'}
+                title={locked ? `${t.lockedUntil} ${formatLockDate(player.locked_until)}` : t.removeFromTracked}
                 className={cn(
                   'w-6 h-6 shrink-0 rounded flex items-center justify-center transition-all duration-150',
                   locked

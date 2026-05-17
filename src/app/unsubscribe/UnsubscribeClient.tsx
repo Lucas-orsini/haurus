@@ -4,14 +4,16 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { UnsubscribeNamespace } from '@/lib/i18n/dictionaries/types'
 
 type UnsubscribeState = 'idle' | 'loading' | 'success' | 'error'
 
 interface UnsubscribeClientProps {
   email: string
+  dict: Pick<UnsubscribeNamespace, 'form' | 'success' | 'error' | 'common' | 'confirmDialog'>
 }
 
-export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
+export default function UnsubscribeClient({ email, dict }: UnsubscribeClientProps) {
   const [state, setState] = useState<UnsubscribeState>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -32,7 +34,7 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
       }
 
       // Parse error body
-      let message = 'Une erreur inattendue est survenue.'
+      let message = dict.error.generic
       try {
         const data = await res.json()
         if (data?.error) message = data.error
@@ -51,7 +53,7 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
       setErrorMessage(message)
       setState('error')
     } catch {
-      setErrorMessage('Erreur réseau. Vérifiez votre connexion et réessayez.')
+      setErrorMessage(dict.error.generic)
       setState('error')
     }
   }
@@ -84,10 +86,10 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
               </svg>
             </div>
             <h1 className="text-base font-semibold text-[var(--text-1)] mb-2">
-              Désabonnement confirmé
+              {dict.success.title}
             </h1>
             <p className="text-sm text-[var(--text-3)] leading-relaxed mb-6">
-              Vous ne recevrez plus de newsletter Haurus à cette adresse.
+              {dict.success.message}
             </p>
             <Link
               href="/"
@@ -96,7 +98,7 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
                          text-sm font-medium transition-colors duration-150
                          shadow-[0_0_12px_var(--accent-glow)]"
             >
-              Retour au site
+              {dict.common.backToSite}
             </Link>
           </div>
         </div>
@@ -128,7 +130,7 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
           </div>
 
           <h1 className="text-base font-semibold text-[var(--text-1)] mb-2">
-            Se désabonner de la newsletter
+            {dict.form.confirmButton}
           </h1>
 
           <p className="text-sm text-[var(--text-3)] leading-relaxed mb-5">
@@ -177,13 +179,14 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
                     'shadow-[0_0_12px_var(--accent-glow)]'
                   )}
                 >
-                  Réessayer
+                  <Loader2 size={14} className="animate-spin shrink-0" />
+                  {dict.common.retry}
                 </button>
                 <Link
                   href="/"
                   className="h-9 px-5 flex items-center justify-center gap-2 rounded-lg border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-sm font-medium transition-colors duration-150"
                 >
-                  Annuler — retour au site
+                  {dict.common.backToSite}
                 </Link>
               </>
             ) : (
@@ -204,7 +207,7 @@ export default function UnsubscribeClient({ email }: UnsubscribeClientProps) {
                       <span>Traitement en cours…</span>
                     </>
                   ) : (
-                    <span>Se désabonner</span>
+                    <span>{dict.form.confirmButton}</span>
                   )}
                 </button>
                 <Link

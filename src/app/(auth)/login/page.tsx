@@ -9,11 +9,15 @@ import { LogIn } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { validateEmail, validatePassword, login, loginWithGoogle, getSession } from '@/lib/auth'
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
 
 type FormState = 'idle' | 'loading' | 'redirecting'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,12 +30,10 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return '/dashboard'
     const params = new URLSearchParams(window.location.search)
     const raw = params.get('redirectTo')
-    // Security: only follow absolute-path redirects
     if (raw && raw.startsWith('/')) return raw
     return '/dashboard'
   }
 
-  // Check for existing session on mount — redirect if already authenticated
   useEffect(() => {
     async function checkSession() {
       try {
@@ -68,7 +70,7 @@ export default function LoginPage() {
       router.push(getRedirectTo())
     } catch (err) {
       setFormState('idle')
-      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+      setGlobalError(err instanceof Error ? err.message : t.auth.login.errorGeneric)
     }
   }
 
@@ -81,9 +83,8 @@ export default function LoginPage() {
         setGlobalError(error)
         setGoogleLoading(false)
       }
-      // On success, Supabase redirects the browser — loading state is never cleared
     } catch (err) {
-      setGlobalError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+      setGlobalError(err instanceof Error ? err.message : t.auth.login.errorGeneric)
       setGoogleLoading(false)
     }
   }
@@ -102,19 +103,19 @@ export default function LoginPage() {
             <LogIn size={20} className="text-[var(--accent)]" strokeWidth={1.5} />
           </div>
           <h1 className="text-2xl font-semibold text-[var(--text-1)] tracking-tight">
-            Connexion
+            {t.auth.login.title}
           </h1>
           <p className="mt-2 text-sm text-[var(--text-2)]">
-            Accédez à votre compte Haurus
+            {t.auth.login.subtitle}
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <Input
-            label="Adresse email"
+            label={t.auth.login.emailLabel}
             type="email"
-            placeholder="alex@example.com"
+            placeholder={t.auth.login.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={errors.email}
@@ -123,9 +124,9 @@ export default function LoginPage() {
           />
 
           <Input
-            label="Mot de passe"
+            label={t.auth.login.passwordLabel}
             type="password"
-            placeholder="••••••••"
+            placeholder={t.auth.login.passwordPlaceholder}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={errors.password}
@@ -149,15 +150,15 @@ export default function LoginPage() {
             {formState === 'loading' ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
-                Connexion...
+                {t.auth.login.submitButtonLoading}
               </span>
             ) : formState === 'redirecting' ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-black/30 border-t-black animate-spin" />
-                Redirection...
+                {t.auth.login.submitButtonRedirecting}
               </span>
             ) : (
-              'Se connecter'
+              t.auth.login.submitButton
             )}
           </Button>
         </form>
@@ -165,7 +166,7 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="flex items-center gap-3 my-5">
           <hr className="flex-1 border-t border-[var(--border-md)]" />
-          <span className="text-xs text-[var(--text-2)] select-none">ou</span>
+          <span className="text-xs text-[var(--text-2)] select-none">{t.auth.login.separator}</span>
           <hr className="flex-1 border-t border-[var(--border-md)]" />
         </div>
 
@@ -180,7 +181,7 @@ export default function LoginPage() {
           {googleLoading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 rounded-full border-2 border-[var(--text-3)] border-t-[var(--text-1)] animate-spin" />
-              Redirection...
+              {t.auth.login.googleButtonLoading}
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
@@ -190,19 +191,19 @@ export default function LoginPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              Se connecter avec Google
+              {t.auth.login.googleButton}
             </span>
           )}
         </Button>
 
         {/* Footer link */}
         <p className="text-center text-sm text-[var(--text-2)] mt-6">
-          Pas encore de compte ?{' '}
+          {t.auth.login.linkToSignup}{' '}
           <Link
             href="/signup"
             className="text-[var(--accent)] hover:text-[var(--accent-hi)] transition-colors duration-150 font-medium"
           >
-            Créer un compte
+            {t.auth.login.linkToSignupAction}
           </Link>
         </p>
       </motion.div>

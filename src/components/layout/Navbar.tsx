@@ -5,18 +5,18 @@ import { Menu, X, LogOut, User, ChevronDown, LayoutDashboard } from 'lucide-reac
 import Link from 'next/link'
 import { getSession, signOut, type AuthUser } from '@/lib/auth'
 import UserProfileModal from '@/components/dashboard/UserProfileModal'
-
-const navLinks = [
-  { label: 'Métriques', href: '#metrics' },
-  { label: 'Tarifs', href: '#pricing' },
-  { label: 'À propos', href: '#about' },
-]
+import { useLocale } from '@/providers/LocaleProvider'
+import { getTranslations } from '@/lib/i18n'
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher'
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+
+  const { locale } = useLocale()
+  const t = getTranslations(locale)
 
   useEffect(() => {
     getSession().then(setUser).catch(() => setUser(null))
@@ -28,6 +28,12 @@ export default function Navbar() {
     setUserMenuOpen(false)
     window.location.href = '/'
   }
+
+  const navLinks = [
+    { label: t.nav.metrics, href: '#metrics' },
+    { label: t.nav.pricing, href: '#pricing' },
+    { label: t.nav.about, href: '#about' },
+  ]
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-14 glass-nav">
@@ -70,8 +76,10 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Right zone: Auth actions */}
-        <div className="hidden md:flex flex-1 items-center justify-end">
+        {/* Right zone: LanguageSwitcher + Auth actions */}
+        <div className="hidden md:flex flex-1 items-center justify-end gap-2">
+          <LanguageSwitcher />
+
           {user ? (
             <div className="relative">
               <button
@@ -105,7 +113,7 @@ export default function Navbar() {
                       className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
                     >
                       <LayoutDashboard size={13} strokeWidth={1.5} className="shrink-0" />
-                      Dashboard
+                      {t.nav.dashboard}
                     </Link>
                     <button
                       onClick={() => {
@@ -115,14 +123,14 @@ export default function Navbar() {
                       className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--text-2)] hover:bg-white/[0.05] hover:text-[var(--text-1)] transition-colors whitespace-nowrap"
                     >
                       <User size={13} strokeWidth={1.5} className="shrink-0" />
-                      Mon profil
+                      {t.nav.myProfile}
                     </button>
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center justify-start gap-2.5 px-3 h-8 text-sm text-[var(--red)] hover:bg-[var(--red)]/10 transition-colors whitespace-nowrap"
                     >
                       <LogOut size={13} strokeWidth={1.5} className="shrink-0" />
-                      Se déconnecter
+                      {t.nav.signOut}
                     </button>
                   </div>
                 </>
@@ -134,13 +142,13 @@ export default function Navbar() {
                 href="/login"
                 className="h-8 px-4 flex items-center justify-center rounded-full border border-[var(--border-md)] text-[var(--text-2)] hover:text-[var(--text-1)] hover:border-[var(--border-hi)] hover:bg-white/[0.04] transition-all duration-150 text-sm font-medium"
               >
-                Connexion
+                {t.nav.login}
               </Link>
               <Link
                 href="#pricing"
                 className="h-8 px-4 flex items-center justify-center rounded-full text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] hover:scale-[1.02] transition-all duration-200 shadow-[0_0_16px_rgba(242,203,56,0.25)] hover:shadow-[0_0_24px_rgba(242,203,56,0.40)]"
               >
-                Commencer
+                {t.nav.start}
               </Link>
             </div>
           )}
@@ -150,7 +158,7 @@ export default function Navbar() {
         <button
           className="md:hidden w-8 h-8 flex items-center justify-center text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors"
           onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-label={mobileOpen ? t.nav.closeMenu : t.nav.openMenu}
         >
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -175,6 +183,9 @@ export default function Navbar() {
             </a>
           ))}
           <div className="h-px bg-[var(--border)] my-1" />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+          </div>
           {user ? (
             <>
               <Link
@@ -183,14 +194,14 @@ export default function Navbar() {
                 className="mt-2 h-9 px-4 flex items-center justify-center gap-2 rounded-lg text-sm font-medium border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] transition-colors"
               >
                 <LayoutDashboard size={14} strokeWidth={1.5} />
-                Dashboard
+                {t.nav.dashboard}
               </Link>
               <button
                 onClick={() => { handleSignOut(); setMobileOpen(false) }}
                 className="h-9 px-4 flex items-center justify-center gap-2 rounded-lg text-sm font-medium border border-[var(--red)]/25 bg-[var(--red)]/[0.06] hover:bg-[var(--red)]/10 text-[var(--red)] transition-colors"
               >
                 <LogOut size={14} strokeWidth={1.5} />
-                Se déconnecter
+                {t.nav.signOut}
               </button>
             </>
           ) : (
@@ -200,14 +211,14 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium border border-[var(--border-md)] text-[var(--text-2)] hover:text-[var(--text-1)] hover:bg-white/[0.04] transition-colors"
               >
-                Connexion
+                {t.nav.login}
               </Link>
               <Link
                 href="#pricing"
                 onClick={() => setMobileOpen(false)}
                 className="h-9 px-4 flex items-center justify-center rounded-lg text-sm font-medium bg-[var(--accent)] text-black hover:bg-[var(--accent-hi)] transition-colors"
               >
-                Commencer
+                {t.nav.start}
               </Link>
             </>
           )}
