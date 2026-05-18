@@ -94,70 +94,71 @@ Then open http://localhost:3000 in your browser.
 
 | Variable | Required | Where to find it | Description |
 |----------|----------|------------------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase Dashboard → Project Settings → API → **Project URL** field at the very top | Your Supabase project URL (looks like `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase Dashboard → Project Settings → API → **anon/public** key section | Public key for client-side Supabase access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Server-side key for admin operations |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | For "Sign in with Google" feature |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog Dashboard → Project Settings → Project API Key | Analytics tracking key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` for EU hosting | PostHog server URL |
-| `RESEND_API_KEY` | Yes | Resend Dashboard → API Keys → Create API Key | Email sending API key |
-| `RESEND_FROM_EMAIL` | Yes | Must be a verified domain in Resend Dashboard → Domains | Sender email address |
-| `RESEND_AUDIENCE_ID` | Yes | Resend Dashboard → Audiences → Settings | Email audience ID for contacts |
-| `NEXT_PUBLIC_APP_URL` | Yes | Use `http://localhost:3000` for local dev | Base URL of your app |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram @BotFather after creating a bot | Bot API token for Telegram integration |
-| `TELEGRAM_BOT_SECRET` | No | Your own secret string for HMAC-SHA256 webhook verification | Webhook request signature verification |
-| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username (from @BotFather) | Bot username for display purposes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase Dashboard → Project Settings → API → **service_role** key section | Server-side key — never expose this to the browser |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | No | Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs | Required only if using Sign in with Google |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Yes | PostHog → Project Settings → Project API Key | Analytics tracking key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | Yes | Use `https://eu.i.posthog.com` (EU cloud) or `https://app.posthog.com` (US cloud) | PostHog server endpoint |
+| `RESEND_API_KEY` | Yes | Resend → API Keys → Create key | Email sending API key |
+| `RESEND_FROM_EMAIL` | Yes | Resend → Domains → verify your domain, then use any address from that domain (or use `onboarding@resend.dev` for testing) | Sender email address |
+| `RESEND_AUDIENCE_ID` | No | Resend → Audiences → select your audience → Settings | Email list audience ID |
+| `NEXT_PUBLIC_APP_URL` | Yes | For local dev: `http://localhost:3000` | Base URL of your app (used for unsubscribe links) |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram → talk to [@BotFather](https://t.me/botfather) → create bot → copy token | Telegram bot API token |
+| `TELEGRAM_BOT_SECRET` | No | Your own secret string — any random string works | HMAC secret for verifying webhook requests |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | No | Your Telegram bot's username from BotFather (e.g., `myAwesomeBot`) | Public bot username |
 
 ## 🧪 Running Tests
 
-Unit tests automatically check that individual pieces of code work correctly without needing the full app running.
+Unit tests automatically check that individual pieces of your app work correctly without needing to run the whole application.
 
 Run all tests:
-
 ```bash
 npx jest
 ```
 
 Run a specific test file:
-
 ```bash
 npx jest __tests__/auth.test.ts
 ```
 
-Watch mode (re-runs tests automatically when files change):
-
+Run tests in watch mode (re-runs automatically when you change files):
 ```bash
 npx jest --watch
 ```
 
-**Understanding the output:**
-- `PASS` — All tests in that file passed ✅
-- `FAIL` — Something broke ❌ — check the error message below for which test failed and why
+**Reading the output**: `PASS` means all tests passed ✅. `FAIL` means something broke ❌ — the error message will show exactly which test failed and why.
 
 The test suite covers:
-- `__tests__/auth-validators.test.ts` — Authentication validation logic
-- `__tests__/auth.test.ts` — Authentication flow tests
-- `__tests__/dashboard/formatMetric.test.ts` — Metric formatting utilities
-- `__tests__/lib/dashboard/stats.test.ts` — Dashboard statistics logic
-- `__tests__/lib/utils.test.ts` — General utility functions
-- `__tests__/utils.test.ts` — Common utilities
+- **Auth validators** — validation logic for authentication
+- **Auth functions** — core authentication functionality
+- **Dashboard formatting** — metric display formatting
+- **Dashboard stats** — statistics calculations
+- **Utility functions** — shared helper functions
 
 ## 📁 Project Structure
 
-- `src/components/dashboard` — Dashboard UI components (TournamentSelector, DashboardOverview)
+Only folders with actual source files are listed below.
+
+- `src/contexts` — React context providers for tournament state management
+- `src/components/dashboard` — Dashboard UI components
 
 ## 🚀 Deploy to Vercel
 
-[![Deploy](https://vercel.com/button)](https://vercel.com/new)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 **Step by step:**
 
-1. Click the "Deploy" button above or go to [vercel.com/new](https://vercel.com/new)
+1. Click the button above or go to [vercel.com/new](https://vercel.com/new)
 2. Import your GitHub repository
-3. Add all environment variables from your `.env.local` file in Vercel → Settings → Environment Variables
-4. Click "Deploy"
+3. In Vercel dashboard → Settings → Environment Variables, add all variables from your `.env.local`:
+   - All `NEXT_PUBLIC_*` variables (required for browser)
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `RESEND_API_KEY`
+   - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_SECRET`
+4. Click **Deploy**
 
-> ⚠️ **Important**: Don't forget to add ALL environment variables listed in the table above in your Vercel dashboard, otherwise the app won't work correctly.
+> ⚠️ **Important**: Every variable from your `.env.local` file must be added to Vercel, or the app will break in production.
 
 ## 📝 License
 
