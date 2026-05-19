@@ -69,13 +69,16 @@ export default function DashboardOverview({
   // ── Weather modal state ───────────────────────────────────────────────────
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  function handleOpenWeatherModal(tourneyName: string) {
+  function handleOpenWeatherModal(_tourneyName: string) {
     setIsModalOpen(true)
   }
 
   function handleModalClose() {
     setIsModalOpen(false)
   }
+
+  // ── Consume TournamentContext BEFORE filteredMatches so the hook is called first ──
+  const { selectedTournament } = useTournament()
 
   const tournaments = useMemo(() => {
     const seen = new Set<string>()
@@ -109,9 +112,14 @@ export default function DashboardOverview({
           if (!activeTournaments.includes(m.tournoi ?? '')) return false
         }
       }
+      if (selectedTournament && m.tournoi) {
+        if (m.tournoi.toLowerCase() !== selectedTournament.toLowerCase()) {
+          return false
+        }
+      }
       return true
     })
-  }, [matches, searchQuery, activeFilters, tournaments, favoritesOnly, localFavoriteIds])
+  }, [matches, searchQuery, activeFilters, tournaments, favoritesOnly, localFavoriteIds, selectedTournament])
 
   function toggleFilter(key: string) {
     setActiveFilters((prev) => {
@@ -139,9 +147,6 @@ export default function DashboardOverview({
   const hasActiveFilters =
     activeFilters.size > 0 || searchQuery.trim().length > 0 || favoritesOnly
   const showFavoritesEmpty = favoritesOnly && localFavoriteIds.length === 0
-
-  // Consume context for selectedTournament (used for chip display in filter bar)
-  const { selectedTournament } = useTournament()
 
   return (
     <TournamentProvider initialTournaments={tournamentList}>
@@ -253,7 +258,7 @@ export default function DashboardOverview({
                   {filteredMatches.length}
                 </span>
                 {' match'}
-                {filteredMatches.length !== 1 ? 's' : ''}
+                {filteredMatches.length !== 1 ? 'es' : ''}
               </p>
             </div>
           </div>
