@@ -4,24 +4,36 @@ import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
 import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useForecastModal } from '@/hooks/dashboard/useForecastModal'
+import WeatherForecastModal from './WeatherForecastModal'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
-  onWeatherClick?: (tourneyName: string) => void
 }
 
-export default function StatCardsRow({ todaysStats, onWeatherClick }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats }: StatCardsRowProps) {
+  const { isOpen, selectedTourneyName, openModal, closeModal } = useForecastModal()
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      {/* Card 1 — Matchs du jour */}
-      <Card1 card1={todaysStats?.card1} />
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Card 1 — Matchs du jour */}
+        <Card1 card1={todaysStats?.card1} />
 
-      {/* Card 2 — Météo */}
-      <Card2 card2={todaysStats?.card2} onWeatherClick={onWeatherClick} />
+        {/* Card 2 — Météo */}
+        <Card2 card2={todaysStats?.card2} onForecastClick={openModal} />
 
-      {/* Card 3 — Vitesse de surface */}
-      <Card3 card3={todaysStats?.card3 ?? null} />
-    </div>
+        {/* Card 3 — Vitesse de surface */}
+        <Card3 card3={todaysStats?.card3 ?? null} />
+      </div>
+
+      {/* Single modal instance mounted here — shared across all tournament buttons */}
+      <WeatherForecastModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        tourneyName={selectedTourneyName}
+      />
+    </>
   )
 }
 
@@ -76,7 +88,13 @@ type WeatherCardData = {
 
 type Card2Entry = { name: string; weather: WeatherCardData }
 
-function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeatherClick?: (name: string) => void }) {
+function Card2({
+  card2,
+  onForecastClick,
+}: {
+  card2?: Card2Entry[] | null
+  onForecastClick: (name: string) => void
+}) {
   // State: idle — data not yet loaded (card2 is undefined)
   if (card2 === undefined) {
     return (
@@ -116,14 +134,6 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
         <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
           Météo
         </p>
-        {/* Bouton texte — ouvre la modal météo, visible uniquement quand des données sont disponibles */}
-        <button
-          onClick={() => onWeatherClick?.(card2[0]?.name ?? '')}
-          title="Voir les prévisions horaires"
-          className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
-        >
-          Prévision
-        </button>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -131,12 +141,12 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
           const { name, weather: w } = entry
           return (
             <div key={i} className="flex flex-col gap-2">
-              {/* Tournament name — non cliquable */}
+              {/* Tournament name */}
               <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
                 {name}
               </p>
 
-              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics */}
+              {/* Two-column layout: left = conditions + icon, right = 4 stacked metrics + Forecast button */}
               <div className="flex flex-col sm:flex-row gap-3 min-w-0">
                 {/* Left zone — conditions label + OpenWeatherMap icon */}
                 <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
@@ -156,32 +166,47 @@ function Card2({ card2, onWeatherClick }: { card2?: Card2Entry[] | null; onWeath
                   </p>
                 </div>
 
-                {/* Right zone — 4 stacked metrics */}
+                {/* Right zone — 4 stacked metrics + Forecast button */}
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <WeatherMetric
                     label="Température"
-                    value={w.temperature !== null && w.temperature !== undefined
-                      ? `${w.temperature}°C`
-                      : '—'}
+                    value={
+                      w.temperature !== null && w.temperature !== undefined
+                        ? `${w.temperature}°C`
+                        : '—'
+                    }
                   />
                   <WeatherMetric
                     label="Humidité"
-                    value={w.humidity !== null && w.humidity !== undefined
-                      ? `${w.humidity}%`
-                      : '—'}
+                    value={
+                      w.humidity !== null && w.humidity !== undefined
+                        ? `${w.humidity}%`
+                        : '—'
+                    }
                   />
                   <WeatherMetric
                     label="Vent"
-                    value={w.wind_speed !== null && w.wind_speed !== undefined
-                      ? `${w.wind_speed} km/h`
-                      : '—'}
+                    value={
+                      w.wind_speed !== null && w.wind_speed !== undefined
+                        ? `${w.wind_speed} km/h`
+                        : '—'
+                    }
                   />
                   <WeatherMetric
                     label="POP"
-                    value={w.pop !== null && w.pop !== undefined
-                      ? `${w.pop}%`
-                      : '—'}
+                    value={
+                      w.pop !== null && w.pop !== undefined ? `${w.pop}%` : '—'
+                    }
                   />
+
+                  {/* Forecast button — one per tournament entry */}
+                  <button
+                    onClick={() => onForecastClick(name)}
+                    title="Voir les prévisions horaires"
+                    className="mt-1 h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
+                  >
+                    Prévision
+                  </button>
                 </div>
               </div>
             </div>
@@ -253,17 +278,17 @@ function Card3({ card3 }: { card3?: Card3Entry[] | null }) {
   )
 }
 
-/** Palette hex pour la jauge — indexée par PaceColor */
+/** Palette hex for the gauge — indexed by PaceColor */
 const PACE_COLOR_HEX: Record<string, string> = {
-  blue:   '#3b82f6',
+  blue: '#3b82f6',
   yellow: '#facc15',
-  red:    '#f87171',
+  red: '#f87171',
 }
 
 function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
   const paceIndex = entry.paceIndex
   const displayValue = paceIndex !== null ? paceIndex.toFixed(2) : '—'
-  const paceColor   = paceIndex !== null ? getPaceColor(paceIndex) : 'blue'
+  const paceColor = paceIndex !== null ? getPaceColor(paceIndex) : 'blue'
   const paceCategory = getPaceCategory(paceIndex)
   const colorHex = PACE_COLOR_HEX[paceColor]
 
