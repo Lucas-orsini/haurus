@@ -58,6 +58,16 @@ export type HourlyForecastEntry = {
   pressure?: number | null
 }
 
+/** Props passed to the WeatherForecastModal component. */
+export type ForecastModalProps = {
+  /** Whether the modal is visible. */
+  isOpen: boolean
+  /** Called to close the modal. */
+  onClose: () => void
+  /** Tournament name used to query tournament_weather rows. */
+  tourneyName: string | null
+}
+
 export type TodaysStats = {
   card1: {
     count: number

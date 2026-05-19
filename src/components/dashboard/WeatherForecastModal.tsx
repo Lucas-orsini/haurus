@@ -1,16 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { X, AlertCircle, CloudOff, Droplets, Thermometer, Wind } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { createClient } from '@/lib/supabase/client'
 import type { HourlyForecastEntry } from '@/lib/types/dashboard'
 
 interface WeatherForecastModalProps {
-  tourneyName: string
-  hourlyData: HourlyForecastEntry[]
-  isLoading: boolean
-  error: string | null
+  isOpen: boolean
   onClose: () => void
+  tourneyName: string | null
 }
 
 /** Format hour integer (0-23) to HH:00 string. */
@@ -29,29 +28,127 @@ function iconUrl(iconCode: string | null): string {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`
 }
 
+/** Inline cn utility — avoids import from utils.ts for standalone component */
+function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ')
+}
+
 export default function WeatherForecastModal({
-  tourneyName,
-  hourlyData,
-  isLoading,
-  error,
+  isOpen,
   onClose,
+  tourneyName,
 }: WeatherForecastModalProps) {
-  // ── Keyboard close: Escape ──────────────────────────────────────────────
+  const [hourlyData, setHourlyData] = useState<HourlyForecastEntry[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  /** Track the last fetched tournament to avoid duplicate fetches on re-open. */
+  const lastTourneyRef = useRef<string>('')
+
+  /** Keyboard close: Escape */
   useEffect(() => {
+    if (!isOpen) return
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  }, [isOpen, onClose])
+
+  /** Fetch hourly forecast when the modal opens for a new tournament. */
+  useEffect(() => {
+    if (!isOpen || tourneyName === null) return
+
+    // Skip re-fetch if the same tournament is already loaded.
+    if (lastTourneyRef.current === tourneyName) return
+
+    lastTourneyRef.current = tourneyName
+    setHourlyData([])
+    setError(null)
+    setIsLoading(true)
+
+    async function load() {
+      try {
+        const supabase = createClient()
+        if (!supabase) throw new Error('Client Supabase non disponible')
+
+        // Build today / tomorrow date strings in Europe/Paris timezone.
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Europe/Paris',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
+        const parts = formatter.formatToParts(new Date())
+        const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
+        const today = `${get('year')}-${get('month')}-${get('day')}`
+
+        const tomorrowDate = new Date()
+        tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+        const tomorrow = tomorrowDate.toISOString().slice(0, 10)
+
+        const { data, error: fetchError } = await supabase
+          .from('tournament_weather')
+          .select(
+            'hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date, wind_speed, humidity, pressure, feels_like'
+          )
+          .eq('tourney_name', tourneyName)
+          .in('date', [today, tomorrow])
+          .order('date', { ascending: true })
+          .order('hour', { ascending: true })
+
+        if (fetchError) throw fetchError
+
+        // Map raw rows to HourlyForecastEntry with dayOffset computed.
+        const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
+          hour: row.hour as number,
+          rain_mm_h: (row.rain_mm_h as number) ?? null,
+          temperature: (row.temperature as number) ?? null,
+          pop: (row.pop as number) ?? null,
+          conditions_icon: (row.conditions_icon as string) ?? null,
+          conditions: (row.conditions as string) ?? null,
+          dayOffset: (row.date as string) === today ? (0 as const) : (1 as const),
+          date: (row.date as string) ?? null,
+          wind_speed: (row.wind_speed as number) ?? null,
+          humidity: (row.humidity as number) ?? null,
+          pressure: (row.pressure as number) ?? null,
+          feels_like: (row.feels_like as number) ?? null,
+        }))
+
+        // Filter to the next 24-hour window from now.
+        const now = new Date()
+        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+        const windowEntries = entries.filter((e) => {
+          const entryDate = new Date(
+            e.dayOffset === 0
+              ? `${today}T${String(e.hour).padStart(2, '0')}:00:00`
+              : `${tomorrow}T${String(e.hour).padStart(2, '0')}:00:00`
+          )
+          return entryDate >= now && entryDate < cutoff
+        })
+
+        setHourlyData(windowEntries.slice(0, 24))
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Échec du chargement des prévisions météo.'
+        )
+        setHourlyData([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    load()
+  }, [isOpen, tourneyName])
 
   // ── Derived values for bar chart ───────────────────────────────────────
   const rainValues = hourlyData.map((h) => h.rain_mm_h ?? 0)
-  const maxRain = Math.max(...rainValues, 0.1) // ≥ 0.1 so chart never empties
-  const midRain = Math.round(maxRain / 2)
-
+  const maxRain = Math.max(...rainValues, 0.1)
   const hasRain = hourlyData.some((h) => (h.rain_mm_h ?? 0) > 0)
   const hourlyCount = hourlyData.length
+
+  // No render if modal is not open.
+  if (!isOpen) return null
 
   return (
     <AnimatePresence>
@@ -65,7 +162,7 @@ export default function WeatherForecastModal({
         onClick={onClose}
         aria-modal="true"
         role="dialog"
-        aria-label={`Prévisions météo pour ${tourneyName}`}
+        aria-label={`Prévisions météo pour ${tourneyName ?? ''}`}
       >
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -84,10 +181,10 @@ export default function WeatherForecastModal({
           <div className="flex items-center justify-between shrink-0 px-5 py-4 border-b border-[var(--border-md)]">
             <div className="flex flex-col min-w-0 mr-4">
               <h2 className="text-sm font-semibold text-[var(--text-1)] truncate">
-                {tourneyName}
+                {tourneyName ?? ''}
               </h2>
               <p className="text-[11px] text-[var(--text-3)] mt-0.5">
-                Prévisions horaires · aujourd&apos;hui
+                Prévisions horaires · aujourd&apos;hui et demain
               </p>
             </div>
             <button
@@ -134,9 +231,76 @@ export default function WeatherForecastModal({
                   <AlertCircle size={18} className="text-[var(--red)]" strokeWidth={1.5} />
                 </div>
                 <p className="text-sm font-medium text-[var(--text-2)]">{error}</p>
-                <p className="text-xs text-[var(--text-3)]">
-                  Réessayez en cliquant à nouveau sur le tournoi.
-                </p>
+                <button
+                  onClick={() => {
+                    // Re-trigger by toggling lastRef so the useEffect re-fires.
+                    lastTourneyRef.current = ''
+                    // Force a re-render to re-trigger the effect.
+                    setHourlyData([])
+                    setError(null)
+                    setIsLoading(true)
+                    // Directly re-call the fetch logic inline.
+                    const supabase = createClient()
+                    if (!supabase) return
+                    const formatter = new Intl.DateTimeFormat('en-CA', {
+                      timeZone: 'Europe/Paris',
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })
+                    const parts = formatter.formatToParts(new Date())
+                    const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '01'
+                    const today = `${get('year')}-${get('month')}-${get('day')}`
+                    const tomorrowDate = new Date()
+                    tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+                    const tomorrow = tomorrowDate.toISOString().slice(0, 10)
+                    supabase
+                      .from('tournament_weather')
+                      .select(
+                        'hour, rain_mm_h, temperature, pop, conditions_icon, conditions, date, wind_speed, humidity, pressure, feels_like'
+                      )
+                      .eq('tourney_name', tourneyName ?? '')
+                      .in('date', [today, tomorrow])
+                      .order('date', { ascending: true })
+                      .order('hour', { ascending: true })
+                      .then(({ data, error: fetchError }) => {
+                        if (fetchError) {
+                          setError(fetchError.message)
+                          setIsLoading(false)
+                          return
+                        }
+                        const entries: HourlyForecastEntry[] = (data ?? []).map((row) => ({
+                          hour: row.hour as number,
+                          rain_mm_h: (row.rain_mm_h as number) ?? null,
+                          temperature: (row.temperature as number) ?? null,
+                          pop: (row.pop as number) ?? null,
+                          conditions_icon: (row.conditions_icon as string) ?? null,
+                          conditions: (row.conditions as string) ?? null,
+                          dayOffset: (row.date as string) === today ? (0 as const) : (1 as const),
+                          date: (row.date as string) ?? null,
+                          wind_speed: (row.wind_speed as number) ?? null,
+                          humidity: (row.humidity as number) ?? null,
+                          pressure: (row.pressure as number) ?? null,
+                          feels_like: (row.feels_like as number) ?? null,
+                        }))
+                        const now = new Date()
+                        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+                        const windowEntries = entries.filter((e) => {
+                          const entryDate = new Date(
+                            e.dayOffset === 0
+                              ? `${today}T${String(e.hour).padStart(2, '0')}:00:00`
+                              : `${tomorrow}T${String(e.hour).padStart(2, '0')}:00:00`
+                          )
+                          return entryDate >= now && entryDate < cutoff
+                        })
+                        setHourlyData(windowEntries.slice(0, 24))
+                        setIsLoading(false)
+                      })
+                  }}
+                  className="h-8 px-4 flex items-center justify-center gap-1.5 rounded-md border border-[var(--border-md)] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-2)] text-xs font-medium transition-colors duration-150"
+                >
+                  Réessayer
+                </button>
               </div>
             )}
 
@@ -155,7 +319,7 @@ export default function WeatherForecastModal({
               </div>
             )}
 
-            {/* Success state — content */}
+            {/* Success state */}
             {!isLoading && !error && hourlyData.length > 0 && (
               <div className="p-5 flex flex-col gap-6">
                 {/* ── Rain bar chart ───────────────────────────────── */}
@@ -172,11 +336,7 @@ export default function WeatherForecastModal({
                     )}
                   </div>
 
-                  {/*
-                   * Scroll container : bars + Y-axis right inside (stays aligned on scroll)
-                   */}
                   <div className="flex items-end gap-2">
-                    {/* Conteneur scrollable — Y-axis droite inside pour rester alignée au scroll */}
                     <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3 flex-1">
                       <div className="flex items-end gap-1 min-w-max">
                         {hourlyData.map((hour, idx) => {
@@ -190,7 +350,6 @@ export default function WeatherForecastModal({
                               className="flex flex-col items-center gap-0.5 w-12 shrink-0"
                               title={`${formatHour(hour.hour)}: ${rain.toFixed(2)} mm/h`}
                             >
-                              {/* Rain bar with fixed-height wrapper so +1j badge never shifts bar height */}
                               <div className="relative w-full flex flex-col items-center justify-end h-[88px]">
                                 {rain > 0 ? (
                                   <div
@@ -201,12 +360,11 @@ export default function WeatherForecastModal({
                                         rain > maxRain * 0.7
                                           ? 'var(--accent)'
                                           : rain > maxRain * 0.3
-                                          ? 'var(--accent-muted)'
-                                          : 'rgba(242,203,56,0.35)',
+                                            ? 'var(--accent-muted)'
+                                            : 'rgba(242,203,56,0.35)',
                                       minHeight: '4px',
                                     }}
                                   >
-                                    {/* Label inside bar if tall enough */}
                                     {heightPct > 25 && (
                                       <span className="absolute inset-x-0 top-1 flex justify-center">
                                         <span className="text-[9px] font-medium text-[var(--accent-hi)] tabular-nums leading-none">
@@ -220,7 +378,6 @@ export default function WeatherForecastModal({
                                 )}
                               </div>
 
-                              {/* X-axis hour label + day offset badge — flex-col justify-end forces baseline alignment */}
                               <div className="flex flex-col items-center justify-end h-[28px]">
                                 <span className="text-[10px] text-[var(--text-3)] tabular-nums font-mono leading-none">
                                   {formatHourChart(hour.hour)}
@@ -234,7 +391,6 @@ export default function WeatherForecastModal({
                             </div>
                           )
                         })}
-
                       </div>
                     </div>
                   </div>
@@ -331,9 +487,4 @@ export default function WeatherForecastModal({
       </motion.div>
     </AnimatePresence>
   )
-}
-
-/** cn utility — inline for this standalone component */
-function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ')
 }
