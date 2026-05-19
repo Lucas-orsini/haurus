@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Check, CalendarX } from 'lucide-react'
+import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTournament } from '@/contexts/TournamentContext'
 
@@ -40,14 +40,7 @@ export default function TournamentSelector({ onSelect }: TournamentSelectorProps
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  if (tournaments.length === 0) {
-    return (
-      <div className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-[var(--border-md)] bg-[var(--surface-1)] text-[var(--text-3)] text-[11px]">
-        <CalendarX size={11} strokeWidth={1.5} className="shrink-0" />
-        <span>Aucun tournoi aujourd'hui</span>
-      </div>
-    )
-  }
+  if (tournaments.length === 0) return null
 
   // selectedTournament is a string; tournaments is string[]
   // Match by value equality (not object property)
