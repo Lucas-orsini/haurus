@@ -1,30 +1,41 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import { cn, getPaceColor, getPaceCategory } from '@/lib/utils'
-import type { TodaysStats, WeatherCardData } from '@/lib/types/dashboard'
+import type { TodaysStats } from '@/lib/types/dashboard'
 import { CalendarDays, TrendingUp, Cloud } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { normalizeTournamentName } from '@/lib/dashboard/stats'
 import { useTournament } from '@/contexts/TournamentContext'
-import { useTournamentWeather } from '@/hooks/useTournamentWeather'
-import { createClient } from '@/lib/supabase/client'
 
 interface StatCardsRowProps {
   todaysStats?: TodaysStats
-  onOpenModal?: (tourneyName: string) => void
+  onWeatherClick?: (tourneyName: string) => void
+  /** Filter stat cards to show only this tournament's data. Null = show all. */
+  selectedTournament?: string | null
 }
 
-export default function StatCardsRow({ todaysStats, onOpenModal }: StatCardsRowProps) {
+export default function StatCardsRow({ todaysStats, onWeatherClick, selectedTournament }: StatCardsRowProps) {
+  const { tournaments } = useTournament()
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* Card 1 — Matchs du jour */}
       <Card1 card1={todaysStats?.card1} />
 
-      {/* Card 2 — Météo (autonome — fetch via hook) */}
-      <Card2 onOpenModal={onOpenModal} />
+      {/* Card 2 — Météo */}
+      <Card2
+        card2={todaysStats?.card2}
+        onWeatherClick={onWeatherClick}
+        selectedTournament={selectedTournament}
+        normalizeTournamentName={normalizeTournamentName}
+      />
 
-      {/* Card 3 — Vitesse de surface (autonome — fetch via useEffect) */}
-      <Card3 />
+      {/* Card 3 — Vitesse de surface */}
+      <Card3
+        card3={todaysStats?.card3 ?? null}
+        selectedTournament={selectedTournament}
+        normalizeTournamentName={normalizeTournamentName}
+      />
     </div>
   )
 }
@@ -69,28 +80,73 @@ function Card1({ card1 }: { card1?: TodaysStats['card1'] }) {
   )
 }
 
-/** Card 2 — Météo
- *
- * Autonome : lit selectedTournament depuis TournamentContext, fetch
- * via useTournamentWeather, et ouvre la modal de prévisions horaires.
- */
-function Card2({ onOpenModal }: { onOpenModal?: (name: string) => void }) {
-  const { selectedTournament } = useTournament()
+type WeatherCardData = {
+  temperature: number | null
+  humidity: number | null
+  wind_speed: number | null
+  pop: number | null
+  conditions: string | null
+  conditions_icon: string | null
+}
 
-  const { hourlyData, isLoading, error } = useTournamentWeather({
-    tourneyName: selectedTournament,
-  })
+type Card2Entry = { name: string; weather: WeatherCardData }
 
-  // Afficher la condition la plus récente (heure la plus proche de maintenant)
-  const latestEntry = hourlyData.length > 0 ? hourlyData[0] : null
-  const hasData = !isLoading && !error && hourlyData.length > 0
+function Card2({
+  card2,
+  onWeatherClick,
+  selectedTournament,
+  normalizeTournamentName,
+}: {
+  card2?: Card2Entry[] | null
+  onWeatherClick?: (name: string) => void
+  selectedTournament?: string | null
+  normalizeTournamentName: (name: string) => string
+}) {
+  // Apply tournament filter using normalized name soft-matching.
+  // Handles mismatch between DB formats (e.g., "ATP Rome Masters, Italy" vs "Rome").
+  const filteredEntries = selectedTournament
+    ? (card2 ?? []).filter((entry) => {
+        const normalizedSelected = normalizeTournamentName(selectedTournament)
+        const normalizedEntry = normalizeTournamentName(entry.name)
+        return (
+          normalizedEntry.includes(normalizedSelected) ||
+          normalizedSelected.includes(normalizedEntry)
+        )
+      })
+    : card2 ?? []
 
-  const handleOpenModal = () => {
-    if (selectedTournament) {
-      onOpenModal?.(selectedTournament)
-    }
+  // State: idle — data not yet loaded (card2 is undefined)
+  if (card2 === undefined) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Météo
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+      </div>
+    )
   }
 
+  // State: empty — no active tournament today or filtered result is empty
+  if (!card2 || card2.length === 0 || filteredEntries.length === 0) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <Cloud size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Météo
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">—</p>
+        <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
+      </div>
+    )
+  }
+
+  // State: success — render filtered weather blocks
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
       <div className="flex items-center gap-2 mb-3">
@@ -99,102 +155,72 @@ function Card2({ onOpenModal }: { onOpenModal?: (name: string) => void }) {
           Météo
         </p>
         <button
-          onClick={handleOpenModal}
-          disabled={!selectedTournament || (!hasData && !isLoading)}
+          onClick={() => onWeatherClick?.(filteredEntries[0]?.name ?? '')}
           title="Voir les prévisions horaires"
-          className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="ml-auto h-7 px-3 flex items-center justify-center gap-1.5 rounded-md text-[11px] font-medium text-[var(--text-2)] border border-[var(--border-md)] bg-[var(--surface-2)] hover:text-[var(--accent-hi)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50"
         >
           Prévision
         </button>
       </div>
 
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <div className="h-3 bg-[var(--border-md)] rounded animate-pulse w-24" />
-          <div className="flex gap-3">
-            <div className="w-10 h-10 bg-[var(--border-md)] rounded animate-pulse" />
-            <div className="flex-1 flex flex-col gap-1.5">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-3 bg-[var(--border-md)] rounded animate-pulse" style={{ width: `${60 + i * 10}%` }} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Error state */}
-      {!isLoading && error && (
-        <p className="text-sm text-[var(--red)]">Erreur</p>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && !error && !hasData && (
-        <>
-          <p className="text-sm text-[var(--text-3)]">—</p>
-          <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
-        </>
-      )}
-
-      {/* Success — current conditions */}
-      {hasData && latestEntry && (
-        <div className="flex flex-col gap-2">
-          {selectedTournament && (
-            <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
-              {selectedTournament}
-            </p>
-          )}
-
-          <div className="flex flex-col sm:flex-row gap-3 min-w-0">
-            {/* Weather icon */}
-            <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
-              {latestEntry.conditions_icon ? (
-                <img
-                  src={`https://openweathermap.org/img/wn/${latestEntry.conditions_icon}@2x.png`}
-                  alt={latestEntry.conditions ?? 'Conditions météo'}
-                  className="w-10 h-10 object-contain"
-                  onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                />
-              ) : (
-                <span className="text-sm text-[var(--text-3)] text-center leading-tight">
-                  {latestEntry.conditions ?? '—'}
-                </span>
-              )}
-              <p className="text-[10px] text-[var(--text-3)] text-center leading-tight">
-                {latestEntry.conditions ?? '—'}
+      <div className="flex flex-col gap-4">
+        {filteredEntries.map((entry, i) => {
+          const { name, weather: w } = entry
+          return (
+            <div key={i} className="flex flex-col gap-2">
+              <p className="text-[11px] text-[var(--text-2)] font-medium truncate">
+                {name}
               </p>
-            </div>
 
-            {/* Metrics */}
-            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-              <WeatherMetric
-                label="Température"
-                value={latestEntry.temperature !== null && latestEntry.temperature !== undefined
-                  ? `${latestEntry.temperature}°C`
-                  : '—'}
-              />
-              <WeatherMetric
-                label="Humidité"
-                value={latestEntry.humidity !== null && latestEntry.humidity !== undefined
-                  ? `${latestEntry.humidity}%`
-                  : '—'}
-              />
-              <WeatherMetric
-                label="Vent"
-                value={latestEntry.wind_speed !== null && latestEntry.wind_speed !== undefined
-                  ? `${latestEntry.wind_speed} km/h`
-                  : '—'}
-              />
-              <WeatherMetric
-                label="POP"
-                value={latestEntry.pop !== null && latestEntry.pop !== undefined
-                  ? `${latestEntry.pop}%`
-                  : '—'}
-              />
+              <div className="flex flex-col sm:flex-row gap-3 min-w-0">
+                <div className="flex flex-col items-center justify-center gap-1.5 shrink-0 sm:w-24">
+                  {w.conditions_icon ? (
+                    <img
+                      src={`https://openweathermap.org/img/wn/${w.conditions_icon}@2x.png`}
+                      alt={w.conditions ?? 'Conditions météo'}
+                      className="w-10 h-10 object-contain"
+                    />
+                  ) : (
+                    <span className="text-sm text-[var(--text-3)] text-center leading-tight">
+                      {w.conditions ?? '—'}
+                    </span>
+                  )}
+                  <p className="text-[10px] text-[var(--text-3)] text-center leading-tight">
+                    {w.conditions ?? '—'}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                  <WeatherMetric
+                    label="Température"
+                    value={w.temperature !== null && w.temperature !== undefined
+                      ? `${w.temperature}°C`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="Humidité"
+                    value={w.humidity !== null && w.humidity !== undefined
+                      ? `${w.humidity}%`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="Vent"
+                    value={w.wind_speed !== null && w.wind_speed !== undefined
+                      ? `${w.wind_speed} km/h`
+                      : '—'}
+                  />
+                  <WeatherMetric
+                    label="POP"
+                    value={w.pop !== null && w.pop !== undefined
+                      ? `${w.pop}%`
+                      : '—'}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -212,79 +238,57 @@ function WeatherMetric({ label, value }: { label: string; value: string }) {
   )
 }
 
-/** Card 3 — Vitesse de surface
- *
- * Autonome : lit selectedTournament depuis TournamentContext,
- * fetch direct via createClient sur tournament_pace filtré par tourney_name exact.
- */
-function Card3() {
-  const { selectedTournament } = useTournament()
+type Card3Entry = { name: string; surface: string; paceIndex: number | null }
 
-  const [paceData, setPaceData] = useState<Array<{ name: string; surface: string; paceIndex: number | null }> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+function Card3({
+  card3,
+  selectedTournament,
+  normalizeTournamentName,
+}: {
+  card3?: Card3Entry[] | null
+  selectedTournament?: string | null
+  normalizeTournamentName: (name: string) => string
+}) {
+  // Apply tournament filter using normalized name soft-matching.
+  // Handles format mismatch between match_stats tournament names and tournament_pace names.
+  const filteredEntries = selectedTournament
+    ? (card3 ?? []).filter((entry) => {
+        const normalizedSelected = normalizeTournamentName(selectedTournament)
+        const normalizedEntry = normalizeTournamentName(entry.name)
+        return (
+          normalizedEntry.includes(normalizedSelected) ||
+          normalizedSelected.includes(normalizedEntry)
+        )
+      })
+    : card3 ?? []
 
-  // Ref pour éviter les race conditions — ignore les réponses périmées
-  const tourneyRef = useRef<string | null>(null)
+  if (card3 === undefined) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Vitesse de surface
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
+      </div>
+    )
+  }
 
-  useEffect(() => {
-    if (!selectedTournament) {
-      setPaceData(null)
-      setError(null)
-      return
-    }
-
-    tourneyRef.current = selectedTournament
-    setIsLoading(true)
-    setError(null)
-
-    async function fetchPace() {
-      const supabase = createClient()
-      if (!supabase) {
-        setError('Client Supabase non disponible')
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        // Exact match sur tourney_name comme spécifié dans les contrats
-        const { data, error: dbError } = await supabase
-          .from('tournament_pace')
-          .select('tourney_name, surface, pace_index')
-          .eq('tourney_name', selectedTournament)
-
-        if (dbError) throw dbError
-
-        // Ignore la réponse si le tournoi a changé entre-temps (race condition cleanup)
-        if (tourneyRef.current !== selectedTournament) return
-
-        if (!data || data.length === 0) {
-          setPaceData([])
-          setIsLoading(false)
-          return
-        }
-
-        // Une ligne par surface — grouper par tourney_name (une seule ligne en théorie)
-        const entries = data.map(row => ({
-          name: row.tourney_name as string,
-          surface: row.surface as string,
-          paceIndex: (row.pace_index as number) ?? null,
-        }))
-
-        setPaceData(entries)
-      } catch (err) {
-        if (tourneyRef.current !== selectedTournament) return
-        setError(err instanceof Error ? err.message : 'Échec du chargement des données pace.')
-        setPaceData(null)
-      } finally {
-        if (tourneyRef.current === selectedTournament) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchPace()
-  }, [selectedTournament])
+  if (card3 === null || card3.length === 0 || filteredEntries.length === 0) {
+    return (
+      <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp size={13} strokeWidth={1.5} className="text-[var(--text-3)] shrink-0" />
+          <p className="text-xs font-medium text-[var(--text-3)] uppercase tracking-wider">
+            Vitesse de surface
+          </p>
+        </div>
+        <p className="text-sm text-[var(--text-3)]">—</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 rounded-lg border border-[var(--border-md)] bg-[var(--surface-1)]">
@@ -294,39 +298,11 @@ function Card3() {
           Vitesse de surface
         </p>
       </div>
-
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className="flex flex-col gap-4">
-          <div className="h-3 bg-[var(--border-md)] rounded animate-pulse w-24" />
-          <div className="h-8 bg-[var(--border-md)] rounded animate-pulse w-20" />
-          <div className="h-[10px] bg-[var(--surface-3)] rounded-full animate-pulse" />
-        </div>
-      )}
-
-      {/* Error state */}
-      {!isLoading && error && (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm text-[var(--text-3)]">Données indisponibles</p>
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && !error && (!paceData || paceData.length === 0) && (
-        <>
-          <p className="text-sm text-[var(--text-3)]">—</p>
-          <p className="text-[11px] text-[var(--text-3)] mt-0.5">Aucun tournoi actif</p>
-        </>
-      )}
-
-      {/* Success */}
-      {!isLoading && !error && paceData && paceData.length > 0 && (
-        <div className="flex flex-col gap-4">
-          {paceData.map((entry, i) => (
-            <GaugeEntry key={i} entry={entry} index={i} />
-          ))}
-        </div>
-      )}
+      <div className="flex flex-col gap-4">
+        {filteredEntries.map((entry, i) => (
+          <GaugeEntry key={i} entry={entry} index={i} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -338,7 +314,7 @@ const PACE_COLOR_HEX: Record<string, string> = {
   red:    '#f87171',
 }
 
-function GaugeEntry({ entry, index }: { entry: { name: string; surface: string; paceIndex: number | null }; index: number }) {
+function GaugeEntry({ entry, index }: { entry: Card3Entry; index: number }) {
   const paceIndex = entry.paceIndex
   const displayValue = paceIndex !== null ? paceIndex.toFixed(2) : '—'
   const paceColor   = paceIndex !== null ? getPaceColor(paceIndex) : 'blue'
