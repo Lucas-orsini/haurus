@@ -115,7 +115,7 @@ function buildCard3(
   if (paceRows === null) return null
 
   // Build the ordered list: one entry per tournament, paceIndex resolved via
-  // bidirectional contains-matching on normalized names + surface equality (case-insensitive)
+  // bidirectional contains-matching on normalized names + surface equality
   const card3 = tournaments.map(({ name, surface }) => {
     const normalizedName = normalizeTournamentName(name)
 
@@ -222,10 +222,7 @@ export async function computeTodaysStats(
   const tournaments = extractTournaments(todaysMatches)
 
   // ── Card 3: tournament_pace ──────────────────────────────────────────────
-  //
-  // SELECT pace_index (NOT surface_speed — the column does not exist in DB)
-  // Surface matching uses .toLowerCase() on both sides, which aligns with the
-  // existing idx_tournament_pace_lower_name_surface index that uses lower().
+
   const { data: paceData, error: paceError } = await supabase
     .from('tournament_pace')
     .select('tourney_name, surface, pace_index')

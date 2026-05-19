@@ -49,14 +49,12 @@ export default function TournamentSelector({ onSelect }: TournamentSelectorProps
     )
   }
 
-  // selectedTournament is null = "show all" sentinel.
-  // Fallback to null so the button displays a neutral placeholder, not a
-  // spurious first-item pre-selection. The selector shows "Tous les tournois"
-  // until the user explicitly picks a tournament.
+  // selectedTournament is a string; tournaments is string[]
+  // Match by value equality (not object property)
   const selected =
     selectedTournament && tournaments.includes(selectedTournament)
       ? selectedTournament
-      : null
+      : tournaments[0]
 
   return (
     <div ref={ref} className="relative">
